@@ -2,41 +2,32 @@
 
 namespace MoneyTransfer.DataAccess
 {
-    public class Transfer
+    public class Transfer(int id, DateOnly dateCreated, decimal amount, 
+        string transferStatus, string transferType, string userToName, 
+        string userFromName)
     {
         [Key]
         [Required(ErrorMessage = "Transfer Id is required.")]
-        public int Id { get; }
+        public int Id { get; } = id;
 
         [Required(ErrorMessage = "Transfer Date Created is required.")]
-        public DateOnly DateCreated { get; }
+        public DateOnly DateCreated { get; } = dateCreated;
 
         [Required(ErrorMessage = "Transfer Amount is required.")]
-        public decimal Amount { get; }
+        public decimal Amount { get; } = amount;
 
         [Required(ErrorMessage = "Transfer Status is required.")]
-        public string TransferStatus { get; } = string.Empty;
+        public string TransferStatus { get; } = transferStatus;
 
         [Required(ErrorMessage = "Transfer Type is required.")]
-        public string TransferType { get; } = string.Empty;
+        public string TransferType { get; } = transferType;
 
         [Required(ErrorMessage = "Transfer User To Name is required.")]
-        public string UserToName { get; } = string.Empty;
+        public string UserToName { get; } = userToName;
 
         [Required(ErrorMessage = "Transfer User From Name is required.")]
-        public string UserFromName { get; } = string.Empty;
+        public string UserFromName { get; } = userFromName;
 
-        public Transfer(int id, DateOnly dateCreated, decimal amount, string transferStatus, string transferType, string userToName, string userFromName)
-        {
-            Id = id;
-            DateCreated = dateCreated;
-            Amount = amount;
-            TransferStatus = transferStatus;
-            TransferType = transferType;
-            UserToName = userToName;
-            UserFromName = userFromName;
-        }
-        
-        public static Transfer NotFound = new Transfer(id: 0, dateCreated: DateOnly.MinValue, amount: 0M, transferStatus: "not found", transferType: "not found", userFromName: "not found", userToName: "not found");
+        public static readonly Transfer NotFound = new(id: 0, dateCreated: DateOnly.MinValue, amount: 0M, transferStatus: "not found", transferType: "not found", userFromName: "not found", userToName: "not found");
     }
 }

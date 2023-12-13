@@ -7,7 +7,7 @@ namespace MoneyTransfer.DataAccess
     {
         public MoneyTransferContext()
         {
-            
+
         }
 
         public MoneyTransferContext(DbContextOptions<MoneyTransferContext> options)
@@ -23,11 +23,9 @@ namespace MoneyTransfer.DataAccess
         {
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+        protected override void OnModelCreating(ModelBuilder modelBuilder) =>
             OnModelCreatingPartial(modelBuilder);
-        }
-        
+
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
         public void ApproveTransferRequest(int transferId) =>
@@ -52,7 +50,7 @@ namespace MoneyTransfer.DataAccess
         public Transfer GetTransferDetails(int transferId) =>
             Transfers
             .FromSql($"GetTransferDetails {transferId}")
-            .SingleOrDefault(Transfer.NotFound);        
+            .SingleOrDefault(Transfer.NotFound);
 
         public void RejectTransferRequest(int transferId) =>
             Database.ExecuteSqlRaw("dbo.RejectTransferRequest @transferId int",
@@ -62,8 +60,8 @@ namespace MoneyTransfer.DataAccess
             string userToName, decimal amount) =>
                 Database.ExecuteSqlRaw("dbo.SendTransfer @userFromName varchar(50), @userToName varchar(50), @amount decimal", new SqlParameter("@userFromName", userFromName), new SqlParameter("@userToName", userToName), new SqlParameter("@amount", amount));
 
-        public void SendTransfer(string userFromName, 
-            string userToName, decimal amount) => 
+        public void SendTransfer(string userFromName,
+            string userToName, decimal amount) =>
                 Database.ExecuteSqlRaw("dbo.SendTransfer @userFromName varchar(50), @userToName varchar(50), @amount decimal", new SqlParameter("@userFromName", userFromName), new SqlParameter("@userToName", userToName), new SqlParameter("@amount", amount));
     }
 }
