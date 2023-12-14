@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using MoneyTransfer.DataAccess;
+using MoneyTransfer.API.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 

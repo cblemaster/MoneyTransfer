@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
-namespace MoneyTransfer.DataAccess
+namespace MoneyTransfer.API.DataAccess
 {
     public partial class MoneyTransferContext : DbContext
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MoneyTransfer.DataAccess
+namespace MoneyTransfer.API.DataAccess
 {
     public class Account(int id, string username, decimal balance)
     {
