@@ -6,7 +6,8 @@
 - .NET 8 / C# 12
 - SQL Server database with stored procedures
 - Data access: Class library using EF Core to call stored procedures
-- API: ASP.NET Core 
+- API: ASP.NET Core, minimal API
+- Security: Class library with classes for hashing passwords and generating JWTs
 - Remaining projects TBD
 
 ## Features:
