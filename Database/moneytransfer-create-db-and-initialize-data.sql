@@ -78,11 +78,13 @@ GO
 -- create stored procedures
 CREATE PROCEDURE ApproveTransferRequest @transferId int
 AS
+	SET NOCOUNT ON;
 	UPDATE Transfers SET TransferStatusId = (SELECT ts.Id FROM TransferStatuses ts WHERE ts.TransferStatus = 'Approved') WHERE Id = @transferId;
 GO
 
 CREATE PROCEDURE GetAccountDetailsForUser @username varchar(50)
 AS
+	SET NOCOUNT ON;
 	DECLARE @start_balance decimal;
 	SET @start_balance = (SELECT a.StartingBalance FROM Accounts a WHERE a.UserId = (SELECT u.Id FROM Users u WHERE u.Username = @username));
 
@@ -100,6 +102,7 @@ GO
 
 CREATE PROCEDURE GetCompletedTransfersForUser @username varchar(50)
 AS
+	SET NOCOUNT ON;
 	SELECT t.Id AS 'Transfer Id', t.DateCreated AS 'Transfer Date', t.Amount AS 'Transfer Amount', ts.TransferStatus AS 'Transfer Status', tt.TransferType AS 'Transfer Type', uTo.Username AS 'User To', uFrom.Username AS 'User From'
 	FROM Transfers t
 	INNER JOIN Accounts aTo ON (t.AccountIdTo = aTo.Id)
@@ -114,6 +117,7 @@ GO
 
 CREATE PROCEDURE GetPendingTransfersForUser @username varchar(50)
 AS
+	SET NOCOUNT ON;
 	SELECT t.Id AS 'Transfer Id', t.DateCreated AS 'Transfer Date', t.Amount AS 'Transfer Amount', ts.TransferStatus AS 'Transfer Status', tt.TransferType AS 'Transfer Type', uTo.Username AS 'User To', uFrom.Username AS 'User From'
 	FROM Transfers t
 	INNER JOIN Accounts aTo ON (t.AccountIdTo = aTo.Id)
@@ -128,6 +132,7 @@ GO
 
 CREATE PROCEDURE GetTransferDetails @transferId int
 AS
+	SET NOCOUNT ON;
 	SELECT t.Id AS 'Transfer Id', t.DateCreated AS 'Transfer Date', t.Amount AS 'Transfer Amount', ts.TransferStatus AS 'Transfer Status', tt.TransferType AS 'Transfer Type', uTo.Username AS 'User To', uFrom.Username AS 'User From'
 	FROM Transfers t
 	INNER JOIN Accounts aTo ON (t.AccountIdTo = aTo.Id)
@@ -141,11 +146,13 @@ GO
 
 CREATE PROCEDURE RejectTransferRequest @transferId int
 AS
+	SET NOCOUNT ON;
 	UPDATE Transfers SET TransferStatusId = (SELECT ts.Id FROM TransferStatuses ts WHERE ts.TransferStatus = 'Rejected') WHERE Id = @transferId;
 GO
 
 CREATE PROCEDURE RequestTransfer @userFromName varchar(50), @userToName varchar(50), @amount decimal
 AS
+	SET NOCOUNT ON;
 	INSERT INTO Transfers (AccountIdFrom, AccountIdTo, Amount, TransferStatusId, TransferTypeId, DateCreated) 
 	VALUES ((SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = @userFromName),
 		    (SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = @userToName),
@@ -158,6 +165,7 @@ GO
 
 CREATE PROCEDURE SendTransfer @userFromName varchar(50), @userToName varchar(50), @amount decimal
 AS
+	SET NOCOUNT ON;
 	INSERT INTO Transfers (AccountIdFrom, AccountIdTo, Amount, TransferStatusId, TransferTypeId, DateCreated) 
 	VALUES ((SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = @userFromName),
 			(SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = @userToName),
