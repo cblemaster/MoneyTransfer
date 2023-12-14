@@ -5,49 +5,52 @@ var builder = WebApplication.CreateBuilder(args);
 
 var config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
-            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", 
+                optional: true)
             .Build();
 
-var connectionString = config.GetConnectionString("Project");
+string connectionString = config.GetConnectionString("Project") ?? string.Empty;
 
-builder.Services.AddDbContext<MoneyTransferContext>(options => options.UseSqlServer(connectionString));
+builder.Services
+    .AddTransient<ITransfersAndAccountsDAO>(d => 
+        new TransfersAndAccountsSqlDAO(connectionString));
 
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapGet("/ApproveTransferRequest/{transferId}", ()=>
-    (int transferId, MoneyTransferContext context) =>
-        context.ApproveTransferRequest(transferId));
+app.MapGet("/ApproveTransferRequest/{transferId}", async
+    (int transferId, ITransfersAndAccountsDAO dao) =>
+        await dao.ApproveTransferRequestAsync(transferId));
 
-app.MapGet("/GetAccountDetailsForUser/{username}", () =>
-    (string username, MoneyTransferContext context) =>
-        context.GetAccountDetailsForUser(username));
+app.MapGet("/GetAccountDetailsForUser/{username}", async
+    (string username, ITransfersAndAccountsDAO dao) =>
+        await dao.GetAccountDetailsForUserAsync(username));
 
-app.MapGet("/GetCompletedTransfersForUser/{username}", () =>
-    (string username, MoneyTransferContext context) =>
-        context.GetCompletedTransfersForUser(username));
+app.MapGet("/GetCompletedTransfersForUser/{username}", async
+    (string username, ITransfersAndAccountsDAO dao) =>
+        await dao.GetCompletedTransfersForUserAsync(username));
 
-app.MapGet("/GetPendingTransfersForUser/{username}", () =>
-    (string username, MoneyTransferContext context) =>
-        context.GetPendingTransfersForUser(username));
+app.MapGet("/GetPendingTransfersForUser/{username}", async
+    (string username, ITransfersAndAccountsDAO dao) =>
+        await dao.GetPendingTransfersForUserAsync(username));
 
-app.MapGet("/GetTransferDetails/{transferId}", () =>
-    (int transferId, MoneyTransferContext context) =>
-        context.GetTransferDetails(transferId));
+app.MapGet("/GetTransferDetails/{transferId}", async
+    (int transferId, ITransfersAndAccountsDAO dao) =>
+        await dao.GetTransferDetailsAsync(transferId));
 
-app.MapGet("/RejectTransferRequest/{transferId}", () =>
-    (int transferId, MoneyTransferContext context) =>
-        context.RejectTransferRequest(transferId));
+app.MapGet("/RejectTransferRequest/{transferId}", async
+    (int transferId, ITransfersAndAccountsDAO dao) =>
+        await dao.RejectTransferRequestAsync(transferId));
 
-app.MapGet("/RequestTransfer", () =>
-    (string userFromName, string userToName, decimal amount, 
-        MoneyTransferContext context) =>
-            context.RequestTransfer(userFromName, userToName, amount));
-
-app.MapGet("/SendTransfer", () =>
+app.MapGet("/RequestTransfer", async
     (string userFromName, string userToName, decimal amount,
-        MoneyTransferContext context) =>
-            context.SendTransfer(userFromName, userToName, amount));
+        ITransfersAndAccountsDAO dao) =>
+            await dao.RequestTransferAsync(userFromName, userToName, amount));
+
+app.MapGet("/SendTransfer", async
+    (string userFromName, string userToName, decimal amount,
+        ITransfersAndAccountsDAO dao) =>
+            await dao.SendTransferAsync(userFromName, userToName, amount));
 
 app.Run();
