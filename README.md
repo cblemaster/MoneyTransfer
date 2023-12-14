@@ -5,10 +5,14 @@
 ### Built with: 
 - .NET 8 / C# 12
 - SQL Server database with stored procedures
-- Data access: Class library using EF Core to call stored procedures
-- API: ASP.NET Core, minimal API
-- Security: Class library with classes for hashing passwords and generating JWTs
-- Remaining projects TBD
+- API: ASP.NET Core, minimal API, ADO.NET to call stored procedures
+- Security: Class library for hashing passwords and generating JWTs
+- UI project(s) TBD
+- - Programming techniques used application-wide:
+	- Asynchronous programming
+	- Dependency injection
+	- Null object pattern (first time I've used it)
+	- Primary constructors and immutable objects
 
 ## Features:
 - Register as a new user
