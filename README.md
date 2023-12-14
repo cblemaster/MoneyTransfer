@@ -5,7 +5,8 @@
 ### Built with: 
 - .NET 8 / C# 12
 - SQL Server database with stored procedures
-- Data access layer - Class library using EF Core to call stored procedures
+- Data access: Class library using EF Core to call stored procedures
+- API: ASP.NET Core 
 - Remaining projects TBD
 
 ## Features:
