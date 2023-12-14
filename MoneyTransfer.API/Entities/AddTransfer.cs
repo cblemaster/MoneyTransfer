@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MoneyTransfer.API.DataAccess
+namespace MoneyTransfer.API.Entities
 {
     public class AddTransfer
     {
@@ -15,6 +15,16 @@ namespace MoneyTransfer.API.DataAccess
         [Required]
         public decimal Amount { get; set; }
 
-        public bool IsValid() => Amount > 0 && UserFromName != UserToName;
+        public bool IsValid()
+        {
+            return !string.IsNullOrEmpty(UserToName) &&
+                !string.IsNullOrWhiteSpace(UserToName) &&
+                UserToName.Length > 0 && UserToName.Length <= 50 &&
+                !string.IsNullOrEmpty(UserFromName) &&
+                !string.IsNullOrWhiteSpace(UserFromName) &&
+                UserFromName.Length > 0 && UserFromName.Length <= 50 &&
+                UserFromName != UserToName &&
+                Amount > 0;
+        }
     }
 }

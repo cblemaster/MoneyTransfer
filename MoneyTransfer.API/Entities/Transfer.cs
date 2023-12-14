@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MoneyTransfer.API.DataAccess
+namespace MoneyTransfer.API.Entities
 {
-    public class Transfer(int id, DateOnly dateCreated, decimal amount, 
-        string transferStatus, string transferType, string userToName, 
+    public class Transfer(int id, DateOnly dateCreated, decimal amount,
+        string transferStatus, string transferType, string userToName,
         string userFromName)
     {
+
         [Key]
         [Required(ErrorMessage = "Transfer Id is required.")]
         public int Id { get; } = id;
