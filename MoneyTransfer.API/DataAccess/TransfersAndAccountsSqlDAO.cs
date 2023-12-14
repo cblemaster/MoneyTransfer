@@ -4,123 +4,185 @@ using System.Data;
 
 namespace MoneyTransfer.API.DataAccess
 {
-    public class TransfersAndAccountsSqlDAO : ITransfersAndAccountsDAO
+    public class TransfersAndAccountsSqlDAO(string connectionString) : ITransfersAndAccountsDAO
     {
-        private readonly string _connectionString;
+        private readonly string _connectionString = connectionString;
 
-        public TransfersAndAccountsSqlDAO(string connectionString) =>
-            _connectionString = connectionString;
+        public async Task ApproveTransferRequestAsync(int transferId)
+        {
+            using SqlConnection connection = new(_connectionString);
+            SqlCommand command = new("ApproveTransferRequest", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            command.Parameters.Add("@transferId", SqlDbType.Int).Value = transferId;
 
-        public void ApproveTransferRequest() => throw new NotImplementedException();
+            connection.Open();
+
+            try
+            {
+                await command.ExecuteNonQueryAsync();
+            }
+            catch (Exception) { throw; }
+        }
+
         public async Task<Account> GetAccountDetailsForUserAsync(string username)
         {
-            using (SqlConnection connection = new(_connectionString))
+            using SqlConnection connection = new(_connectionString);
+            SqlCommand command = new("GetAccountDetailsForUser", connection)
             {
-                SqlCommand command = new("GetAccountDetailsForUser", connection);
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add("@username", SqlDbType.VarChar, 50).Value = username;
+                CommandType = CommandType.StoredProcedure
+            };
+            command.Parameters.Add("@username", SqlDbType.VarChar, 50).Value = username;
 
-                connection.Open();
+            connection.Open();
 
-                try
-                {
-                    SqlDataReader reader = await command.ExecuteReaderAsync();
+            try
+            {
+                SqlDataReader reader = await command.ExecuteReaderAsync();
 
-                    return GetAccountFromReader(reader);
-                }
-                catch (Exception) { throw; }
+                return reader.HasRows && reader.Read() ? GetAccountFromReader(reader) : Account.NotFound;
             }
+            catch (Exception) { throw; }
         }
 
         public async Task<List<Transfer>> GetCompletedTransfersForUserAsync(string username)
         {
-            using (SqlConnection connection = new(_connectionString))
+            using SqlConnection connection = new(_connectionString);
+            SqlCommand command = new("GetCompletedTransfersForUser", connection)
             {
-                SqlCommand command = new("GetCompletedTransfersForUser", connection);
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add("@username", SqlDbType.VarChar, 50).Value = username;
+                CommandType = CommandType.StoredProcedure
+            };
+            command.Parameters.Add("@username", SqlDbType.VarChar, 50).Value = username;
 
-                connection.Open();
+            connection.Open();
 
-                try
-                {
-                    SqlDataReader reader = await command.ExecuteReaderAsync();
+            try
+            {
+                SqlDataReader reader = await command.ExecuteReaderAsync();
 
-                    return GetTransfersFromReader(reader);
-                }
-                catch (Exception) { throw; }
+                return GetTransfersFromReader(reader);
             }
+            catch (Exception) { throw; }
         }
 
         public async Task<List<Transfer>> GetPendingTransfersForUserAsync(string username)
         {
-            using (SqlConnection connection = new(_connectionString))
+            using SqlConnection connection = new(_connectionString);
+            SqlCommand command = new("GetPendingTransfersForUser", connection)
             {
-                SqlCommand command = new("GetPendingTransfersForUser", connection);
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add("@username", SqlDbType.VarChar, 50).Value = username;
+                CommandType = CommandType.StoredProcedure
+            };
+            command.Parameters.Add("@username", SqlDbType.VarChar, 50).Value = username;
 
-                connection.Open();
+            connection.Open();
 
-                try
-                {
-                    SqlDataReader reader = await command.ExecuteReaderAsync();
+            try
+            {
+                SqlDataReader reader = await command.ExecuteReaderAsync();
 
-                    return GetTransfersFromReader(reader);
-                }
-                catch (Exception) { throw; }
+                return GetTransfersFromReader(reader);
             }
+            catch (Exception) { throw; }
         }
 
         public async Task<Transfer> GetTransferDetailsAsync(int transferId)
         {
-            using (SqlConnection connection = new(_connectionString))
+            using SqlConnection connection = new(_connectionString);
+            SqlCommand command = new("GetTransferDetails", connection)
             {
-                SqlCommand command = new("GetTransferDetails", connection);
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add("@transferId", SqlDbType.Int).Value = transferId;
+                CommandType = CommandType.StoredProcedure
+            };
+            command.Parameters.Add("@transferId", SqlDbType.Int).Value = transferId;
 
-                connection.Open();
+            connection.Open();
 
-                try
-                {
-                    SqlDataReader reader = await command.ExecuteReaderAsync();
+            try
+            {
+                SqlDataReader reader = await command.ExecuteReaderAsync();
 
-                    return GetTransferFromReader(reader);
-                }
-                catch (Exception) { throw; }
+                return reader.HasRows && reader.Read() ? GetTransferFromReader(reader) : Transfer.NotFound;
             }
+            catch (Exception) { throw; }
         }
 
-        public void RejectTransferRequest() => throw new NotImplementedException();
-        public void RequestTransfer() => throw new NotImplementedException();
-        public void SendTransfer() => throw new NotImplementedException();
+        public async Task RejectTransferRequestAsync(int transferId)
+        {
+            using SqlConnection connection = new(_connectionString);
+            SqlCommand command = new("RejectTransferRequest", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            command.Parameters.Add("@transferId", SqlDbType.Int).Value = transferId;
+
+            connection.Open();
+
+            try
+            {
+                await command.ExecuteNonQueryAsync();
+            }
+            catch (Exception) { throw; }
+        }
+
+        public async Task RequestTransferAsync(string userFromName, string userToName, decimal amount)
+        {
+            using SqlConnection connection = new(_connectionString);
+            SqlCommand command = new("RequestTransfer", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            command.Parameters.Add("@userFromName", SqlDbType.VarChar, 50).Value = userFromName;
+            command.Parameters.Add("@userToName", SqlDbType.VarChar, 50).Value = userToName;
+            command.Parameters.Add("@amount", SqlDbType.Decimal).Value = amount;
+
+            connection.Open();
+
+            try
+            {
+                await command.ExecuteNonQueryAsync();
+            }
+            catch (Exception) { throw; }
+        }
+
+        public async Task SendTransferAsync(string userFromName, string userToName, decimal amount)
+        {
+            using SqlConnection connection = new(_connectionString);
+            SqlCommand command = new("SendTransfer", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            command.Parameters.Add("@userFromName", SqlDbType.VarChar, 50).Value = userFromName;
+            command.Parameters.Add("@userToName", SqlDbType.VarChar, 50).Value = userToName;
+            command.Parameters.Add("@amount", SqlDbType.Decimal).Value = amount;
+
+            connection.Open();
+
+            try
+            {
+                await command.ExecuteNonQueryAsync();
+            }
+            catch (Exception) { throw; }
+        }
 
         private static Transfer GetTransferFromReader(SqlDataReader reader)
         {
-            if (reader.HasRows && reader.Read())
-            {
-                int transferId = reader.GetInt32(reader.GetOrdinal("Transfer Id"));
-                string userFromName = reader.GetString(reader.GetOrdinal("User From")) ?? "error reading data";
-                string userToName = reader.GetString(reader.GetOrdinal("User To")) ?? "error reading data";
-                string transferStatus = reader.GetString(reader.GetOrdinal("Transfer Status")) ?? "error reading data";
-                string transferType = reader.GetString(reader.GetOrdinal("Transfer Type")) ?? "error reading data";
-                decimal transferAmount = reader.GetDecimal(reader.GetOrdinal("Transfer Amount"));
-                DateOnly transferDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("Transfer Date")));
+            int transferId = reader.GetInt32(reader.GetOrdinal("Transfer Id"));
+            string userFromName = reader.GetString(reader.GetOrdinal("User From")) ?? "error reading data";
+            string userToName = reader.GetString(reader.GetOrdinal("User To")) ?? "error reading data";
+            string transferStatus = reader.GetString(reader.GetOrdinal("Transfer Status")) ?? "error reading data";
+            string transferType = reader.GetString(reader.GetOrdinal("Transfer Type")) ?? "error reading data";
+            decimal transferAmount = reader.GetDecimal(reader.GetOrdinal("Transfer Amount"));
+            DateOnly transferDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("Transfer Date")));
 
-                if (transferId > 0)
-                {
-                    return new Transfer(transferId, transferDate, transferAmount, transferStatus, transferType, userToName, userFromName);
-                }
-            }
-
-            return Transfer.NotFound;
+            return transferId > 0
+                ? new Transfer(transferId, transferDate, transferAmount, transferStatus, transferType, userToName, userFromName)
+                : Transfer.NotFound;
         }
 
         private static List<Transfer> GetTransfersFromReader(SqlDataReader reader)
         {
-            List<Transfer> transfers = new();
-            while (reader.HasRows && reader.Read())
+            List<Transfer> transfers = [];
+            while (reader.Read())
             {
                 transfers.Add(GetTransferFromReader(reader));
             }

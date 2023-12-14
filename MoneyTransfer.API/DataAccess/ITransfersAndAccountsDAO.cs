@@ -4,13 +4,13 @@ namespace MoneyTransfer.API.DataAccess
 {
     public interface ITransfersAndAccountsDAO
     {
-        void ApproveTransferRequest();
+        Task ApproveTransferRequestAsync(int transferId);
         Task<Account> GetAccountDetailsForUserAsync(string username);
         Task<List<Transfer>> GetCompletedTransfersForUserAsync(string username);
         Task<List<Transfer>> GetPendingTransfersForUserAsync(string username);
         Task<Transfer> GetTransferDetailsAsync(int transferId);
-        void RejectTransferRequest();
-        void RequestTransfer();
-        void SendTransfer();
+        Task RejectTransferRequestAsync(int transferId);
+        Task RequestTransferAsync(string userFromName, string userToName, decimal amount);
+        Task SendTransferAsync(string userFromName, string userToName, decimal amount);
     }
 }
