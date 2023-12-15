@@ -1,4 +1,4 @@
-﻿namespace MoneyTransfer.API.Helpers
+﻿namespace MoneyTransfer.API.Entities
 {
     public static class Helpers
     {
