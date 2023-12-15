@@ -4,9 +4,9 @@ namespace MoneyTransfer.UI.MAUI.Pages;
 
 public partial class PendingTransfersPage : ContentPage
 {
-	public PendingTransfersPage(PendingTransfersPageModel pageModel)
-	{
-		InitializeComponent();
+    public PendingTransfersPage(PendingTransfersPageModel pageModel)
+    {
+        InitializeComponent();
         BindingContext = pageModel;
-	}
+    }
 }

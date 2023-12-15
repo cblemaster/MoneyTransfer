@@ -4,9 +4,9 @@ namespace MoneyTransfer.UI.MAUI.Pages;
 
 public partial class AccountDetailsPage : ContentPage
 {
-	public AccountDetailsPage(AccountDetailsPageModel pageModel)
-	{
-		InitializeComponent();
+    public AccountDetailsPage(AccountDetailsPageModel pageModel)
+    {
+        InitializeComponent();
         BindingContext = pageModel;
-	}
+    }
 }

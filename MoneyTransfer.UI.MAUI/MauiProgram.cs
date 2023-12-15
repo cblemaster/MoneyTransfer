@@ -16,7 +16,7 @@ namespace MoneyTransfer.UI.MAUI
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 })
-                
+
                 .Services
                     .AddSingleton<AppShell>()
                     .AddSingleton<IDataService, HttpDataService>()
@@ -47,7 +47,7 @@ namespace MoneyTransfer.UI.MAUI
                     ;
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();
