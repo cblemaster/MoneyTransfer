@@ -192,19 +192,11 @@ namespace MoneyTransfer.API.DataAccess
 
         private static Account GetAccountFromReader(SqlDataReader reader)
         {
-            if (reader.HasRows && reader.Read())
-            {
-                int accountId = reader.GetInt32(reader.GetOrdinal("Id"));
-                string username = reader.GetString(reader.GetOrdinal("Username")) ?? "error reading data";
-                decimal currentBalance = reader.GetDecimal(reader.GetOrdinal("Current Balance"));                
-                
-                if (accountId > 0)
-                {
-                    return new Account(accountId,username, currentBalance);
-                }
-            }
+            int accountId = reader.GetInt32(reader.GetOrdinal("Id"));
+            string username = reader.GetString(reader.GetOrdinal("Username")) ?? "error reading data";
+            decimal currentBalance = reader.GetDecimal(reader.GetOrdinal("Current Balance"));
 
-            return Account.NotFound;
+            return accountId > 0 ? new Account(accountId,username, currentBalance) : Account.NotFound;
         }
     }
 }

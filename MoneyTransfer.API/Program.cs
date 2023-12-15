@@ -5,14 +5,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 var config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
-            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", 
+            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json",
                 optional: true)
             .Build();
 
 string connectionString = config.GetConnectionString("Project") ?? string.Empty;
 
 builder.Services
-    .AddTransient<ITransfersAndAccountsDAO>(d => 
+    .AddTransient<ITransfersAndAccountsDAO>(d =>
         new TransfersAndAccountsSqlDAO(connectionString));
 
 var app = builder.Build();
@@ -43,12 +43,12 @@ app.MapGet("/RejectTransferRequest/{transferId}", async
     (int transferId, ITransfersAndAccountsDAO dao) =>
         await dao.RejectTransferRequestAsync(transferId));
 
-app.MapGet("/RequestTransfer", async
+app.MapGet("/RequestTransfer/{userFromName}/{userToName}/{amount}", async
     (string userFromName, string userToName, decimal amount,
         ITransfersAndAccountsDAO dao) =>
             await dao.RequestTransferAsync(userFromName, userToName, amount));
 
-app.MapGet("/SendTransfer", async
+app.MapGet("/SendTransfer/{userFromName}/{userToName}/{amount}", async
     (string userFromName, string userToName, decimal amount,
         ITransfersAndAccountsDAO dao) =>
             await dao.SendTransferAsync(userFromName, userToName, amount));
