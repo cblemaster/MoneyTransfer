@@ -34,6 +34,8 @@ namespace MoneyTransfer.UI.MAUI.Services.Models
         public string UserFromName { get; } = userFromName;
 
         public static readonly TransferDetails NotFound = new(id: 0, dateCreated: DateOnly.MinValue, amount: 0M, transferStatus: "not found", transferType: "not found", userFromName: "not found", userToName: "not found");
+        public static readonly TransferDetails NotValid = new(id: 0, dateCreated: DateOnly.MinValue, amount: 0M, transferStatus: "not valid", transferType: "not valid", userFromName: "not valid", userToName: "not valid");
+        public static readonly TransferDetails SearchParamNotValid = new(id: 0, dateCreated: DateOnly.MinValue, amount: 0M, transferStatus: "one or more search parameter(s) not valid", transferType: "one or more search parameter(s) not valid", userFromName: "one or more search parameter(s) not valid", userToName: "one or more search parameter(s) not valid");
 
         public bool IsValid()
         {

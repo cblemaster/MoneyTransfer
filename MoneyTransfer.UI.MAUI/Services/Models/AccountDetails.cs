@@ -17,6 +17,8 @@ namespace MoneyTransfer.UI.MAUI.Services.Models
         public decimal Balance { get; } = balance;
 
         public static readonly AccountDetails NotFound = new(id: 0, username: "not found", balance: 0M);
+        public static readonly AccountDetails NotValid = new(id: 0, username: "not valid", balance: 0M);
+        public static readonly AccountDetails SearchParamNotValid = new(id: 0, username: "search parameter username not valid", balance: 0M);
 
         public bool IsValid()
         {

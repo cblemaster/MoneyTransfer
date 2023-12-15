@@ -2,7 +2,7 @@
 
 namespace MoneyTransfer.UI.MAUI.Services
 {
-    public interface IHttpService
+    public interface IDataService
     {
         Task ApproveTransferRequestAsync(int transferId);
         Task<AccountDetails> GetAccountDetailsForUserAsync(string username);
