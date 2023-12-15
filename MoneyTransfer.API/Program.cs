@@ -20,7 +20,8 @@ var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapGet("/ApproveTransferRequest/{transferId}", async    
+//TODO: Require authorization for api endpoints...
+app.MapGet("/ApproveTransferRequest/{transferId}", async
     (int transferId, ITransfersAndAccountsDAO dao) =>
         {
             if (transferId > 0)
@@ -56,7 +57,7 @@ app.MapGet("/GetPendingTransfersForUser/{username}", async
 
 app.MapGet("/GetTransferDetails/{transferId}", async
     (int transferId, ITransfersAndAccountsDAO dao) =>
-        { 
+        {
             Transfer transfer = await dao.GetTransferDetailsAsync(transferId);
             if (!transfer.IsValid()) { transfer = Transfer.NotFound; }
             return transfer;

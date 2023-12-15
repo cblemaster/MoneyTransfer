@@ -23,7 +23,7 @@ namespace MoneyTransfer.API.DataAccess
             {
                 await command.ExecuteNonQueryAsync();
             }
-            catch (Exception) { throw; }
+            catch (Exception) { throw; } //TODO: Proper exception handling, here and elsewhere in this class
         }
 
         public async Task<Account> GetAccountDetailsForUserAsync(string username)
