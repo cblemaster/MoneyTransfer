@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Helper = MoneyTransfer.API.Helpers.Helpers;
 
 namespace MoneyTransfer.API.Entities
 {
@@ -25,6 +26,17 @@ namespace MoneyTransfer.API.Entities
                 UserFromName.Length > 0 && UserFromName.Length <= 50 &&
                 UserFromName != UserToName &&
                 Amount > 0;
+        }
+
+        public bool IsValid(int id)
+        {
+            bool amountIsValid = Amount > 0;
+            bool userFromNameIsValid = Helper.StringIsValid(UserFromName, 1, 50);
+            bool userToNameIsValid = Helper.StringIsValid(UserToName, 1, 50);
+            bool userToAndUserFromAreNotTheSame = !UserToName.Equals(UserFromName);
+
+            return amountIsValid && userFromNameIsValid &&
+                userToNameIsValid && userToAndUserFromAreNotTheSame;
         }
     }
 }

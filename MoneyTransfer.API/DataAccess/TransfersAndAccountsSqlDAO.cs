@@ -196,7 +196,7 @@ namespace MoneyTransfer.API.DataAccess
             string username = reader.GetString(reader.GetOrdinal("Username")) ?? "error reading data";
             decimal currentBalance = reader.GetDecimal(reader.GetOrdinal("Current Balance"));
 
-            return accountId > 0 ? new Account(accountId,username, currentBalance) : Account.NotFound;
+            return accountId > 0 ? new Account(accountId, username, currentBalance) : Account.NotFound;
         }
     }
 }
