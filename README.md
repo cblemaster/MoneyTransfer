@@ -7,7 +7,7 @@
 - SQL Server database with stored procedures
 - API: ASP.NET Core, minimal API, ADO.NET to call stored procedures
 - Security: Class library for hashing passwords and generating JWTs
-- UI project(s) TBD
+- UI: .NET MAUI, targeting windows desktop only
 - Programming techniques used application-wide:
 	- Asynchronous programming
 	- Dependency injection
@@ -44,7 +44,7 @@ When I started this project I had been thinking about how ORMs make it easy for 
 
 For the record, I don’t think this is a shortcoming of ORMs necessarily, but rather a situation where the technology makes it easy for developers to be lazy or thoughtless about the data their apps consume, since the ORM makes abstract so many of these concerns.
 
-.With this in mind, I started development at the database level, creating stored procedures that return only the data needed for a particular view, or that perform an insert or update. A lot of what could be considered application logic ended up in these procedures, which was just me being self-indulgent as I really enjoy playing around in databases.
+With this in mind, I started development at the database level, creating stored procedures that return only the data needed for a particular view, or that perform an insert or update. A lot of what could be considered application logic ended up in these procedures, which was just me being self-indulgent as I really enjoy playing around in databases.
 
 But as I moved forward with the project, I started to see a big problem with this approach: it makes the application not very extensible.
 
