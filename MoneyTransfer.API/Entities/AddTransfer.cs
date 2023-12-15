@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Helper = MoneyTransfer.API.Helpers.Helpers;
+using Helper = MoneyTransfer.API.Entities.Helpers;
 
 namespace MoneyTransfer.API.Entities
 {
