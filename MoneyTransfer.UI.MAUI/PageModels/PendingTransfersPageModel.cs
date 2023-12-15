@@ -1,6 +1,8 @@
-﻿namespace MoneyTransfer.UI.MAUI.PageModels
+﻿using MoneyTransfer.UI.MAUI.Services;
+
+namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public class PendingTransfersPageModel : PageModelBase
+    public class PendingTransfersPageModel(IDataService dataService) : PageModelBase(dataService)
     {
     }
 }
