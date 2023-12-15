@@ -27,11 +27,11 @@ namespace MoneyTransfer.API.Entities
         public string TransferType { get; } = transferType;
 
         [Required(ErrorMessage = "Transfer User To Name is required.")]
-        [MaxLength(10, ErrorMessage = "Max length for User To Name is 10")]
+        [MaxLength(50, ErrorMessage = "Max length for User To Name is 50")]
         public string UserToName { get; } = userToName;
 
         [Required(ErrorMessage = "Transfer User From Name is required.")]
-        [MaxLength(10, ErrorMessage = "Max length for User From Name is 10")]
+        [MaxLength(50, ErrorMessage = "Max length for User From Name is 50")]
         public string UserFromName { get; } = userFromName;
 
         public static readonly Transfer NotFound = new(id: 0, dateCreated: DateOnly.MinValue, amount: 0M, transferStatus: "not found", transferType: "not found", userFromName: "not found", userToName: "not found");
@@ -46,9 +46,9 @@ namespace MoneyTransfer.API.Entities
             bool userToNameIsValid = Helper.StringIsValid(UserToName, 1, 50);
             bool userToAndUserFromAreNotTheSame = !UserToName.Equals(UserFromName);
 
-            return idIsValid && amountIsValid && 
-                transferTypeIsValid && transferStatusIsValid && 
-                userFromNameIsValid && userToNameIsValid && 
+            return idIsValid && amountIsValid &&
+                transferTypeIsValid && transferStatusIsValid &&
+                userFromNameIsValid && userToNameIsValid &&
                 userToAndUserFromAreNotTheSame;
         }
     }

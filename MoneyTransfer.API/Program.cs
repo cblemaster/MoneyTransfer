@@ -43,7 +43,7 @@ app.MapGet("/GetCompletedTransfersForUser/{username}", async
     (string username, ITransfersAndAccountsDAO dao) =>
         {
             List<Transfer> transfers = await dao.GetCompletedTransfersForUserAsync(username);
-            if (!transfers.All(transfer => transfer.IsValid())) { transfers = new(); }
+            if (!transfers.All(transfer => transfer.IsValid())) { transfers = []; }
             return transfers;
         });
 
@@ -51,7 +51,7 @@ app.MapGet("/GetPendingTransfersForUser/{username}", async
     (string username, ITransfersAndAccountsDAO dao) =>
         {
             List<Transfer> transfers = await dao.GetPendingTransfersForUserAsync(username);
-            if (!transfers.All(transfer => transfer.IsValid())) { transfers = new(); }
+            if (!transfers.All(transfer => transfer.IsValid())) { transfers = []; }
             return transfers;
         });
 
