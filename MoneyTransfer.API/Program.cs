@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MoneyTransfer.API.DataAccess;
+using MoneyTransfer.API.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,7 @@ var config = new ConfigurationBuilder()
                 optional: true)
             .Build();
 
-string connectionString = config.GetConnectionString("Project") ?? string.Empty;
+string connectionString = config.GetConnectionString("Project") ?? "Error locating connection string";
 
 builder.Services
     .AddTransient<ITransfersAndAccountsDAO>(d =>
@@ -19,38 +20,92 @@ var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapGet("/ApproveTransferRequest/{transferId}", async
+app.MapGet("/ApproveTransferRequest/{transferId}", async    
     (int transferId, ITransfersAndAccountsDAO dao) =>
-        await dao.ApproveTransferRequestAsync(transferId));
+        {
+            if (transferId > 0)
+            {
+                await dao.ApproveTransferRequestAsync(transferId);
+            }
+            return Results.BadRequest();
+        });
 
 app.MapGet("/GetAccountDetailsForUser/{username}", async
     (string username, ITransfersAndAccountsDAO dao) =>
-        await dao.GetAccountDetailsForUserAsync(username));
+        {
+            Account account = await dao.GetAccountDetailsForUserAsync(username);
+            if (!account.IsValid()) { account = Account.NotFound; }
+            return account;
+        });
 
 app.MapGet("/GetCompletedTransfersForUser/{username}", async
     (string username, ITransfersAndAccountsDAO dao) =>
-        await dao.GetCompletedTransfersForUserAsync(username));
+        {
+            List<Transfer> transfers = await dao.GetCompletedTransfersForUserAsync(username);
+            if (!transfers.All(transfer => transfer.IsValid())) { transfers = new(); }
+            return transfers;
+        });
 
 app.MapGet("/GetPendingTransfersForUser/{username}", async
     (string username, ITransfersAndAccountsDAO dao) =>
-        await dao.GetPendingTransfersForUserAsync(username));
+        {
+            List<Transfer> transfers = await dao.GetPendingTransfersForUserAsync(username);
+            if (!transfers.All(transfer => transfer.IsValid())) { transfers = new(); }
+            return transfers;
+        });
 
 app.MapGet("/GetTransferDetails/{transferId}", async
     (int transferId, ITransfersAndAccountsDAO dao) =>
-        await dao.GetTransferDetailsAsync(transferId));
+        { 
+            Transfer transfer = await dao.GetTransferDetailsAsync(transferId);
+            if (!transfer.IsValid()) { transfer = Transfer.NotFound; }
+            return transfer;
+        });
 
 app.MapGet("/RejectTransferRequest/{transferId}", async
     (int transferId, ITransfersAndAccountsDAO dao) =>
-        await dao.RejectTransferRequestAsync(transferId));
+        {
+            if (transferId > 0)
+            {
+                await dao.RejectTransferRequestAsync(transferId);
+            }
+            return Results.BadRequest();
+        });
 
 app.MapGet("/RequestTransfer/{userFromName}/{userToName}/{amount}", async
     (string userFromName, string userToName, decimal amount,
         ITransfersAndAccountsDAO dao) =>
-            await dao.RequestTransferAsync(userFromName, userToName, amount));
+            {
+                AddTransfer transfer = new()
+                {
+                    UserFromName = userFromName,
+                    UserToName = userToName,
+                    Amount = amount,
+                };
+
+                if (transfer.IsValid())
+                {
+                    await dao.RequestTransferAsync(userFromName, userToName, amount);
+                }
+                return Results.BadRequest();
+            });
 
 app.MapGet("/SendTransfer/{userFromName}/{userToName}/{amount}", async
     (string userFromName, string userToName, decimal amount,
         ITransfersAndAccountsDAO dao) =>
-            await dao.SendTransferAsync(userFromName, userToName, amount));
+            {
+                AddTransfer transfer = new()
+                {
+                    UserFromName = userFromName,
+                    UserToName = userToName,
+                    Amount = amount,
+                };
+
+                if (transfer.IsValid())
+                {
+                    await dao.SendTransferAsync(userFromName, userToName, amount);
+                }
+                return Results.BadRequest();
+            });
 
 app.Run();
