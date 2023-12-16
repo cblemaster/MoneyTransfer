@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoneyTransfer.API", "MoneyTransfer.API\MoneyTransfer.API.csproj", "{BBFDA5E5-AB3E-4D11-AB43-7703948F4570}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoneyTransfer.Security", "MoneyTransfer.Security\MoneyTransfer.Security.csproj", "{D08AA39F-A8E1-428B-A67C-C1F1564D2311}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoneyTransfer.UI.MAUI", "MoneyTransfer.UI.MAUI\MoneyTransfer.UI.MAUI.csproj", "{DCDD7CAE-97D0-4CF8-AF61-65519E7C4481}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoneyTransfer.UI.MAUI", "MoneyTransfer.UI.MAUI\MoneyTransfer.UI.MAUI.csproj", "{DCDD7CAE-97D0-4CF8-AF61-65519E7C4481}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BBFDA5E5-AB3E-4D11-AB43-7703948F4570}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BBFDA5E5-AB3E-4D11-AB43-7703948F4570}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BBFDA5E5-AB3E-4D11-AB43-7703948F4570}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BBFDA5E5-AB3E-4D11-AB43-7703948F4570}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D08AA39F-A8E1-428B-A67C-C1F1564D2311}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D08AA39F-A8E1-428B-A67C-C1F1564D2311}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D08AA39F-A8E1-428B-A67C-C1F1564D2311}.Release|Any CPU.ActiveCfg = Release|Any CPU
