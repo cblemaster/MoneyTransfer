@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoneyTransfer.Security", "M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoneyTransfer.UI.MAUI", "MoneyTransfer.UI.MAUI\MoneyTransfer.UI.MAUI.csproj", "{DCDD7CAE-97D0-4CF8-AF61-65519E7C4481}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoneyTransfer.API", "MoneyTransfer.API\MoneyTransfer.API.csproj", "{5D30D61D-AD33-48FC-AD88-8C57CE096909}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{DCDD7CAE-97D0-4CF8-AF61-65519E7C4481}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCDD7CAE-97D0-4CF8-AF61-65519E7C4481}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DCDD7CAE-97D0-4CF8-AF61-65519E7C4481}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{5D30D61D-AD33-48FC-AD88-8C57CE096909}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D30D61D-AD33-48FC-AD88-8C57CE096909}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D30D61D-AD33-48FC-AD88-8C57CE096909}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D30D61D-AD33-48FC-AD88-8C57CE096909}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
