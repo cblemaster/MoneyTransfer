@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MoneyTransfer.UI.MAUI.PageModels;
+using MoneyTransfer.UI.MAUI.Pages;
 using MoneyTransfer.UI.MAUI.Services;
 
 namespace MoneyTransfer.UI.MAUI
@@ -20,30 +21,28 @@ namespace MoneyTransfer.UI.MAUI
                 .Services
                     .AddSingleton<AppShell>()
                     .AddSingleton<IDataService, HttpDataService>()
-                    .AddTransient<ApproveTransferRequestPageModel>()
-                    .AddTransient<CompletedTransfersPageModel>()
-                    .AddTransient<LogInPageModel>()
-                    .AddTransient<LogOutPageModel>()
-                    .AddTransient<PendingTransfersPageModel>()
-                    .AddTransient<RegisterPageModel>()
-                    .AddTransient<RejectTransferRequestPageModel>()
-                    .AddTransient<RequestTransferPageModel>()
-                    .AddTransient<SendTransferPageModel>()
                     .AddTransient<AccountDetailsPageModel>()
-                    .AddTransient<TransferDetailsPageModel>()
-                    .AddSingleton<AppShell>()
-                    .AddSingleton<IDataService, HttpDataService>()
+                    .AddTransient<AccountDetailsPage>()
                     .AddTransient<ApproveTransferRequestPageModel>()
+                    .AddTransient<ApproveTransferRequestPage>()
                     .AddTransient<CompletedTransfersPageModel>()
+                    .AddTransient<CompletedTransfersPage>()
                     .AddTransient<LogInPageModel>()
+                    .AddTransient<LogInPage>()
                     .AddTransient<LogOutPageModel>()
+                    .AddTransient<LogOutPage>()
                     .AddTransient<PendingTransfersPageModel>()
+                    .AddTransient<PendingTransfersPage>()
                     .AddTransient<RegisterPageModel>()
+                    .AddTransient<RegisterPage>()
                     .AddTransient<RejectTransferRequestPageModel>()
+                    .AddTransient<RejectTransferRequestPage>()
                     .AddTransient<RequestTransferPageModel>()
+                    .AddTransient<RequestTransferPage>()
                     .AddTransient<SendTransferPageModel>()
-                    .AddTransient<AccountDetailsPageModel>()
+                    .AddTransient<SendTransferPage>()                    
                     .AddTransient<TransferDetailsPageModel>()
+                    .AddTransient<TransferDetailsPage>()
                     ;
 
 #if DEBUG
