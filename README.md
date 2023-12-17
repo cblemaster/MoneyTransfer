@@ -4,8 +4,8 @@
 
 ### Built with: 
 - .NET 8 / C# 12
-- SQL Server database with stored procedures
-- API: ASP.NET Core, minimal API, ADO.NET to call stored procedures
+- SQL Server database
+- API: ASP.NET Core, minimal API, Entity Framework Core 8
 - Security: Class library for hashing passwords and generating JWTs
 - UI: .NET MAUI, targeting windows desktop only
 - Programming techniques used application-wide:
