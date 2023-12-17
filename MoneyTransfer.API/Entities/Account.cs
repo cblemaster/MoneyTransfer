@@ -31,5 +31,5 @@ public partial class Account
                 .Sum(transfer => transfer.Amount);
     }
 
-    public bool IsValid => UserId > 0;
+    public bool IsValid() => UserId > 0;
 }
