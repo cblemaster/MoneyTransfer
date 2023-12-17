@@ -22,11 +22,11 @@ public partial class Account
     {
         return StartingBalance +
             TransferAccountIdToNavigations
-                .Where(transfer => transfer.TransferStatus == 
+                .Where(transfer => transfer.TransferStatus ==
                                     TransferStatus.Approved)
                 .Sum(transfer => transfer.Amount) -
             TransferAccountIdFromNavigations
-                .Where(transfer => transfer.TransferStatus == 
+                .Where(transfer => transfer.TransferStatus ==
                                     TransferStatus.Approved)
                 .Sum(transfer => transfer.Amount);
     }

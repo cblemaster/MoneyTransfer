@@ -8,9 +8,9 @@ var config = new ConfigurationBuilder()
             .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
             .Build();
 
-var connectionString = config.GetConnectionString("Project");
+string connectionString = config.GetConnectionString("Project") ?? "Error retrieving connection string!";
 
-builder.Services.AddDbContext<MoneyTransferContext>(options => 
+builder.Services.AddDbContext<MoneyTransferContext>(options =>
     options.UseSqlServer(connectionString));
 
 var app = builder.Build();
