@@ -41,6 +41,7 @@ public partial class MoneyTransferContext : DbContext
             // current balance, auto include the transfers
             entity.Navigation(e => e.TransferAccountIdFromNavigations).AutoInclude();
             entity.Navigation(e => e.TransferAccountIdToNavigations).AutoInclude();
+            entity.Navigation(e => e.User).AutoInclude();
         });
 
         modelBuilder.Entity<Transfer>(entity =>
