@@ -51,6 +51,8 @@ public partial class MoneyTransferContext : DbContext
                 .HasForeignKey(d => d.AccountIdTo)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Transfers_AccountsTo");
+
+            entity.Ignore(e => e.TransferType).Ignore(e => e.TransferStatus);
         });
 
         modelBuilder.Entity<User>(entity =>

@@ -19,4 +19,8 @@ public partial class Transfer
     public virtual Account AccountIdFromNavigation { get; set; } = null!;
 
     public virtual Account AccountIdToNavigation { get; set; } = null!;
+
+    public TransferType TransferStatus => (TransferType)TransferStatusId;
+    
+    public TransferType TransferType => (TransferType)TransferTypeId;
 }
