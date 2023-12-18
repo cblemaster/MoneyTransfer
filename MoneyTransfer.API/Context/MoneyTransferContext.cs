@@ -36,12 +36,6 @@ public partial class MoneyTransferContext : DbContext
                 .HasForeignKey<Account>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Accounts_Users");
-
-            // since transfers are needed by the account entity to calculate
-            // current balance, auto include the transfers
-            entity.Navigation(e => e.TransferAccountIdFromNavigations).AutoInclude();
-            entity.Navigation(e => e.TransferAccountIdToNavigations).AutoInclude();
-            entity.Navigation(e => e.User).AutoInclude();
         });
 
         modelBuilder.Entity<Transfer>(entity =>
