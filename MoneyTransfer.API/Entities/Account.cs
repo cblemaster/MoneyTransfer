@@ -18,7 +18,8 @@ public partial class Account
 
     public static Account NotFound => new()
     {
-        Id = 0, StartingBalance = 0M,
+        Id = 0,
+        StartingBalance = 0M,
         TransferAccountIdFromNavigations = null!,
         TransferAccountIdToNavigations = null!,
         User = null!,

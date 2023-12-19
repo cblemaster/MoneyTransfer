@@ -161,8 +161,8 @@ app.MapGet("/User/Transfer/Pending/{id}", async (int id, MoneyTransferContext co
 
 app.MapPost("/Transfer/Create", async (Transfer transfer, MoneyTransferContext context) =>
     {
-        if (!transfer.IsValid()) { return Results.BadRequest(); }        
-        
+        if (!transfer.IsValid()) { return Results.BadRequest(); }
+
         context.Transfers.Add(transfer);
         await context.SaveChangesAsync();
         return Results.Created($"/Transfer/Details/{transfer.Id}", transfer);
@@ -173,10 +173,10 @@ app.MapPut("/Transfer/Approve/{id}", async (int id, Transfer transfer, MoneyTran
         Transfer findTransfer = (await context.Transfers.FindAsync(id))!;
         if (findTransfer is null) { return Results.NotFound(); }
         if (findTransfer.TransferStatus != TransferStatus.Pending) { return Results.BadRequest(); }
-        
+
         findTransfer.TransferStatusId = (int)TransferStatus.Approved;
         await context.SaveChangesAsync();
-        return Results.NoContent();        
+        return Results.NoContent();
     });
 
 app.MapPut("/Transfer/Reject/{id}", async (int id, Transfer transfer, MoneyTransferContext context) =>
