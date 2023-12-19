@@ -84,7 +84,7 @@ app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext con
                     Username = a.User.Username
                 },
             })
-            .SingleOrDefaultAsync(a => a.UserId == id) is Account account
+            .SingleOrDefaultAsync(a => a.User.Id == id) is Account account
         ? Results.Ok(account)
         : Results.NotFound();
     });
