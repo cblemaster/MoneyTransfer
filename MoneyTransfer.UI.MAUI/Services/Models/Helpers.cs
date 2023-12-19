@@ -18,5 +18,19 @@
             return amountIsValid && userFromNameIsValid &&
                 userToNameIsValid && userToAndUserFromAreNotTheSame;
         }
+
+        public static readonly AccountDetails AccountNotFound = 
+            new(id: 0, username: "not found", currentBalance: 0M, dateCreated: DateOnly.MinValue);
+
+        public static readonly AccountDetails AccountSearchParamNotValid =
+            new(id: 0, username: "search param not valid", currentBalance: 0M, dateCreated: DateOnly.MinValue);
+
+        public static readonly TransferDetails TransferNotFound = 
+            new(id: 0, amount: 0M, transferStatus: "not found", transferType: "not found", 
+                dateCreated: DateOnly.MinValue, userToName: "not found", userFromName: "not found");
+
+        public static readonly TransferDetails TransferSearchParamNotValid =
+            new(id: 0, amount: 0M, transferStatus: "search param not valid", transferType: "search param not valid",
+                dateCreated: DateOnly.MinValue, userToName: "search param not valid", userFromName: "search param not valid");
     }
 }

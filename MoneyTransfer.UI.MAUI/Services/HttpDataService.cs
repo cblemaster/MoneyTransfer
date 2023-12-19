@@ -1,4 +1,6 @@
 ﻿using MoneyTransfer.UI.MAUI.Services.Models;
+using System.Collections.ObjectModel;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace MoneyTransfer.UI.MAUI.Services
@@ -7,7 +9,7 @@ namespace MoneyTransfer.UI.MAUI.Services
     {
         private readonly HttpClient _client;
         private readonly JsonSerializerOptions _serializerOptions;
-        private const string BASE_URI = "https://localhost:7024";
+        private const string BASE_URI = "https://localhost:7114";
 
         public HttpDataService()
         {
@@ -22,7 +24,7 @@ namespace MoneyTransfer.UI.MAUI.Services
         {
             if (transferId <= 0) { return; }
 
-            Uri = new($"{BASE_URI}/ApproveTransferRequest/{transferId}");
+            Uri = new($"{BASE_URI}/Transfer/Approve/{transferId}");
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
@@ -31,135 +33,112 @@ namespace MoneyTransfer.UI.MAUI.Services
             catch (Exception) { throw; }
         }
 
-        public async Task<AccountDetails> GetAccountDetailsForUserAsync(string username)
+        public async Task<AccountDetails> GetAccountDetailsForUserAsync(int userId)
         {
-            if (string.IsNullOrEmpty(username) ||
-                string.IsNullOrWhiteSpace(username) ||
-                username.Length > 50)
-            { return AccountDetails.SearchParamNotValid; }
+            if (userId <= 0) { return Helpers.AccountSearchParamNotValid; }
 
-            Uri = new($"{BASE_URI}/GetAccountDetailsForUser/{username}");
+            Uri = new($"{BASE_URI}/User/Account/Details/{userId}");
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 if (response.IsSuccessStatusCode && response.Content is not null)
                 {
-                    AccountDetails accountFromResponse =
-                        JsonSerializer.Deserialize<AccountDetails>
+                    AccountDetails accountFromResponse = JsonSerializer.Deserialize<AccountDetails>
                             (response.Content.ToString()!, _serializerOptions)!;
 
                     if (accountFromResponse == null)
                     {
-                        return AccountDetails.NotFound;
+                        return Helpers.AccountNotFound;
                     }
-                    else if (!accountFromResponse.IsValid())
-                    {
-                        return AccountDetails.NotValid;
-                    }
-
+                    
                     return accountFromResponse;
                 }
 
-                return AccountDetails.NotFound;
+                return Helpers.AccountNotFound;
             }
             catch (Exception) { throw; }
         }
 
-        public async Task<List<TransferDetails>> GetCompletedTransfersForUserAsync(string username)
+        public async Task<IReadOnlyCollection<TransferDetails>> GetCompletedTransfersForUserAsync(int userId)
         {
-            if (string.IsNullOrEmpty(username) ||
-                string.IsNullOrWhiteSpace(username) ||
-                username.Length > 50)
-            { return [TransferDetails.SearchParamNotValid]; }
+            if (userId <= 0)
+            {
+                return new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferSearchParamNotValid });
+            }
 
-            Uri = new($"{BASE_URI}/GetCompletedTransfersForUser/{username}");
+            Uri = new($"{BASE_URI}/User/Transfer/Completed/{userId}");
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 if (response.IsSuccessStatusCode && response.Content is not null)
                 {
-                    List<TransferDetails> transfersFromResponse =
-                        JsonSerializer.Deserialize<List<TransferDetails>>
-                            (response.Content.ToString()!, _serializerOptions)!;
+                    ReadOnlyCollection<TransferDetails> transfersFromResponse = new(JsonSerializer.Deserialize<List<TransferDetails>>
+                            (response.Content.ToString()!, _serializerOptions)!);
 
-                    if (transfersFromResponse == null || !transfersFromResponse.Any())
+                    if (transfersFromResponse == null)
                     {
-                        return [TransferDetails.NotFound];
-                    }
-                    else if (!transfersFromResponse.All(transfer => transfer.IsValid()))
-                    {
-                        return [TransferDetails.NotValid];
+                        return new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
                     }
 
                     return transfersFromResponse;
                 }
 
-                return [TransferDetails.NotFound];
+                return new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
             }
             catch (Exception) { throw; }
         }
 
-        public async Task<List<TransferDetails>> GetPendingTransfersForUserAsync(string username)
+        public async Task<IReadOnlyCollection<TransferDetails>> GetPendingTransfersForUserAsync(int userId)
         {
-            if (string.IsNullOrEmpty(username) ||
-                string.IsNullOrWhiteSpace(username) ||
-                username.Length > 50)
-            { return [TransferDetails.SearchParamNotValid]; }
+            if (userId <= 0)
+            {
+                return new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferSearchParamNotValid });
+            }
 
-            Uri = new($"{BASE_URI}/GetPendingTransfersForUser/{username}");
+            Uri = new($"{BASE_URI}/User/Transfer/Pending/{userId}");
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 if (response.IsSuccessStatusCode && response.Content is not null)
                 {
-                    List<TransferDetails> transfersFromResponse =
-                        JsonSerializer.Deserialize<List<TransferDetails>>
-                            (response.Content.ToString()!, _serializerOptions)!;
+                    ReadOnlyCollection<TransferDetails> transfersFromResponse = new(JsonSerializer.Deserialize<List<TransferDetails>>
+                            (response.Content.ToString()!, _serializerOptions)!);
 
-                    if (transfersFromResponse == null || !transfersFromResponse.Any())
+                    if (transfersFromResponse == null)
                     {
-                        return [TransferDetails.NotFound];
-                    }
-                    else if (!transfersFromResponse.All(transfer => transfer.IsValid()))
-                    {
-                        return [TransferDetails.NotValid];
+                        return new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
                     }
 
                     return transfersFromResponse;
                 }
 
-                return [TransferDetails.NotFound];
+                return new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
             }
             catch (Exception) { throw; }
         }
 
         public async Task<TransferDetails> GetTransferDetailsAsync(int transferId)
         {
-            if (transferId <= 0) { return TransferDetails.SearchParamNotValid; }
+            if (transferId <= 0) { return Helpers.TransferSearchParamNotValid; }
 
-            Uri = new($"{BASE_URI}/GetTransferDetails/{transferId}");
+            Uri = new($"{BASE_URI}/Transfer/Details/{transferId}");
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 if (response.IsSuccessStatusCode && response.Content is not null)
                 {
-                    TransferDetails transferFromResponse =
-                        JsonSerializer.Deserialize<TransferDetails>
+                    TransferDetails transferFromResponse = JsonSerializer.Deserialize<TransferDetails>
                             (response.Content.ToString()!, _serializerOptions)!;
 
                     if (transferFromResponse == null)
                     {
-                        return TransferDetails.NotFound;
-                    }
-                    else if (!transferFromResponse.IsValid())
-                    {
-                        return TransferDetails.NotValid;
+                        return Helpers.TransferNotFound;
                     }
 
                     return transferFromResponse;
                 }
 
-                return TransferDetails.NotFound;
+                return Helpers.TransferNotFound;
             }
             catch (Exception) { throw; }
         }
@@ -168,7 +147,7 @@ namespace MoneyTransfer.UI.MAUI.Services
         {
             if (transferId <= 0) { return; }
 
-            Uri = new($"{BASE_URI}/RejectTransferRequest/{transferId}");
+            Uri = new($"{BASE_URI}/Transfer/Reject/{transferId}");
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
@@ -186,12 +165,15 @@ namespace MoneyTransfer.UI.MAUI.Services
                 Amount = amount,
             };
 
-            if (!transfer.IsValid()) { return; }
+            if (!Helpers.AddTransferIsValid(transfer)) { return; }
 
-            Uri = new($"{BASE_URI}/RequestTransfer/{userFromName}/{userToName}/{amount}");
+            Uri = new($"{BASE_URI}/Transfer/Request");
             try
             {
-                HttpResponseMessage response = await _client.GetAsync(Uri);
+                StringContent content = new StringContent(JsonSerializer.Serialize(transfer));
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                HttpResponseMessage response = await _client.PostAsync(Uri, content);
+                
                 if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
             }
             catch (Exception) { throw; }
@@ -206,12 +188,15 @@ namespace MoneyTransfer.UI.MAUI.Services
                 Amount = amount,
             };
 
-            if (!transfer.IsValid()) { return; }
+            if (!Helpers.AddTransferIsValid(transfer)) { return; }
 
-            Uri = new($"{BASE_URI}/SendTransfer/{userFromName}/{userToName}/{amount}");
+            Uri = new($"{BASE_URI}/Transfer/Send");
             try
             {
-                HttpResponseMessage response = await _client.GetAsync(Uri);
+                StringContent content = new StringContent(JsonSerializer.Serialize(transfer));
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                HttpResponseMessage response = await _client.PostAsync(Uri, content);
+
                 if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
             }
             catch (Exception) { throw; }

@@ -22,9 +22,9 @@ var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapPut("/Transfer/Approve/{id}", async (int id, Transfer transfer, MoneyTransferContext context) =>
+app.MapPut("/Transfer/Approve/{id}", async (int id, MoneyTransferContext context) =>
 {
-    if (transfer is null || id != transfer.Id || id <= 0) {  return Results.BadRequest(); }
+    if (id <= 0) {  return Results.BadRequest(); }
     if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
 
     Transfer findTransfer = (await context.Transfers.Include(transfer => transfer.AccountIdFromNavigation)
@@ -77,9 +77,9 @@ app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context
             : Results.NotFound();
 });
 
-app.MapPut("/Transfer/Reject/{id}", async (int id, Transfer transfer, MoneyTransferContext context) =>
+app.MapPut("/Transfer/Reject/{id}", async (int id, MoneyTransferContext context) =>
 {
-    if (transfer is null || id != transfer.Id || id <= 0) { return Results.BadRequest(); }
+    if (id <= 0) { return Results.BadRequest(); }
     if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
 
     Transfer findTransfer = (await context.Transfers.Include(transfer => transfer.AccountIdFromNavigation)

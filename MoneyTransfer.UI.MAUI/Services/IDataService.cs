@@ -5,9 +5,9 @@ namespace MoneyTransfer.UI.MAUI.Services
     public interface IDataService
     {
         Task ApproveTransferRequestAsync(int transferId);
-        Task<AccountDetails> GetAccountDetailsForUserAsync(string username);
-        Task<List<TransferDetails>> GetCompletedTransfersForUserAsync(string username);
-        Task<List<TransferDetails>> GetPendingTransfersForUserAsync(string username);
+        Task<AccountDetails> GetAccountDetailsForUserAsync(int userId);
+        Task<IReadOnlyCollection<TransferDetails>> GetCompletedTransfersForUserAsync(int userId);
+        Task<IReadOnlyCollection<TransferDetails>> GetPendingTransfersForUserAsync(int userId);
         Task<TransferDetails> GetTransferDetailsAsync(int transferId);
         Task RejectTransferRequestAsync(int transferId);
         Task RequestTransferAsync(string userFromName, string userToName, decimal amount);
