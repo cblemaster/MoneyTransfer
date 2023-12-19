@@ -58,7 +58,7 @@ app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context
 
 app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext context) =>
     {
-        return await context.Accounts.Select(a =>
+        return await context.Accounts.Where(a => a.User.Id == id).Select(a =>
             new Account
             {
                 Id = a.Id,
@@ -70,6 +70,7 @@ app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext con
                         {
                             Id = t.Id,
                             Amount = t.Amount,
+                            TransferStatusId = t.TransferStatusId,
                         }).ToList(),
                 TransferAccountIdToNavigations =
                     a.TransferAccountIdToNavigations
@@ -77,6 +78,7 @@ app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext con
                         {
                             Id = t.Id,
                             Amount = t.Amount,
+                            TransferStatusId = t.TransferStatusId,
                         }).ToList(),
                 User = new User
                 {
@@ -84,7 +86,14 @@ app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext con
                     Username = a.User.Username
                 },
             })
-            .SingleOrDefaultAsync(a => a.User.Id == id) is Account account
+            .Select(a => 
+                new
+                {
+                    Id = a.Id,
+                    Username = a.User.Username,
+                    Balance = a.CurrentBalance(),
+                    DateCreated = a.DateCreated,
+                }).SingleOrDefaultAsync() is object account            
         ? Results.Ok(account)
         : Results.NotFound();
     });
