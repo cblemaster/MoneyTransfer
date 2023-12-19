@@ -24,8 +24,6 @@ public partial class Transfer
 
     public TransferType TransferType => (TransferType)TransferTypeId;
 
-    public static Transfer NotFound => new() { Id = 0, TransferTypeId = 0, TransferStatusId = 0, AccountIdFromNavigation = null!, AccountIdToNavigation = null!, AccountIdFrom = 0, AccountIdTo = 0, Amount = 0, DateCreated = DateOnly.MinValue };
-
     public bool IsValid() => AccountIdFrom > 0 && AccountIdTo > 0 &&
         Amount > 0 && TransferTypeId > 0 && TransferStatusId > 0 &&
         AccountIdFrom != AccountIdTo;
