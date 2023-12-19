@@ -159,60 +159,35 @@ app.MapGet("/User/Transfer/Pending/{id}", async (int id, MoneyTransferContext co
             .ToListAsync();
     });
 
-//app.MapPost("/Account/Create", async
-//    (Account account, MoneyTransferContext context) => {
-//        context.Accounts.Add(account);
-//        await context.SaveChangesAsync();
+app.MapPost("/Transfer/Create", async (Transfer transfer, MoneyTransferContext context) =>
+    {
+        if (!transfer.IsValid()) { return Results.BadRequest(); }        
+        
+        context.Transfers.Add(transfer);
+        await context.SaveChangesAsync();
+        return Results.Created($"/Transfer/Details/{transfer.Id}", transfer);
+    });
 
-//        return Results.Created($"/Account/Get/{account.Id}", account);
-//    });
+app.MapPut("/Transfer/Approve/{id}", async (int id, Transfer transfer, MoneyTransferContext context) =>
+    {
+        Transfer findTransfer = (await context.Transfers.FindAsync(id))!;
+        if (findTransfer is null) { return Results.NotFound(); }
+        if (findTransfer.TransferStatus != TransferStatus.Pending) { return Results.BadRequest(); }
+        
+        findTransfer.TransferStatusId = (int)TransferStatus.Approved;
+        await context.SaveChangesAsync();
+        return Results.NoContent();        
+    });
 
-//app.MapPost("/Transfer/Create", async
-//    (Transfer transfer, MoneyTransferContext context) => {
-//        context.Transfers.Add(transfer);
-//        await context.SaveChangesAsync();
+app.MapPut("/Transfer/Reject/{id}", async (int id, Transfer transfer, MoneyTransferContext context) =>
+    {
+        Transfer findTransfer = (await context.Transfers.FindAsync(id))!;
+        if (findTransfer is null) { return Results.NotFound(); }
+        if (findTransfer.TransferStatus != TransferStatus.Pending) { return Results.BadRequest(); }
 
-//        return Results.Created($"/Transfer/Get/{transfer.Id}", transfer);
-//    });
-
-//app.MapPut("/Account/Update/{id}", async
-//    (int id, Account account, MoneyTransferContext context) => {
-//        Account findAccount = (await context.Accounts.FindAsync(id))!;
-
-//        if (findAccount is null) { return Results.NotFound(); }
-
-//        findAccount.Id = account.Id;
-//        findAccount.UserId = account.UserId;
-//        findAccount.User = account.User;
-//        findAccount.DateCreated = account.DateCreated;
-//        findAccount.StartingBalance = account.StartingBalance;
-//        findAccount.TransferAccountIdFromNavigations = account.TransferAccountIdFromNavigations;
-//        findAccount.TransferAccountIdToNavigations = account.TransferAccountIdToNavigations;
-
-//        await context.SaveChangesAsync();
-
-//        return Results.NoContent();
-//    });
-
-//app.MapPut("/Transfer/Update/{id}",
-//    async (int id, Transfer transfer, MoneyTransferContext context) => {
-//        Transfer findTransfer = (await context.Transfers.FindAsync(id))!;
-
-//        if (findTransfer is null) { return Results.NotFound(); }
-
-//        findTransfer.Id = transfer.Id;
-//        findTransfer.Amount = transfer.Amount;
-//        findTransfer.AccountIdFrom = transfer.AccountIdFrom;
-//        findTransfer.AccountIdTo = transfer.AccountIdTo;
-//        findTransfer.AccountIdFromNavigation = transfer.AccountIdFromNavigation;
-//        findTransfer.AccountIdToNavigation = transfer.AccountIdToNavigation;
-//        findTransfer.TransferStatusId = transfer.TransferStatusId;
-//        findTransfer.TransferTypeId = transfer.TransferTypeId;
-//        findTransfer.DateCreated = transfer.DateCreated;
-
-//        await context.SaveChangesAsync();
-
-//        return Results.NoContent();
-//    });
+        findTransfer.TransferStatusId = (int)TransferStatus.Rejected;
+        await context.SaveChangesAsync();
+        return Results.NoContent();
+    });
 
 app.Run();
