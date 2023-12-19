@@ -36,12 +36,12 @@ app.MapPut("/Transfer/Approve/{id}", async (int id, Transfer transfer, MoneyTran
 app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context) =>
 {
     return await context.Transfers.Select(t =>
-        new Transfer
+        new 
         {
             Id = t.Id,
             Amount = t.Amount,
-            TransferStatusId = t.TransferStatusId,
-            TransferTypeId = t.TransferTypeId,
+            TransferStatus = t.TransferStatus.ToString(),
+            TransferType = t.TransferType.ToString(),
             DateCreated = t.DateCreated,
             AccountIdFromNavigation = new Account
             {
@@ -62,7 +62,7 @@ app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context
                 },
             },
         })
-        .SingleOrDefaultAsync(transfer => transfer.Id == id) is Transfer transfer
+        .SingleOrDefaultAsync(transfer => transfer.Id == id) is object transfer
             ? Results.Ok(transfer)
             : Results.NotFound();
 });
@@ -135,7 +135,7 @@ app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext con
                 {
                     Id = a.Id,
                     Username = a.User.Username,
-                    Balance = a.CurrentBalance(),
+                    CurrentBalance = a.CurrentBalance(),
                     DateCreated = a.DateCreated,
                 }).SingleOrDefaultAsync() is object account            
         ? Results.Ok(account)
@@ -148,12 +148,12 @@ app.MapGet("/User/Transfer/Completed/{id}", async (int id, MoneyTransferContext 
             (transfer.AccountIdFromNavigation.UserId == id
               || transfer.AccountIdToNavigation.UserId == id)
               && transfer.TransferStatusId != (int)TransferStatus.Pending)
-            .Select(t => new Transfer
+            .Select(t => new 
             {
                 Id = t.Id,
                 Amount = t.Amount,
-                TransferStatusId = t.TransferStatusId,
-                TransferTypeId = t.TransferTypeId,
+                TransferStatus = t.TransferStatus.ToString(),
+                TransferType = t.TransferType.ToString(),
                 DateCreated = t.DateCreated,
                 AccountIdFromNavigation = new Account
                 {
@@ -183,12 +183,12 @@ app.MapGet("/User/Transfer/Pending/{id}", async (int id, MoneyTransferContext co
             (transfer.AccountIdFromNavigation.UserId == id
               || transfer.AccountIdToNavigation.UserId == id)
               && transfer.TransferStatusId == (int)TransferStatus.Pending)
-            .Select(t => new Transfer
+            .Select(t => new 
             {
                 Id = t.Id,
                 Amount = t.Amount,
-                TransferStatusId = t.TransferStatusId,
-                TransferTypeId = t.TransferTypeId,
+                TransferStatus = t.TransferStatus.ToString(),
+                TransferType = t.TransferType.ToString(),
                 DateCreated = t.DateCreated,
                 AccountIdFromNavigation = new Account
                 {
