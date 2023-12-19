@@ -7,5 +7,16 @@
             eval != string.Empty &&
             eval.Length >= minLength &&
             eval.Length <= maxLength;
+
+        public static bool AddTransferIsValid(AddTransfer addTransfer)
+        {
+            bool amountIsValid = addTransfer.Amount > 0;
+            bool userFromNameIsValid = StringIsValid(addTransfer.UserFromName, 1, 50);
+            bool userToNameIsValid = StringIsValid(addTransfer.UserToName, 1, 50);
+            bool userToAndUserFromAreNotTheSame = !addTransfer.UserToName.Equals(addTransfer.UserFromName);
+
+            return amountIsValid && userFromNameIsValid &&
+                userToNameIsValid && userToAndUserFromAreNotTheSame;
+        }
     }
 }
