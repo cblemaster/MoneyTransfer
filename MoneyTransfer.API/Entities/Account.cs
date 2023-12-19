@@ -28,6 +28,4 @@ public partial class Account
                                     TransferStatus.Approved)
                 .Sum(transfer => transfer.Amount);
     }
-
-    public bool IsValid() => UserId > 0;
 }

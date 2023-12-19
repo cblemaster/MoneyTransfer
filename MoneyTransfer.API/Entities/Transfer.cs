@@ -24,7 +24,17 @@ public partial class Transfer
 
     public TransferType TransferType => (TransferType)TransferTypeId;
 
-    public bool IsValid() => AccountIdFrom > 0 && AccountIdTo > 0 &&
-        Amount > 0 && TransferTypeId > 0 && TransferStatusId > 0 &&
+    public bool IsValid =>
+        TransferTypeId > 0 &&
+        TransferStatusId > 0 &&
+        AccountIdFrom > 0 &&
+        AccountIdTo > 0 &&
+        Amount > 0 &&
         AccountIdFrom != AccountIdTo;
+
+    public bool IsValidForAdd => IsValid && Id == 0;
+
+    public bool IsValidForUpdate => IsValid && Id > 0;
+    
+    public bool IsValidForApproveOrReject => IsValidForUpdate && TransferStatus == TransferStatus.Pending;
 }
