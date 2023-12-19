@@ -168,14 +168,27 @@ app.MapGet("/User/Transfer/Pending/{id}", async (int id, MoneyTransferContext co
             .ToListAsync();
     });
 
-app.MapPost("/Transfer/Create", async (Transfer transfer, MoneyTransferContext context) =>
-    {
-        if (!transfer.IsValid()) { return Results.BadRequest(); }
+app.MapPost("/Transfer/Request", async (Transfer transfer, MoneyTransferContext context) =>
+{
+    if (!transfer.IsValid()) { return Results.BadRequest(); }
 
-        context.Transfers.Add(transfer);
-        await context.SaveChangesAsync();
-        return Results.Created($"/Transfer/Details/{transfer.Id}", transfer);
-    });
+    transfer.TransferStatusId = (int)TransferStatus.Pending;
+    transfer.TransferTypeId = (int)TransferType.Request;
+    context.Transfers.Add(transfer);
+    await context.SaveChangesAsync();
+    return Results.Created($"/Transfer/Details/{transfer.Id}", transfer);
+});
+
+app.MapPost("/Transfer/Send", async (Transfer transfer, MoneyTransferContext context) =>
+{
+    if (!transfer.IsValid()) { return Results.BadRequest(); }
+
+    transfer.TransferStatusId = (int)TransferStatus.Approved;
+    transfer.TransferTypeId = (int)TransferType.Send;
+    context.Transfers.Add(transfer);
+    await context.SaveChangesAsync();
+    return Results.Created($"/Transfer/Details/{transfer.Id}", transfer);
+});
 
 app.MapPut("/Transfer/Approve/{id}", async (int id, Transfer transfer, MoneyTransferContext context) =>
     {
