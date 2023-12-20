@@ -20,10 +20,10 @@
         }
 
         public static readonly AccountDetails AccountNotFound = 
-            new(id: 0, username: "not found", currentBalance: 0M, dateCreated: DateOnly.MinValue);
+            new() { Id = 0, Username = "not found", CurrentBalance = 0M, DateCreated = DateOnly.MinValue };
 
         public static readonly AccountDetails AccountSearchParamNotValid =
-            new(id: 0, username: "search param not valid", currentBalance: 0M, dateCreated: DateOnly.MinValue);
+            new() { Id = 0, Username = "search param not valid", CurrentBalance = 0M, DateCreated = DateOnly.MinValue };
 
         public static readonly TransferDetails TransferNotFound = 
             new(id: 0, amount: 0M, transferStatus: "not found", transferType: "not found", 

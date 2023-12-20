@@ -1,6 +1,7 @@
 ﻿using MoneyTransfer.UI.MAUI.Services.Models;
 using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace MoneyTransfer.UI.MAUI.Services
@@ -9,7 +10,7 @@ namespace MoneyTransfer.UI.MAUI.Services
     {
         private readonly HttpClient _client;
         private readonly JsonSerializerOptions _serializerOptions;
-        private const string BASE_URI = "https://localhost:7114";
+        private const string BASE_URI = "https://localhost:7144";
 
         public HttpDataService()
         {
@@ -43,15 +44,7 @@ namespace MoneyTransfer.UI.MAUI.Services
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 if (response.IsSuccessStatusCode && response.Content is not null)
                 {
-                    AccountDetails accountFromResponse = JsonSerializer.Deserialize<AccountDetails>
-                            (response.Content.ToString()!, _serializerOptions)!;
-
-                    if (accountFromResponse == null)
-                    {
-                        return Helpers.AccountNotFound;
-                    }
-                    
-                    return accountFromResponse;
+                    return  await response.Content.ReadFromJsonAsync<AccountDetails>() ?? Helpers.AccountNotFound;
                 }
 
                 return Helpers.AccountNotFound;
