@@ -1,19 +1,19 @@
 ﻿namespace MoneyTransfer.UI.MAUI.Services.Models
 {
-    public class TransferDetails(int id, decimal amount, string transferStatus, string transferType, DateOnly dateCreated, string userToName, string userFromName)
+    public class TransferDetails
     {
-        public int Id { get; } = id;
+        public int Id { get; init; }
 
-        public DateOnly DateCreated { get; } = dateCreated;
+        public DateOnly DateCreated { get; init; }
 
-        public decimal Amount { get; } = amount;
+        public decimal Amount { get; init; }
 
-        public string TransferStatus { get; } = transferStatus;
+        public required string TransferStatus { get; init; }
 
-        public string TransferType { get; } = transferType;
+        public required string TransferType { get; init; }
 
-        public string UserToName { get; } = userToName;
+        public required string UserToName { get; init; }
 
-        public string UserFromName { get; } = userFromName;
+        public required string UserFromName { get; init; }
     }
 }

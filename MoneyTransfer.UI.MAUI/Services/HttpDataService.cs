@@ -44,7 +44,7 @@ namespace MoneyTransfer.UI.MAUI.Services
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 if (response.IsSuccessStatusCode && response.Content is not null)
                 {
-                    return  await response.Content.ReadFromJsonAsync<AccountDetails>() ?? Helpers.AccountNotFound;
+                    return await response.Content.ReadFromJsonAsync<AccountDetails>() ?? Helpers.AccountNotFound;
                 }
 
                 return Helpers.AccountNotFound;
@@ -120,15 +120,7 @@ namespace MoneyTransfer.UI.MAUI.Services
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 if (response.IsSuccessStatusCode && response.Content is not null)
                 {
-                    TransferDetails transferFromResponse = JsonSerializer.Deserialize<TransferDetails>
-                            (response.Content.ToString()!, _serializerOptions)!;
-
-                    if (transferFromResponse == null)
-                    {
-                        return Helpers.TransferNotFound;
-                    }
-
-                    return transferFromResponse;
+                    return await response.Content.ReadFromJsonAsync<TransferDetails>() ?? Helpers.TransferNotFound;
                 }
 
                 return Helpers.TransferNotFound;

@@ -20,17 +20,44 @@
         }
 
         public static readonly AccountDetails AccountNotFound = 
-            new() { Id = 0, Username = "not found", CurrentBalance = 0M, DateCreated = DateOnly.MinValue };
+            new()
+            {
+                Id = 0,
+                Username = "not found",
+                CurrentBalance = 0M,
+                DateCreated = DateOnly.MinValue
+            };
 
         public static readonly AccountDetails AccountSearchParamNotValid =
-            new() { Id = 0, Username = "search param not valid", CurrentBalance = 0M, DateCreated = DateOnly.MinValue };
+            new()
+            {
+                Id = 0,
+                Username = "search param not valid",
+                CurrentBalance = 0M,
+                DateCreated = DateOnly.MinValue };
 
         public static readonly TransferDetails TransferNotFound = 
-            new(id: 0, amount: 0M, transferStatus: "not found", transferType: "not found", 
-                dateCreated: DateOnly.MinValue, userToName: "not found", userFromName: "not found");
+            new()
+            {
+                Id = 0,
+                Amount = 0M,
+                TransferStatus = "not found",
+                TransferType = "not found",
+                DateCreated = DateOnly.MinValue,
+                UserToName = "not found",
+                UserFromName = "not found"
+            };
 
         public static readonly TransferDetails TransferSearchParamNotValid =
-            new(id: 0, amount: 0M, transferStatus: "search param not valid", transferType: "search param not valid",
-                dateCreated: DateOnly.MinValue, userToName: "search param not valid", userFromName: "search param not valid");
+            new()
+            {
+                Id = 0,
+                Amount = 0M,
+                TransferStatus = "search param not valid",
+                TransferType = "search param not valid",
+                DateCreated = DateOnly.MinValue,
+                UserToName = "search param not valid",
+                UserFromName = "search param not valid"
+            };
     }
 }

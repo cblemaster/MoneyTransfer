@@ -45,7 +45,7 @@ app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context
     if (id <= 0) { return Results.BadRequest(); }
     if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
     
-    return await context.Transfers.Select(t =>
+    return await context.Transfers.Where(transfer => transfer.Id == id).Select(t =>
         new 
         {
             Id = t.Id,
@@ -71,10 +71,20 @@ app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context
                     Username = t.AccountIdToNavigation.User.Username,
                 },
             },
-        })
-        .SingleOrDefaultAsync(transfer => transfer.Id == id) is object transfer
-            ? Results.Ok(transfer)
-            : Results.NotFound();
+        }).Select(a =>
+                new
+                {
+                    Id = a.Id,
+                    DateCreated = a.DateCreated,
+                    Amount = a.Amount,
+                    TransferStatus = a.TransferStatus,
+                    TransferType = a.TransferType,
+                    UserFromName = a.AccountIdFromNavigation.User.Username,
+                    UserToName = a.AccountIdToNavigation.User.Username,
+                    
+                }).SingleOrDefaultAsync() is object transfer
+        ? Results.Ok(transfer)
+        : Results.NotFound();
 });
 
 app.MapPut("/Transfer/Reject/{id}", async (int id, MoneyTransferContext context) =>
