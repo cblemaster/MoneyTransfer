@@ -291,7 +291,18 @@ app.MapGet("/User/Transfer/Pending/{id}", async (int id, MoneyTransferContext co
                         Username = t.AccountIdToNavigation.User.Username,
                     },
                 },
-            })
+            }).Select(a =>
+                new
+                {
+                    Id = a.Id,
+                    DateCreated = a.DateCreated,
+                    Amount = a.Amount,
+                    TransferStatus = a.TransferStatus,
+                    TransferType = a.TransferType,
+                    UserFromName = a.AccountIdFromNavigation.User.Username,
+                    UserToName = a.AccountIdToNavigation.User.Username,
+
+                })
             .ToListAsync();
     });
 

@@ -81,7 +81,7 @@ namespace MoneyTransfer.UI.MAUI.Services
             catch (Exception) { throw; }
         }
 
-        public async Task<IReadOnlyCollection<TransferDetails>> GetPendingTransfersForUserAsync(int userId)
+        public async Task<ReadOnlyCollection<TransferDetails>> GetPendingTransfersForUserAsync(int userId)
         {
             if (userId <= 0)
             {
@@ -94,15 +94,7 @@ namespace MoneyTransfer.UI.MAUI.Services
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 if (response.IsSuccessStatusCode && response.Content is not null)
                 {
-                    ReadOnlyCollection<TransferDetails> transfersFromResponse = new(JsonSerializer.Deserialize<List<TransferDetails>>
-                            (response.Content.ToString()!, _serializerOptions)!);
-
-                    if (transfersFromResponse == null)
-                    {
-                        return new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
-                    }
-
-                    return transfersFromResponse;
+                    return new ReadOnlyCollection<TransferDetails>((response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!).ToBlockingEnumerable<TransferDetails>().ToList()) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
                 }
 
                 return new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
