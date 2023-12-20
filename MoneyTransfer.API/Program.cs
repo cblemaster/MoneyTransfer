@@ -219,43 +219,54 @@ app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext con
     });
 
 app.MapGet("/User/Transfer/Completed/{id}", async (int id, MoneyTransferContext context) =>
-{
-    // TODO: Debug why enabling the next two (2) lines breaks the lambda expression
-    //if (id <= 0) { return Results.BadRequest(); }
-    //if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
+    {
+        // TODO: Debug why enabling the next two (2) lines breaks the lambda expression
+        //if (id <= 0) { return Results.BadRequest(); }
+        //if (context is null || context.Accounts is null) { return Results.StatusCode(500); }
 
-    return await context.Transfers.Where(transfer =>
-        (transfer.AccountIdFromNavigation.UserId == id
-          || transfer.AccountIdToNavigation.UserId == id)
-          && transfer.TransferStatusId != (int)TransferStatus.Pending)
-        .Select(t => new
-        {
-            Id = t.Id,
-            Amount = t.Amount,
-            TransferStatus = t.TransferStatus.ToString(),
-            TransferType = t.TransferType.ToString(),
-            DateCreated = t.DateCreated,
-            AccountIdFromNavigation = new Account
+        return await context.Transfers.Where(transfer =>
+            (transfer.AccountIdFromNavigation.UserId == id
+              || transfer.AccountIdToNavigation.UserId == id)
+              && transfer.TransferStatusId != (int)TransferStatus.Pending)
+            .Select(t => new
             {
-                Id = t.AccountIdFromNavigation.Id,
-                User = new User
+                Id = t.Id,
+                Amount = t.Amount,
+                TransferStatus = t.TransferStatus.ToString(),
+                TransferType = t.TransferType.ToString(),
+                DateCreated = t.DateCreated,
+                AccountIdFromNavigation = new Account
                 {
-                    Id = t.AccountIdFromNavigation.User.Id,
-                    Username = t.AccountIdFromNavigation.User.Username
+                    Id = t.AccountIdFromNavigation.Id,
+                    User = new User
+                    {
+                        Id = t.AccountIdFromNavigation.User.Id,
+                        Username = t.AccountIdFromNavigation.User.Username
+                    },
                 },
-            },
-            AccountIdToNavigation = new Account
-            {
-                Id = t.AccountIdToNavigation.Id,
-                User = new User
+                AccountIdToNavigation = new Account
                 {
-                    Id = t.AccountIdToNavigation.User.Id,
-                    Username = t.AccountIdToNavigation.User.Username,
+                    Id = t.AccountIdToNavigation.Id,
+                    User = new User
+                    {
+                        Id = t.AccountIdToNavigation.User.Id,
+                        Username = t.AccountIdToNavigation.User.Username,
+                    },
                 },
-            },
-        })
-        .ToListAsync();
-});
+            }).Select(a =>
+                new
+                {
+                    Id = a.Id,
+                    DateCreated = a.DateCreated,
+                    Amount = a.Amount,
+                    TransferStatus = a.TransferStatus,
+                    TransferType = a.TransferType,
+                    UserFromName = a.AccountIdFromNavigation.User.Username,
+                    UserToName = a.AccountIdToNavigation.User.Username,
+
+                })
+            .ToListAsync();
+    });
 
 app.MapGet("/User/Transfer/Pending/{id}", async (int id, MoneyTransferContext context) =>
     {
