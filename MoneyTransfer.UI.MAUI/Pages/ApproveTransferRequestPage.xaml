@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:pageModels="clr-namespace:MoneyTransfer.UI.MAUI.PageModels"
              x:Class="MoneyTransfer.UI.MAUI.Pages.ApproveTransferRequestPage"
-             Title="ApproveTransferRequestPage">
-    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}">
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+             x:DataType="{x:Type pageModels:ApproveTransferRequestPageModel}"
+             Title="Approve Transfer Request">
+    <ContentPage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="18" />
+        </Style>
+    </ContentPage.Resources>
+    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}" Spacing="10">
+        <Label Text="Are you sure you want to Approve this transfer request?" FontSize="28" TextColor="{StaticResource Primary}" />
+        <Label Text="{Binding TransferDetails.UserFromName, StringFormat='User From: {0}', Mode=OneWay}" />
+        <Label Text="{Binding TransferDetails.UserToName, StringFormat='User To: {0}', Mode=OneWay}" />
+        <Label Text="{Binding TransferDetails.Amount, StringFormat='Amount: {0}', Mode=OneWay}" />
+        <HorizontalStackLayout Spacing="10">
+            <Button Command="{Binding ApproveCommand}" IsEnabled="{Binding CanApprove}" Text="Yes, Approve" />
+            <Button Command="{Binding CancelCommand}" IsEnabled="{Binding CanCancel}" Text="No, Cancel" />
+        </HorizontalStackLayout>
     </VerticalStackLayout>
 </ContentPage>
