@@ -14,6 +14,7 @@
 	- Null object pattern (first time I've used it)
 	- Primary constructors (first time I've used them)
 	- Immutable objects and collections (first time I've used them)
+	- Anonymous objects (first time I've used them)
 
 ## Features:
 - Register as a new user
