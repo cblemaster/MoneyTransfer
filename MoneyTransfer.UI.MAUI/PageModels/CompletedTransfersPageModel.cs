@@ -23,15 +23,13 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private TransferDetails _selectedTransfer = default!;
 
         [RelayCommand]
-        private void ChangeSelection()
-        {
-            // TODO: Nav to transfer details, passing the selected transfer's id
-        }
-
+        private async Task ChangeSelection() => await Shell.Current.GoToAsync($"TransferDetails?id={SelectedTransfer.Id}");
+        
         private async void LoadData()
         {
             // TODO: The passed in id is hard coded here for testing
             TransferDetails = await _dataService.GetCompletedTransfersForUserAsync(1) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
+            SelectedTransfer = null!;
         }
     }
 }

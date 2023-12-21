@@ -5,18 +5,20 @@ using MoneyTransfer.UI.MAUI.Services.Models;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
+    [QueryProperty(nameof(TransferId), "id")]
     public partial class TransferDetailsPageModel : ObservableObject
     {
         private readonly IDataService _dataService;
 
-        public TransferDetailsPageModel(IDataService dataService)
-        {
-            _dataService = dataService;
-            LoadData();
-        }
+        public TransferDetailsPageModel(IDataService dataService) => _dataService = dataService;
 
         [ObservableProperty]
         private TransferDetails _transferDetails = default!;
+
+        [ObservableProperty]
+        private int transferId;
+
+        partial void OnTransferIdChanged(int value) => LoadData();
 
         [RelayCommand]
         private void Approve()
@@ -52,8 +54,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            // TODO: The passed in id is hard coded here for testing
-            TransferDetails = await _dataService.GetTransferDetailsAsync(1) ?? Helpers.TransferNotFound;
+            TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
         }
     }
 }
