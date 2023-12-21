@@ -1,6 +1,8 @@
-﻿namespace MoneyTransfer.UI.MAUI.PageModels
+﻿using MoneyTransfer.UI.MAUI.Services;
+
+namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public class LogInPageModel
+    public class LogInPageModel(IDataService dataService) : PageModelBase(dataService)
     {
     }
 }

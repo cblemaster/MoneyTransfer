@@ -12,8 +12,7 @@
 	- Asynchronous programming
 	- Dependency injection
 	- Null object pattern (first time I've used it)
-	- Primary constructors (first time I've used them)
-	- Immutable objects and collections (first time I've used them)
+	- Primary constructors and immutable objects
 
 ## Features:
 - Register as a new user
