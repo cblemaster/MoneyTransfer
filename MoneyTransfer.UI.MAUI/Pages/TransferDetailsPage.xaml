@@ -12,11 +12,22 @@
     </ContentPage.Resources>
     <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}" Spacing="20">
         <Label Text="{Binding TransferDetails.Id, StringFormat='Transfer Id: {0}', Mode=OneWay}" TextColor="{StaticResource Primary}" />
-        <Label Text="{Binding TransferDetails.UserFromName, StringFormat='User From: {0}', Mode=OneWay}" TextColor="{StaticResource PrimaryDark}" FontAttributes="Bold" />
-        <Label Text="{Binding TransferDetails.UserToName, StringFormat='User To: {0}', Mode=OneWay}" TextColor="{StaticResource PrimaryDark}" FontAttributes="Bold" />
-        <Label Text="{Binding TransferDetails.TransferType, StringFormat='Transfer Type: {0}', Mode=OneWay}" TextColor="{StaticResource Magenta}" />
-        <Label Text="{Binding TransferDetails.TransferStatus, StringFormat='Transfer Status: {0}', Mode=OneWay}" TextColor="{StaticResource Magenta}" />
-        <Label Text="{Binding TransferDetails.Amount, StringFormat='Transfer Amount: {0:C}', Mode=OneWay}" TextColor="{StaticResource PrimaryDark}" FontAttributes="Bold" />
-        <Label Text="{Binding TransferDetails.DateCreated, StringFormat='Transfer Date: {0:d}', Mode=OneWay}" TextColor="{StaticResource Primary}" />
+        <Label Text="{Binding TransferDetails.UserFromName, StringFormat='User From: {0}', Mode=OneWay}" 
+               TextColor="{StaticResource PrimaryDark}" FontAttributes="Bold" />
+        <Label Text="{Binding TransferDetails.UserToName, StringFormat='User To: {0}', Mode=OneWay}" 
+               TextColor="{StaticResource PrimaryDark}" FontAttributes="Bold" />
+        <Label Text="{Binding TransferDetails.TransferType, StringFormat='Transfer Type: {0}', Mode=OneWay}"
+               TextColor="{StaticResource Magenta}" />
+        <Label Text="{Binding TransferDetails.TransferStatus, StringFormat='Transfer Status: {0}', Mode=OneWay}"
+               TextColor="{StaticResource Magenta}" />
+        <Label Text="{Binding TransferDetails.Amount, StringFormat='Transfer Amount: {0:C}', Mode=OneWay}"
+               TextColor="{StaticResource PrimaryDark}" FontAttributes="Bold" />
+        <Label Text="{Binding TransferDetails.DateCreated, StringFormat='Transfer Date: {0:d}', Mode=OneWay}"
+               TextColor="{StaticResource Primary}" />
+        <HorizontalStackLayout Spacing="10">
+            <Button Text="Approve" Command="{Binding ApproveCommand}" IsVisible="{Binding CanApprove, Mode=OneWay}" />
+            <Button Text="Reject" Command="{Binding RejectCommand}" IsVisible="{Binding CanReject, Mode=OneWay}" />
+            <Button Text="Back to list" Command="{Binding CancelCommand}" IsVisible="{Binding CanCancel, Mode=OneWay}" />
+        </HorizontalStackLayout>
     </VerticalStackLayout>
 </ContentPage>

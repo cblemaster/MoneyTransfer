@@ -6,11 +6,11 @@
     xmlns:local="clr-namespace:MoneyTransfer.UI.MAUI"
     xmlns:pages="clr-namespace:MoneyTransfer.UI.MAUI.Pages"
     Shell.FlyoutBehavior="Disabled"
-    Title="MoneyTransfer.UI.MAUI">
+    Title="MoneyTransfer MAUI">
 
     <ShellContent
         Title="Home"
-        ContentTemplate="{DataTemplate pages:CompletedTransfersPage}"
+        ContentTemplate="{DataTemplate pages:TransferDetailsPage}"
         Route="MainPage" />
 
 </Shell>

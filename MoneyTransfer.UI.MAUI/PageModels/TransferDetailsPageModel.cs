@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MoneyTransfer.UI.MAUI.Services;
 using MoneyTransfer.UI.MAUI.Services.Models;
 
@@ -15,7 +16,34 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         }
 
         [ObservableProperty]
-        TransferDetails _transferDetails = default!;
+        private TransferDetails _transferDetails = default!;
+
+        [RelayCommand]
+        private void Approve()
+        {
+            if (!CanApprove) { return; }
+        }
+
+        [RelayCommand]
+        private void Reject()
+        {
+            if (!CanReject) { return; }
+        }
+
+        [RelayCommand]
+        private void Cancel()
+        {
+            if (!CanCancel) { return; }
+        }
+
+        [ObservableProperty]
+        private bool canApprove = true;  // TODO: if type == request && status == pending && user from is the current logged in user
+
+        [ObservableProperty]
+        private bool canReject = true; // TODO: if type == request && status == pending && user from is the current logged in user
+
+        [ObservableProperty]
+        private bool canCancel = true;
 
         private async void LoadData()
         {
