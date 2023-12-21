@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Shell
-    x:Class="MoneyTransfer.UI.MAUI.AppShell"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:MoneyTransfer.UI.MAUI"
-    xmlns:pages="clr-namespace:MoneyTransfer.UI.MAUI.Pages"
-    Shell.FlyoutBehavior="Disabled"
-    Title="MoneyTransfer MAUI">
-
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate pages:PendingTransfersPage}"
-        Route="MainPage" />
-
+<Shell x:Class="MoneyTransfer.UI.MAUI.AppShell"
+        xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+        xmlns:local="clr-namespace:MoneyTransfer.UI.MAUI"
+        xmlns:pages="clr-namespace:MoneyTransfer.UI.MAUI.Pages"
+        Shell.FlyoutBehavior="Disabled"
+        Title="MoneyTransfer MAUI">
+    <TabBar>
+        <ShellContent Title="Register" ContentTemplate="{DataTemplate pages:RegisterPage}" Route="Register" />
+        <ShellContent Title="Log In" ContentTemplate="{DataTemplate pages:LogInPage}" Route="LogIn" />
+        <ShellContent Title="Log Out" ContentTemplate="{DataTemplate pages:LogOutPage}" Route="LogOut" />
+        <ShellContent Title="Account Details" ContentTemplate="{DataTemplate pages:AccountDetailsPage}" Route="AccountDetails" />
+        <ShellContent Title="Request Transfer" ContentTemplate="{DataTemplate pages:RequestTransferPage}" Route="RequestTransfer" />
+        <ShellContent Title="Send Transfer" ContentTemplate="{DataTemplate pages:SendTransferPage}" Route="SendTransfer" />
+        <ShellContent Title="Completed Transfers" ContentTemplate="{DataTemplate pages:CompletedTransfersPage}" Route="CompletedTransfers" />
+        <ShellContent Title="Pending Transfers" ContentTemplate="{DataTemplate pages:PendingTransfersPage}" Route="PendingTransfers" />
+    </TabBar>
 </Shell>
