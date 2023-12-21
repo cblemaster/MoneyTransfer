@@ -35,12 +35,10 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         }
 
         [RelayCommand]
-        private void Cancel()
+        private async Task Cancel()
         {
             if (!CanCancel) { return; }
-            // TODO: nav back to transfer list, either go back one page in the nav stack,
-            //      or nav to pending transfers page if transfer status is pending,
-            //      otherwise nav to completed transfers page
+            await Shell.Current.GoToAsync("..");
         }
 
         [ObservableProperty]

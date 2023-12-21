@@ -23,8 +23,17 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private TransferDetails _selectedTransfer = default!;
 
         [RelayCommand]
-        private async Task ChangeSelection() => await Shell.Current.GoToAsync($"TransferDetails?id={SelectedTransfer.Id}");
-        
+        private void PageAppearing() => SelectedTransfer = null!;
+
+        [RelayCommand]
+        private async Task ChangeSelection()
+        {
+            if (SelectedTransfer is not null && SelectedTransfer.Id > 0)
+            {
+                await Shell.Current.GoToAsync(($"TransferDetails?id={SelectedTransfer.Id}"));
+            }
+        }
+
         private async void LoadData()
         {
             // TODO: The passed in id is hard coded here for testing

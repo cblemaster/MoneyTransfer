@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CommunityToolkit.Maui;
+using Microsoft.Extensions.Logging;
 using MoneyTransfer.UI.MAUI.PageModels;
 using MoneyTransfer.UI.MAUI.Pages;
 using MoneyTransfer.UI.MAUI.Services;
@@ -12,6 +13,7 @@ namespace MoneyTransfer.UI.MAUI
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
