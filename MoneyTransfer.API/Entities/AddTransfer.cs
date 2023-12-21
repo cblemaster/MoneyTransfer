@@ -1,6 +1,4 @@
-﻿using Microsoft.Identity.Client;
-
-namespace MoneyTransfer.API.Entities
+﻿namespace MoneyTransfer.API.Entities
 {
     public class AddTransfer
     {
@@ -16,10 +14,10 @@ namespace MoneyTransfer.API.Entities
             Amount > 0 &&
             UserFromName != UserToName;
 
-        public bool UsernameIsValid(string username) => 
-            !string.IsNullOrEmpty(username) && 
-            !string.IsNullOrWhiteSpace(username) && 
-            username.Length > 0 && 
+        public bool UsernameIsValid(string username) =>
+            !string.IsNullOrEmpty(username) &&
+            !string.IsNullOrWhiteSpace(username) &&
+            username.Length > 0 &&
             username.Length <= 50;
     }
 }

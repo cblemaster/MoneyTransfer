@@ -24,15 +24,15 @@ app.MapGet("/", () => "Hello World!");
 
 app.MapPut("/Transfer/Approve/{id}", async (int id, MoneyTransferContext context) =>
 {
-    if (id <= 0) {  return Results.BadRequest(); }
+    if (id <= 0) { return Results.BadRequest(); }
     if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
 
     Transfer findTransfer = (await context.Transfers.Include(transfer => transfer.AccountIdFromNavigation)
         .SingleOrDefaultAsync(transfer => transfer.Id == id))!;
-    
+
     if (findTransfer is null) { return Results.NotFound(); }
-    if (!findTransfer.IsValidForApproveOrReject || 
-        !AccountFromHasSufficientFundsForTransfer(findTransfer.Amount, 
+    if (!findTransfer.IsValidForApproveOrReject ||
+        !AccountFromHasSufficientFundsForTransfer(findTransfer.Amount,
             findTransfer.AccountIdFromNavigation.CurrentBalance(), context)) { return Results.BadRequest(); }
 
     findTransfer.TransferStatusId = (int)TransferStatus.Approved;
@@ -44,9 +44,9 @@ app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context
 {
     if (id <= 0) { return Results.BadRequest(); }
     if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
-    
+
     return await context.Transfers.Where(transfer => transfer.Id == id).Select(t =>
-        new 
+        new
         {
             Id = t.Id,
             Amount = t.Amount,
@@ -81,7 +81,7 @@ app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context
                     TransferType = a.TransferType,
                     UserFromName = a.AccountIdFromNavigation.User.Username,
                     UserToName = a.AccountIdToNavigation.User.Username,
-                    
+
                 }).SingleOrDefaultAsync() is object transfer
         ? Results.Ok(transfer)
         : Results.NotFound();
@@ -141,7 +141,7 @@ app.MapPost("/Transfer/Send", async (AddTransfer transfer, MoneyTransferContext 
 {
     if (transfer is null || !transfer.IsValid) { return Results.BadRequest(); }
     if (context is null || context.Accounts is null || context.Transfers is null) { return Results.StatusCode(500); }
-    
+
     Account accountFrom = (await context.Accounts
         .Include(account => account.TransferAccountIdFromNavigations)
         .Include(account => account.TransferAccountIdToNavigations)
@@ -149,8 +149,8 @@ app.MapPost("/Transfer/Send", async (AddTransfer transfer, MoneyTransferContext 
 
     if (accountFrom is null ||
         !AccountFromHasSufficientFundsForTransfer(transfer.Amount, accountFrom.CurrentBalance(), context))
-        { return Results.BadRequest(); }
-        
+    { return Results.BadRequest(); }
+
     Transfer transferToAdd = new()
     {
         Id = 0,
@@ -166,8 +166,8 @@ app.MapPost("/Transfer/Send", async (AddTransfer transfer, MoneyTransferContext 
                 : 0,
     };
 
-    if (!transferToAdd.IsValidForAdd) { return Results.BadRequest(); }    
-    
+    if (!transferToAdd.IsValidForAdd) { return Results.BadRequest(); }
+
     context.Transfers.Add(transferToAdd);
     await context.SaveChangesAsync();
     return Results.Created($"/Transfer/Details/{transferToAdd.Id}", transferToAdd);
@@ -206,14 +206,14 @@ app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext con
                     Username = a.User.Username
                 },
             })
-            .Select(a => 
+            .Select(a =>
                 new
                 {
                     Id = a.Id,
                     Username = a.User.Username,
                     CurrentBalance = a.CurrentBalance(),
                     DateCreated = a.DateCreated,
-                }).SingleOrDefaultAsync() is object account            
+                }).SingleOrDefaultAsync() is object account
         ? Results.Ok(account)
         : Results.NotFound();
     });
@@ -277,7 +277,7 @@ app.MapGet("/User/Transfer/Pending/{id}", async (int id, MoneyTransferContext co
             (transfer.AccountIdFromNavigation.UserId == id
               || transfer.AccountIdToNavigation.UserId == id)
               && transfer.TransferStatusId == (int)TransferStatus.Pending)
-            .Select(t => new 
+            .Select(t => new
             {
                 Id = t.Id,
                 Amount = t.Amount,
@@ -319,6 +319,7 @@ app.MapGet("/User/Transfer/Pending/{id}", async (int id, MoneyTransferContext co
 
 app.Run();
 
-static bool AccountFromHasSufficientFundsForTransfer
-    (decimal amount, decimal accountFromCurrentBalance, MoneyTransferContext context) => 
-        accountFromCurrentBalance > 0 && accountFromCurrentBalance >= amount;
+static bool AccountFromHasSufficientFundsForTransfer(decimal amount, decimal accountFromCurrentBalance, MoneyTransferContext context)
+{
+    return accountFromCurrentBalance > 0 && accountFromCurrentBalance >= amount;
+}

@@ -16,10 +16,10 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         }
 
         [ObservableProperty]
-        ReadOnlyCollection<TransferDetails> _transferDetails = default!;
+        private ReadOnlyCollection<TransferDetails> _transferDetails = default!;
 
         [ObservableProperty]
-        TransferDetails _selectedTransfer = default!;
+        private TransferDetails _selectedTransfer = default!;
 
         private async void LoadData()
         {

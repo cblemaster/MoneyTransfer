@@ -35,6 +35,6 @@ public partial class Transfer
     public bool IsValidForAdd => IsValid && Id == 0;
 
     public bool IsValidForUpdate => IsValid && Id > 0;
-    
+
     public bool IsValidForApproveOrReject => IsValidForUpdate && TransferStatus == TransferStatus.Pending;
 }

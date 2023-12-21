@@ -1,6 +1,5 @@
 ﻿using MoneyTransfer.UI.MAUI.Services.Models;
 using System.Collections.ObjectModel;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -9,13 +8,11 @@ namespace MoneyTransfer.UI.MAUI.Services
     public class HttpDataService : IDataService
     {
         private readonly HttpClient _client;
-        private readonly JsonSerializerOptions _serializerOptions;
         private const string BASE_URI = "https://localhost:7144";
 
         public HttpDataService()
         {
             _client = new HttpClient();
-            _serializerOptions = new JsonSerializerOptions();
             Uri = new(BASE_URI);
         }
 
@@ -42,12 +39,9 @@ namespace MoneyTransfer.UI.MAUI.Services
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
-                if (response.IsSuccessStatusCode && response.Content is not null)
-                {
-                    return await response.Content.ReadFromJsonAsync<AccountDetails>() ?? Helpers.AccountNotFound;
-                }
-
-                return Helpers.AccountNotFound;
+                return response.IsSuccessStatusCode && response.Content is not null
+                    ? await response.Content.ReadFromJsonAsync<AccountDetails>() ?? Helpers.AccountNotFound
+                    : Helpers.AccountNotFound;
             }
             catch (Exception) { throw; }
         }
@@ -63,12 +57,9 @@ namespace MoneyTransfer.UI.MAUI.Services
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
-                if (response.IsSuccessStatusCode && response.Content is not null)
-                {
-                    return new ReadOnlyCollection<TransferDetails>((response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!).ToBlockingEnumerable<TransferDetails>().ToList()) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
-                }
-
-                return new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
+                return response.IsSuccessStatusCode && response.Content is not null
+                    ? new ReadOnlyCollection<TransferDetails>((response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!).ToBlockingEnumerable<TransferDetails>().ToList()) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
+                    : new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
             }
             catch (Exception) { throw; }
         }
@@ -84,12 +75,9 @@ namespace MoneyTransfer.UI.MAUI.Services
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
-                if (response.IsSuccessStatusCode && response.Content is not null)
-                {
-                    return new ReadOnlyCollection<TransferDetails>((response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!).ToBlockingEnumerable<TransferDetails>().ToList()) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
-                }
-
-                return new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
+                return response.IsSuccessStatusCode && response.Content is not null
+                    ? new ReadOnlyCollection<TransferDetails>((response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!).ToBlockingEnumerable<TransferDetails>().ToList()) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
+                    : new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
             }
             catch (Exception) { throw; }
         }
@@ -102,12 +90,9 @@ namespace MoneyTransfer.UI.MAUI.Services
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
-                if (response.IsSuccessStatusCode && response.Content is not null)
-                {
-                    return await response.Content.ReadFromJsonAsync<TransferDetails>() ?? Helpers.TransferNotFound;
-                }
-
-                return Helpers.TransferNotFound;
+                return response.IsSuccessStatusCode && response.Content is not null
+                    ? await response.Content.ReadFromJsonAsync<TransferDetails>() ?? Helpers.TransferNotFound
+                    : Helpers.TransferNotFound;
             }
             catch (Exception) { throw; }
         }
@@ -139,10 +124,21 @@ namespace MoneyTransfer.UI.MAUI.Services
             Uri = new($"{BASE_URI}/Transfer/Request");
             try
             {
-                StringContent content = new StringContent(JsonSerializer.Serialize(transfer));
-                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                StringContent content = new(JsonSerializer.Serialize(transfer));
+                content.Headers.ContentType = new("application/json");
+
+                /* Unmerged change from project 'MoneyTransfer.UI.MAUI (net8.0-windows10.0.19041.0)'
+                Before:
+                                HttpResponseMessage response = await _client.PostAsync(Uri, content);
+
+                                if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
+                After:
+                                HttpResponseMessage response = await _client.PostAsync(Uri, content);
+
+                                if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
+                */
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
-                
+
                 if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
             }
             catch (Exception) { throw; }
@@ -162,8 +158,8 @@ namespace MoneyTransfer.UI.MAUI.Services
             Uri = new($"{BASE_URI}/Transfer/Send");
             try
             {
-                StringContent content = new StringContent(JsonSerializer.Serialize(transfer));
-                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                StringContent content = new(JsonSerializer.Serialize(transfer));
+                content.Headers.ContentType = new("application/json");
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
 
                 if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?

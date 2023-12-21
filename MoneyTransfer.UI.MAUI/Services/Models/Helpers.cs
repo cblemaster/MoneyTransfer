@@ -19,7 +19,7 @@
                 userToNameIsValid && userToAndUserFromAreNotTheSame;
         }
 
-        public static readonly AccountDetails AccountNotFound = 
+        public static readonly AccountDetails AccountNotFound =
             new()
             {
                 Id = 0,
@@ -34,9 +34,10 @@
                 Id = 0,
                 Username = "search param not valid",
                 CurrentBalance = 0M,
-                DateCreated = DateOnly.MinValue };
+                DateCreated = DateOnly.MinValue
+            };
 
-        public static readonly TransferDetails TransferNotFound = 
+        public static readonly TransferDetails TransferNotFound =
             new()
             {
                 Id = 0,

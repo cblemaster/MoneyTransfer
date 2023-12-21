@@ -15,7 +15,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         }
 
         [ObservableProperty]
-        AccountDetails _accountDetails = default!;
+        private AccountDetails _accountDetails = default!;
 
         private async void LoadData()
         {

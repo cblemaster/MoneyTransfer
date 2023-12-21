@@ -16,16 +16,12 @@ public partial class Account
 
     public virtual User User { get; set; } = null!;
 
-    public decimal CurrentBalance()
-    {
-        return StartingBalance +
-            TransferAccountIdToNavigations
-                .Where(transfer => transfer.TransferStatus ==
-                                    TransferStatus.Approved)
-                .Sum(transfer => transfer.Amount) -
-            TransferAccountIdFromNavigations
-                .Where(transfer => transfer.TransferStatus ==
-                                    TransferStatus.Approved)
-                .Sum(transfer => transfer.Amount);
-    }
+    public decimal CurrentBalance() =>
+        StartingBalance +
+        TransferAccountIdToNavigations
+            .Where(transfer => transfer.TransferStatus == TransferStatus.Approved)
+            .Sum(transfer => transfer.Amount) -
+        TransferAccountIdFromNavigations
+            .Where(transfer => transfer.TransferStatus == TransferStatus.Approved)
+            .Sum(transfer => transfer.Amount);
 }
