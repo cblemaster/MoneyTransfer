@@ -7,7 +7,7 @@
              x:DataType="{x:Type pageModels:PendingTransfersPageModel}"
              Title="Pending Transfers">
     <Grid Style="{StaticResource ContainerGridStyle}">
-        <CollectionView ItemsSource="{Binding TransferDetails}" SelectedItem="{Binding SelectedTransfer, Mode=TwoWay}">
+        <CollectionView ItemsSource="{Binding TransferDetails}" SelectedItem="{Binding SelectedTransfer, Mode=TwoWay}" SelectionChangedCommand="{Binding ChangeSelectionCommand}" SelectionMode="Single">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="3" />                
             </CollectionView.ItemsLayout>

@@ -22,12 +22,15 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private void Reject()
         {
             if (!CanReject) { return; }
+            // TODO: call logic to reject the transfer, nav nack to transfer details,
+            // passing the transfer's id (*make sure that page shows the new status!*)
         }
 
         [RelayCommand]
         private void Cancel()
         {
             if (!CanCancel) { return; }
+            // TODO: nav nack to transfer details, passing the transfer's id
         }
 
         [ObservableProperty]

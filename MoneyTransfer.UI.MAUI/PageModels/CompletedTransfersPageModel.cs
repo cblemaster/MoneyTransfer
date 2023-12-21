@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MoneyTransfer.UI.MAUI.Services;
 using MoneyTransfer.UI.MAUI.Services.Models;
 using System.Collections.ObjectModel;
@@ -20,6 +21,12 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         [ObservableProperty]
         private TransferDetails _selectedTransfer = default!;
+
+        [RelayCommand]
+        private void ChangeSelection()
+        {
+            // TODO: Nav to transfer details, passing the selected transfer's id
+        }
 
         private async void LoadData()
         {

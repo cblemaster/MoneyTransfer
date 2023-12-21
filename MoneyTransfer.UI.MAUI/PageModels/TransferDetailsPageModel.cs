@@ -22,18 +22,23 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private void Approve()
         {
             if (!CanApprove) { return; }
+            // TODO: nav to approve transfer request page, passing the transfer's id
         }
 
         [RelayCommand]
         private void Reject()
         {
             if (!CanReject) { return; }
+            // TODO: nav to reject transfer request page, passing the transfer's id
         }
 
         [RelayCommand]
         private void Cancel()
         {
             if (!CanCancel) { return; }
+            // TODO: nav back to transfer list, either go back one page in the nav stack,
+            //      or nav to pending transfers page if transfer status is pending,
+            //      otherwise nav to completed transfers page
         }
 
         [ObservableProperty]
