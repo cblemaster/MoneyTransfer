@@ -29,10 +29,10 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         }
 
         [RelayCommand]
-        private void Cancel()
+        private async Task Cancel()
         {
             if (!CanCancel) { return; }
-            // TODO: nav nack to transfer details, passing the transfer's id
+            await Shell.Current.GoToAsync("..");
         }
 
         [ObservableProperty]
