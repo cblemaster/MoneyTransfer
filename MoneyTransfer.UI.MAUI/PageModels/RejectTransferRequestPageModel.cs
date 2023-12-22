@@ -21,11 +21,14 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         partial void OnTransferIdChanged(int value) => LoadData();
 
         [RelayCommand]
-        private void Reject()
+        private async Task Reject()
         {
+            // TODO: Error handling...
             if (!CanReject) { return; }
-            // TODO: call logic to reject the transfer, nav nack to transfer details,
-            // passing the transfer's id (*make sure that page shows the new status!*)
+            if (TransferDetails.TransferStatus != "Pending") { return; }
+            
+            await _dataService.RejectTransferRequestAsync(TransferDetails.Id, TransferDetails);
+            await Shell.Current.GoToAsync(($"TransferDetails?id={TransferDetails.Id}"));
         }
 
         [RelayCommand]
@@ -43,7 +46,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            // TODO: The passed in id is hard coded here for testing
             TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
         }
     }

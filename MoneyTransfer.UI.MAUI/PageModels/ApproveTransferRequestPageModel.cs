@@ -21,11 +21,18 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         partial void OnTransferIdChanged(int value) => LoadData();
 
         [RelayCommand]
-        private void Approve()
+        private async Task Approve()
         {
+            // TODO: Error handling...
             if (!CanApprove) { return; }
-            // TODO: call logic to approve the transfer, nav nack to transfer details,
-            // passing the transfer's id (*make sure that page shows the new status!*)
+            if (TransferDetails.TransferStatus != "Pending") { return; }
+            
+            int currentUserId = 2; // TODO: Needs to be the logged in user's id
+            decimal currentBalance = (await _dataService.GetAccountDetailsForUserAsync(currentUserId)).CurrentBalance;
+            if (currentBalance <= 0 || currentBalance < TransferDetails.Amount) { return; }
+            
+            await _dataService.ApproveTransferRequestAsync(TransferDetails.Id, TransferDetails);
+            await Shell.Current.GoToAsync(($"TransferDetails?id={TransferDetails.Id}"));
         }
 
         [RelayCommand]
@@ -43,7 +50,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            // TODO: The passed in id is hard coded here for testing
             TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
         }
     }

@@ -22,7 +22,7 @@ var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapPut("/Transfer/Approve/{id}", async (int id, MoneyTransferContext context) =>
+app.MapPut("/Transfer/Approve/{id}", async (int id, object transfer, MoneyTransferContext context) =>
 {
     if (id <= 0) { return Results.BadRequest(); }
     if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
@@ -87,7 +87,7 @@ app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context
         : Results.NotFound();
 });
 
-app.MapPut("/Transfer/Reject/{id}", async (int id, MoneyTransferContext context) =>
+app.MapPut("/Transfer/Reject/{id}", async (int id, object transfer, MoneyTransferContext context) =>
 {
     if (id <= 0) { return Results.BadRequest(); }
     if (context is null || context.Transfers is null) { return Results.StatusCode(500); }

@@ -55,6 +55,8 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private async void LoadData()
         {
             TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
+            CanApprove = TransferDetails.TransferStatus == "Pending";
+            CanReject = CanApprove;
         }
     }
 }

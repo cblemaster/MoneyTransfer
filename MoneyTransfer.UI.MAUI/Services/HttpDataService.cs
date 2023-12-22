@@ -18,14 +18,17 @@ namespace MoneyTransfer.UI.MAUI.Services
 
         private Uri Uri { get; set; }
 
-        public async Task ApproveTransferRequestAsync(int transferId)
+        public async Task ApproveTransferRequestAsync(int transferId, TransferDetails transfer)
         {
             if (transferId <= 0) { return; }
 
             Uri = new($"{BASE_URI}/Transfer/Approve/{transferId}");
+            StringContent content = new(JsonSerializer.Serialize(transfer));
+            content.Headers.ContentType = new("application/json");
+            
             try
             {
-                HttpResponseMessage response = await _client.GetAsync(Uri);
+                HttpResponseMessage response = await _client.PutAsync(Uri, content);
                 if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
             }
             catch (Exception) { throw; }
@@ -97,14 +100,17 @@ namespace MoneyTransfer.UI.MAUI.Services
             catch (Exception) { throw; }
         }
 
-        public async Task RejectTransferRequestAsync(int transferId)
+        public async Task RejectTransferRequestAsync(int transferId, TransferDetails transfer)
         {
             if (transferId <= 0) { return; }
 
             Uri = new($"{BASE_URI}/Transfer/Reject/{transferId}");
+            StringContent content = new(JsonSerializer.Serialize(transfer));
+            content.Headers.ContentType = new("application/json");
+            
             try
             {
-                HttpResponseMessage response = await _client.GetAsync(Uri);
+                HttpResponseMessage response = await _client.PutAsync(Uri, content);
                 if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
             }
             catch (Exception) { throw; }
@@ -127,18 +133,7 @@ namespace MoneyTransfer.UI.MAUI.Services
                 StringContent content = new(JsonSerializer.Serialize(transfer));
                 content.Headers.ContentType = new("application/json");
 
-                /* Unmerged change from project 'MoneyTransfer.UI.MAUI (net8.0-windows10.0.19041.0)'
-                Before:
-                                HttpResponseMessage response = await _client.PostAsync(Uri, content);
-
-                                if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
-                After:
-                                HttpResponseMessage response = await _client.PostAsync(Uri, content);
-
-                                if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
-                */
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
-
                 if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
             }
             catch (Exception) { throw; }
@@ -160,8 +155,8 @@ namespace MoneyTransfer.UI.MAUI.Services
             {
                 StringContent content = new(JsonSerializer.Serialize(transfer));
                 content.Headers.ContentType = new("application/json");
+                
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
-
                 if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
             }
             catch (Exception) { throw; }
