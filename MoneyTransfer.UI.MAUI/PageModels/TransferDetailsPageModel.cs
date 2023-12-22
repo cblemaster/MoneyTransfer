@@ -21,17 +21,19 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         partial void OnTransferIdChanged(int value) => LoadData();
 
         [RelayCommand]
-        private void Approve()
+        private async Task Approve()
         {
             if (!CanApprove) { return; }
-            // TODO: nav to approve transfer request page, passing the transfer's id
+            if (TransferId <= 0) { return; }
+            await Shell.Current.GoToAsync(($"ApproveTransfer?id={TransferId}"));
         }
 
         [RelayCommand]
-        private void Reject()
+        private async Task Reject()
         {
             if (!CanReject) { return; }
-            // TODO: nav to reject transfer request page, passing the transfer's id
+            if (TransferId <= 0) { return; }
+            await Shell.Current.GoToAsync(($"RejectTransfer?id={TransferId}"));
         }
 
         [RelayCommand]
