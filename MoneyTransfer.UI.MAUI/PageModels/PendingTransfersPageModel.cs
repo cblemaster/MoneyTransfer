@@ -10,7 +10,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
     public partial class PendingTransfersPageModel(IDataService dataService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
-        
+
         [ObservableProperty]
         private ReadOnlyCollection<TransferDetails> _transferDetails = default!;
 
@@ -18,7 +18,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private TransferDetails _selectedTransfer = default!;
 
         [RelayCommand]
-        private void PageAppearing() => LoadData(); 
+        private void PageAppearing() => LoadData();
 
         [RelayCommand]
         private async Task ChangeSelection()

@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MoneyTransfer.UI.MAUI.Pages;
 using MoneyTransfer.UI.MAUI.Services;
 using MoneyTransfer.UI.MAUI.Services.Models;
 
@@ -9,7 +8,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
     public partial class ApproveTransferRequestPageModel(IDataService dataService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
-        
+
         [ObservableProperty]
         private TransferDetails _transferDetails = default!;
 
@@ -25,15 +24,26 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (TransferDetails.TransferStatus != "Pending")
             {
                 await Shell.Current.DisplayAlert("Error!", "Only transfer requests with a status of Pending can be approved.", "OK");
+
+                /* Unmerged change from project 'MoneyTransfer.UI.MAUI (net8.0-windows10.0.19041.0)'
+                Before:
+                            }
+
+                            int currentUserId = 2; // TODO: Needs to be the logged in user's id
+                After:
+                            }
+
+                            int currentUserId = 2; // TODO: Needs to be the logged in user's id
+                */
             }
-            
+
             int currentUserId = 2; // TODO: Needs to be the logged in user's id
             decimal currentBalance = (await _dataService.GetAccountDetailsForUserAsync(currentUserId)).CurrentBalance;
             if (currentBalance <= 0 || currentBalance < TransferDetails.Amount)
             {
                 await Shell.Current.DisplayAlert("Error!", "Only transfer requests with an amount less than or equal to your current balance can be approved.", "OK");
             }
-            
+
             await _dataService.ApproveTransferRequestAsync(TransferDetails.Id, TransferDetails);
             await Shell.Current.DisplayAlert("Success!", "Transfer approved.", "OK");
             await Shell.Current.GoToAsync("CompletedTransfers");

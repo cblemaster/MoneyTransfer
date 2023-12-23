@@ -25,7 +25,7 @@ namespace MoneyTransfer.UI.MAUI.Services
             Uri = new($"{BASE_URI}/Transfer/Approve/{transferId}");
             StringContent content = new(JsonSerializer.Serialize(transfer));
             content.Headers.ContentType = new("application/json");
-            
+
             try
             {
                 HttpResponseMessage response = await _client.PutAsync(Uri, content);
@@ -107,7 +107,7 @@ namespace MoneyTransfer.UI.MAUI.Services
             Uri = new($"{BASE_URI}/Transfer/Reject/{transferId}");
             StringContent content = new(JsonSerializer.Serialize(transfer));
             content.Headers.ContentType = new("application/json");
-            
+
             try
             {
                 HttpResponseMessage response = await _client.PutAsync(Uri, content);
@@ -155,7 +155,7 @@ namespace MoneyTransfer.UI.MAUI.Services
             {
                 StringContent content = new(JsonSerializer.Serialize(transfer));
                 content.Headers.ContentType = new("application/json");
-                
+
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
                 if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
             }

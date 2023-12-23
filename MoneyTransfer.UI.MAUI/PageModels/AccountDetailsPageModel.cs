@@ -8,7 +8,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
     public partial class AccountDetailsPageModel(IDataService dataService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
-        
+
         [ObservableProperty]
         private AccountDetails _accountDetails = default!;
 

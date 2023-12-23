@@ -11,7 +11,7 @@
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand, Mode=OneWay}" />
     </ContentPage.Behaviors>
     <Grid Style="{StaticResource ContainerGridStyle}">
-        <CollectionView ItemsSource="{Binding TransferDetails}" SelectedItem="{Binding SelectedTransfer, Mode=TwoWay}" SelectionChangedCommand="{Binding ChangeSelectionCommand}" SelectionMode="Single">
+        <CollectionView ItemsSource="{Binding TransferDetails}" SelectedItem="{Binding SelectedTransfer, Mode=TwoWay}" SelectionChangedCommand="{Binding ChangeSelectionCommand, Mode=OneWay}" SelectionMode="Single">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="3" />
             </CollectionView.ItemsLayout>
