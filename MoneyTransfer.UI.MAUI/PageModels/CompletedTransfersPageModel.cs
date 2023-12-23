@@ -7,9 +7,10 @@ using System.Collections.ObjectModel;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class CompletedTransfersPageModel(IDataService dataService) : ObservableObject
+    public partial class CompletedTransfersPageModel(IDataService dataService, IMockUserService userService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
+        private readonly IMockUserService _mockUserService = userService;
 
         [ObservableProperty]
         private ReadOnlyCollection<TransferDetails> _transferDetails = default!;
@@ -31,9 +32,8 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            // TODO: The passed in id is hard coded here for testing
-            int userId = 1;
-            TransferDetails = await _dataService.GetCompletedTransfersForUserAsync(userId) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
+            User loggedInUser = (await _mockUserService.GetLoggedInUserAsync())!;
+            TransferDetails = await _dataService.GetCompletedTransfersForUserAsync(loggedInUser.Id) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
         }
     }
 }

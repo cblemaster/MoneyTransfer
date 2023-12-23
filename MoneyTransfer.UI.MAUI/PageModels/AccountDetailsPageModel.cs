@@ -5,9 +5,10 @@ using MoneyTransfer.UI.MAUI.Services.Models;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class AccountDetailsPageModel(IDataService dataService) : ObservableObject
+    public partial class AccountDetailsPageModel(IDataService dataService, IMockUserService userService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
+        private readonly IMockUserService _mockUserService = userService;
 
         [ObservableProperty]
         private AccountDetails _accountDetails = default!;
@@ -17,11 +18,8 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            // TODO: The passed in userid is hard coded here
-            // We will want to get it by accessing the current logged in user
-            // once a user service is available...
-            int userId = 1;
-            AccountDetails = await _dataService.GetAccountDetailsForUserAsync(userId) ?? Helpers.AccountNotFound;
+            User loggedInUser = (await _mockUserService.GetLoggedInUserAsync())!;
+            AccountDetails = await _dataService.GetAccountDetailsForUserAsync(loggedInUser.Id) ?? Helpers.AccountNotFound;
         }
     }
 }

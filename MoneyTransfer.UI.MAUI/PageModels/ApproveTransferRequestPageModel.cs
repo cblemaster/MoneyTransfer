@@ -5,9 +5,10 @@ using MoneyTransfer.UI.MAUI.Services.Models;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class ApproveTransferRequestPageModel(IDataService dataService) : ObservableObject
+    public partial class ApproveTransferRequestPageModel(IDataService dataService, IMockUserService userService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
+        private readonly IMockUserService _mockUserService = userService;
 
         [ObservableProperty]
         private TransferDetails _transferDetails = default!;
@@ -26,8 +27,8 @@ namespace MoneyTransfer.UI.MAUI.PageModels
                 await Shell.Current.DisplayAlert("Error!", "Only transfer requests with a status of Pending can be approved.", "OK");
             }
 
-            int currentUserId = 2; // TODO: Needs to be the logged in user's id
-            decimal currentBalance = (await _dataService.GetAccountDetailsForUserAsync(currentUserId)).CurrentBalance;
+            User loggedInUser = (await _mockUserService.GetLoggedInUserAsync())!;
+            decimal currentBalance = (await _dataService.GetAccountDetailsForUserAsync(loggedInUser.Id)).CurrentBalance;
             if (currentBalance <= 0 || currentBalance < TransferDetails.Amount)
             {
                 await Shell.Current.DisplayAlert("Error!", "Only transfer requests with an amount less than or equal to your current balance can be approved.", "OK");
