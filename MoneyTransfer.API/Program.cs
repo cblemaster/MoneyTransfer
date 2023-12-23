@@ -267,6 +267,18 @@ app.MapGet("/User/Transfer/Completed/{id}", async Task<object> (int id, MoneyTra
             .ToListAsync();
     });
 
+app.MapGet("/User/LoggedIn", async (MoneyTransferContext context) =>
+{
+    if (context is null || context.Users is null ) { return null; }  // TODO: return null object instead of null
+    return await context.Users.SingleOrDefaultAsync(user => user.Username == "brian"); // TODO: Change this to return actual logged in user after auth is in place
+});
+
+app.MapGet("/User/NotLoggedIn", async (MoneyTransferContext context) =>
+{
+    if (context is null || context.Users is null) { return null; }  // TODO: return null object instead of null
+    return await context.Users.Where(user => user.Username != "brian").ToListAsync(); // TODO: Change this to return actual not logged in users after auth is in place
+});
+
 app.MapGet("/User/Transfer/Pending/{id}", async Task<object> (int id, MoneyTransferContext context) =>
     {
         if (id <= 0) { return Results.BadRequest(); }
