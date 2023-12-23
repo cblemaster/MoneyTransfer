@@ -26,8 +26,6 @@ namespace MoneyTransfer.UI.MAUI
                     .AddSingleton<IMockUserService, MockHttpUserService>()
                     .AddTransient<AccountDetailsPageModel>()
                     .AddTransient<AccountDetailsPage>()
-                    .AddTransient<ApproveTransferRequestPageModel>()
-                    .AddTransient<ApproveTransferRequestPage>()
                     .AddTransient<CompletedTransfersPageModel>()
                     .AddTransient<CompletedTransfersPage>()
                     .AddTransient<LogInPageModel>()
@@ -38,14 +36,10 @@ namespace MoneyTransfer.UI.MAUI
                     .AddTransient<PendingTransfersPage>()
                     .AddTransient<RegisterPageModel>()
                     .AddTransient<RegisterPage>()
-                    .AddTransient<RejectTransferRequestPageModel>()
-                    .AddTransient<RejectTransferRequestPage>()
                     .AddTransient<RequestTransferPageModel>()
                     .AddTransient<RequestTransferPage>()
                     .AddTransient<SendTransferPageModel>()
                     .AddTransient<SendTransferPage>()
-                    .AddTransient<TransferDetailsPageModel>()
-                    .AddTransient<TransferDetailsPage>()
                     ;
 
 #if DEBUG
