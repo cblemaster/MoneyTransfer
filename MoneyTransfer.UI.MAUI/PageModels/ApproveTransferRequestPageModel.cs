@@ -22,10 +22,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private async Task Approve()
         {
             if (!CanApprove) { return; }
-            if (TransferDetails.TransferStatus != "Pending")
-            {
-                await Shell.Current.DisplayAlert("Error!", "Only transfer requests with a status of Pending can be approved.", "OK");
-            }
 
             User loggedInUser = (await _mockUserService.GetLoggedInUserAsync())!;
             decimal currentBalance = (await _dataService.GetAccountDetailsForUserAsync(loggedInUser.Id)).CurrentBalance;
@@ -47,7 +43,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         }
 
         [ObservableProperty]
-        private bool canApprove = true; // TODO: if type == request && status == pending && user from is the current logged in user
+        private bool canApprove;
 
         [ObservableProperty]
         private bool canCancel = true;
@@ -57,7 +53,9 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (TransferId > 0)
             {
                 TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
-                CanApprove = TransferDetails.TransferStatus == "Pending";
+                User loggedInUser = (await _mockUserService.GetLoggedInUserAsync())!;
+
+                CanApprove = TransferDetails.TransferStatus == "Pending" && TransferDetails.TransferType == "Request" && TransferDetails.UserFromName == loggedInUser!.Username;
             }
         }
     }

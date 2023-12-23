@@ -6,9 +6,10 @@ using MoneyTransfer.UI.MAUI.Services.Models;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class TransferDetailsPageModel(IDataService dataService) : ObservableObject
+    public partial class TransferDetailsPageModel(IDataService dataService, IMockUserService userService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
+        private readonly IMockUserService _mockUserService = userService;
 
         [ObservableProperty]
         private TransferDetails _transferDetails = default!;
@@ -42,10 +43,10 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         }
 
         [ObservableProperty]
-        private bool canApprove = true;  // TODO: if type == request && status == pending && user from is the current logged in user
+        private bool canApprove;
 
         [ObservableProperty]
-        private bool canReject = true; // TODO: if type == request && status == pending && user from is the current logged in user
+        private bool canReject;
 
         [ObservableProperty]
         private bool canCancel = true;
@@ -55,7 +56,9 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (TransferId > 0)
             {
                 TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
-                CanApprove = TransferDetails.TransferStatus == "Pending";
+                User loggedInUser = (await _mockUserService.GetLoggedInUserAsync())!;
+
+                CanApprove = TransferDetails.TransferStatus == "Pending" && TransferDetails.TransferType == "Request" && TransferDetails.UserFromName == loggedInUser!.Username;
                 CanReject = CanApprove;
             }
         }

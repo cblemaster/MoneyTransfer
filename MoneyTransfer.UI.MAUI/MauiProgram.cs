@@ -23,6 +23,7 @@ namespace MoneyTransfer.UI.MAUI
                 .Services
                     .AddSingleton<AppShell>()
                     .AddSingleton<IDataService, HttpDataService>()
+                    .AddSingleton<IMockUserService, MockHttpUserService>()
                     .AddTransient<AccountDetailsPageModel>()
                     .AddTransient<AccountDetailsPage>()
                     .AddTransient<ApproveTransferRequestPageModel>()

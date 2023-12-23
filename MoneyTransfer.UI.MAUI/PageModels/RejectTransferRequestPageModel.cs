@@ -5,9 +5,10 @@ using MoneyTransfer.UI.MAUI.Services.Models;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class RejectTransferRequestPageModel(IDataService dataService) : ObservableObject
+    public partial class RejectTransferRequestPageModel(IDataService dataService, IMockUserService userService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
+        private readonly IMockUserService _mockUserService = userService;
 
         [ObservableProperty]
         private TransferDetails _transferDetails = default!;
@@ -21,10 +22,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private async Task Reject()
         {
             if (!CanReject) { return; }
-            if (TransferDetails.TransferStatus != "Pending")
-            {
-                await Shell.Current.DisplayAlert("Error!", "Only transfer requests with a status of Pending can be rejected.", "OK");
-            }
 
             await _dataService.RejectTransferRequestAsync(TransferDetails.Id, TransferDetails);
             await Shell.Current.DisplayAlert("Success!", "Transfer rejected.", "OK");
@@ -39,7 +36,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         }
 
         [ObservableProperty]
-        private bool canReject = true; // TODO: if type == request && status == pending && user from is the current logged in user
+        private bool canReject;
 
         [ObservableProperty]
         private bool canCancel = true;
@@ -49,7 +46,9 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (TransferId > 0)
             {
                 TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
-                CanReject = TransferDetails.TransferStatus == "Pending";
+                User loggedInUser = (await _mockUserService.GetLoggedInUserAsync())!;
+
+                CanReject = TransferDetails.TransferStatus == "Pending" && TransferDetails.TransferType == "Request" && TransferDetails.UserFromName == loggedInUser!.Username;
             }
         }
     }
