@@ -1,17 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MoneyTransfer.UI.MAUI.Pages;
 using MoneyTransfer.UI.MAUI.Services;
 using MoneyTransfer.UI.MAUI.Services.Models;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    [QueryProperty(nameof(TransferId), "id")]
-    public partial class RejectTransferRequestPageModel : ObservableObject
+    public partial class RejectTransferRequestPageModel(IDataService dataService) : ObservableObject
     {
-        private readonly IDataService _dataService;
-
-        public RejectTransferRequestPageModel(IDataService dataService) => _dataService = dataService;
-
+        private readonly IDataService _dataService = dataService;
+        
         [ObservableProperty]
         private TransferDetails _transferDetails = default!;
 
@@ -28,14 +26,14 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (TransferDetails.TransferStatus != "Pending") { return; }
             
             await _dataService.RejectTransferRequestAsync(TransferDetails.Id, TransferDetails);
-            await Shell.Current.GoToAsync(($"TransferDetails?id={TransferDetails.Id}"));
+            await Shell.Current.GoToAsync("CompletedTransfers");
         }
 
         [RelayCommand]
         private async Task Cancel()
         {
             if (!CanCancel) { return; }
-            await Shell.Current.GoToAsync("..");
+            await Shell.Current.Navigation.PopAsync();
         }
 
         [ObservableProperty]
@@ -46,7 +44,11 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
+            if (TransferId > 0)
+            {
+                TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
+                CanReject = TransferDetails.TransferStatus == "Pending";
+            }
         }
     }
 }

@@ -4,9 +4,18 @@ namespace MoneyTransfer.UI.MAUI.Pages;
 
 public partial class RejectTransferRequestPage : ContentPage
 {
-    public RejectTransferRequestPage(RejectTransferRequestPageModel pageModel)
+    public RejectTransferRequestPage(int id)
     {
         InitializeComponent();
-        BindingContext = pageModel;
+
+        if (Handler is not null && Handler.MauiContext is not null)
+        {
+            RejectTransferRequestPageModel? pageModel = Handler.MauiContext.Services.GetService<RejectTransferRequestPageModel>();
+            if (pageModel != null)
+            {
+                BindingContext = pageModel;
+                pageModel.TransferId = id;
+            }
+        }
     }
 }

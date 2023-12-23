@@ -1,17 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MoneyTransfer.UI.MAUI.Pages;
 using MoneyTransfer.UI.MAUI.Services;
 using MoneyTransfer.UI.MAUI.Services.Models;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    [QueryProperty(nameof(TransferId), "id")]
-    public partial class TransferDetailsPageModel : ObservableObject
+    public partial class TransferDetailsPageModel(IDataService dataService) : ObservableObject
     {
-        private readonly IDataService _dataService;
-
-        public TransferDetailsPageModel(IDataService dataService) => _dataService = dataService;
-
+        private readonly IDataService _dataService = dataService;
+        
         [ObservableProperty]
         private TransferDetails _transferDetails = default!;
 
@@ -24,23 +22,23 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private async Task Approve()
         {
             if (!CanApprove) { return; }
-            if (TransferId <= 0) { return; }
-            await Shell.Current.GoToAsync(($"ApproveTransfer?id={TransferId}"));
+            if (TransferDetails.Id <= 0) { return; }
+            await Shell.Current.Navigation.PushModalAsync(new ApproveTransferRequestPage(TransferDetails.Id));
         }
 
         [RelayCommand]
         private async Task Reject()
         {
             if (!CanReject) { return; }
-            if (TransferId <= 0) { return; }
-            await Shell.Current.GoToAsync(($"RejectTransfer?id={TransferId}"));
+            if (TransferDetails.Id <= 0) { return; }
+            await Shell.Current.Navigation.PushModalAsync(new RejectTransferRequestPage(TransferDetails.Id));
         }
 
         [RelayCommand]
         private async Task Cancel()
         {
             if (!CanCancel) { return; }
-            await Shell.Current.GoToAsync("..");
+            await Shell.Current.Navigation.PopAsync();
         }
 
         [ObservableProperty]
@@ -54,9 +52,12 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
-            CanApprove = TransferDetails.TransferStatus == "Pending";
-            CanReject = CanApprove;
+            if (TransferId > 0)
+            {
+                TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
+                CanApprove = TransferDetails.TransferStatus == "Pending";
+                CanReject = CanApprove;
+            }
         }
     }
 }
