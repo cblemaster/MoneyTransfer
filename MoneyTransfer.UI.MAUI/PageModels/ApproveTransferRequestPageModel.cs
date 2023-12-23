@@ -21,15 +21,21 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         [RelayCommand]
         private async Task Approve()
         {
-            // TODO: Error handling...
             if (!CanApprove) { return; }
-            if (TransferDetails.TransferStatus != "Pending") { return; }
+            if (TransferDetails.TransferStatus != "Pending")
+            {
+                await Shell.Current.DisplayAlert("Error!", "Only transfer requests with a status of Pending can be approved.", "OK");
+            }
             
             int currentUserId = 2; // TODO: Needs to be the logged in user's id
             decimal currentBalance = (await _dataService.GetAccountDetailsForUserAsync(currentUserId)).CurrentBalance;
-            if (currentBalance <= 0 || currentBalance < TransferDetails.Amount) { return; }
+            if (currentBalance <= 0 || currentBalance < TransferDetails.Amount)
+            {
+                await Shell.Current.DisplayAlert("Error!", "Only transfer requests with an amount less than or equal to your current balance can be approved.", "OK");
+            }
             
             await _dataService.ApproveTransferRequestAsync(TransferDetails.Id, TransferDetails);
+            await Shell.Current.DisplayAlert("Success!", "Transfer approved.", "OK");
             await Shell.Current.GoToAsync("CompletedTransfers");
         }
 

@@ -21,11 +21,14 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         [RelayCommand]
         private async Task Reject()
         {
-            // TODO: Error handling...
             if (!CanReject) { return; }
-            if (TransferDetails.TransferStatus != "Pending") { return; }
-            
+            if (TransferDetails.TransferStatus != "Pending")
+            {
+                await Shell.Current.DisplayAlert("Error!", "Only transfer requests with a status of Pending can be rejected.", "OK");
+            }
+
             await _dataService.RejectTransferRequestAsync(TransferDetails.Id, TransferDetails);
+            await Shell.Current.DisplayAlert("Success!", "Transfer rejected.", "OK");
             await Shell.Current.GoToAsync("CompletedTransfers");
         }
 
