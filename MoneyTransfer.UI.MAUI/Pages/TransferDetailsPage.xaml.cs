@@ -8,9 +8,9 @@ public partial class TransferDetailsPage : ContentPage
     {
         InitializeComponent();
 
-        if (Handler is not null && Handler.MauiContext is not null)
+        if (Shell.Current.Handler is not null && Shell.Current.Handler.MauiContext is not null)
         {
-            TransferDetailsPageModel? pageModel = Handler.MauiContext.Services.GetService<TransferDetailsPageModel>();
+            TransferDetailsPageModel? pageModel = Shell.Current.Handler.MauiContext.Services.GetService<TransferDetailsPageModel>();
             if (pageModel != null)
             {
                 BindingContext = pageModel;

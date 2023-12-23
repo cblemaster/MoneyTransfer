@@ -24,17 +24,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (TransferDetails.TransferStatus != "Pending")
             {
                 await Shell.Current.DisplayAlert("Error!", "Only transfer requests with a status of Pending can be approved.", "OK");
-
-                /* Unmerged change from project 'MoneyTransfer.UI.MAUI (net8.0-windows10.0.19041.0)'
-                Before:
-                            }
-
-                            int currentUserId = 2; // TODO: Needs to be the logged in user's id
-                After:
-                            }
-
-                            int currentUserId = 2; // TODO: Needs to be the logged in user's id
-                */
             }
 
             int currentUserId = 2; // TODO: Needs to be the logged in user's id
@@ -46,7 +35,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
             await _dataService.ApproveTransferRequestAsync(TransferDetails.Id, TransferDetails);
             await Shell.Current.DisplayAlert("Success!", "Transfer approved.", "OK");
-            await Shell.Current.GoToAsync("CompletedTransfers");
+            await Shell.Current.GoToAsync("///CompletedTransfers");
         }
 
         [RelayCommand]

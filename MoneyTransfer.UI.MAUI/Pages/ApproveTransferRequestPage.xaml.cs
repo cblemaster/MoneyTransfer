@@ -8,9 +8,9 @@ public partial class ApproveTransferRequestPage : ContentPage
     {
         InitializeComponent();
 
-        if (Handler is not null && Handler.MauiContext is not null)
+        if (Shell.Current.Handler is not null && Shell.Current.Handler.MauiContext is not null)
         {
-            ApproveTransferRequestPageModel? pageModel = Handler.MauiContext.Services.GetService<ApproveTransferRequestPageModel>();
+            ApproveTransferRequestPageModel? pageModel = Shell.Current.Handler.MauiContext.Services.GetService<ApproveTransferRequestPageModel>();
             if (pageModel != null)
             {
                 BindingContext = pageModel;

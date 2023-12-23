@@ -28,7 +28,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
             await _dataService.RejectTransferRequestAsync(TransferDetails.Id, TransferDetails);
             await Shell.Current.DisplayAlert("Success!", "Transfer rejected.", "OK");
-            await Shell.Current.GoToAsync("CompletedTransfers");
+            await Shell.Current.GoToAsync("///CompletedTransfers");
         }
 
         [RelayCommand]
