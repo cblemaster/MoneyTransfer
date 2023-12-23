@@ -8,7 +8,7 @@
              x:DataType="{x:Type pageModels:PendingTransfersPageModel}"
              Title="Pending Transfers">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand}" />
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand, Mode=OneWay}" />
     </ContentPage.Behaviors>
     <Grid Style="{StaticResource ContainerGridStyle}">
         <CollectionView ItemsSource="{Binding TransferDetails}" SelectedItem="{Binding SelectedTransfer, Mode=TwoWay}" SelectionChangedCommand="{Binding ChangeSelectionCommand}" SelectionMode="Single">

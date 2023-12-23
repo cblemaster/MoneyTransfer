@@ -16,8 +16,8 @@
         <Label Text="{Binding TransferDetails.UserToName, StringFormat='User To: {0}', Mode=OneWay}" />
         <Label Text="{Binding TransferDetails.Amount, StringFormat='Amount: {0}', Mode=OneWay}" />
         <HorizontalStackLayout Spacing="10">
-            <Button Command="{Binding RejectCommand}" IsEnabled="{Binding CanReject}" Text="Yes, Reject" />
-            <Button Command="{Binding CancelCommand}" IsEnabled="{Binding CanCancel}" Text="No, Cancel" />
+            <Button Command="{Binding RejectCommand}" IsEnabled="{Binding CanReject, Mode=OneWay}" Text="Yes, Reject" />
+            <Button Command="{Binding CancelCommand}" IsEnabled="{Binding CanCancel, Mode=OneWay}" Text="No, Cancel" />
         </HorizontalStackLayout>
     </VerticalStackLayout>
 </ContentPage>

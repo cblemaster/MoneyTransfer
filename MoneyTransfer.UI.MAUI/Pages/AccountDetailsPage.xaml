@@ -7,7 +7,7 @@
              x:DataType="{x:Type pageModels:AccountDetailsPageModel}"
              Title="Account Details">
     <ContentPage.Behaviors>
-        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand}" />
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand, Mode=OneWay}" />
     </ContentPage.Behaviors>
     <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}" Spacing="30">
         <Label Text="{Binding AccountDetails.Username, StringFormat='Hello, {0}', Mode=OneWay}" FontSize="28" 
