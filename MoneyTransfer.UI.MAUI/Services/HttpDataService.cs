@@ -29,7 +29,7 @@ namespace MoneyTransfer.UI.MAUI.Services
             try
             {
                 HttpResponseMessage response = await _client.PutAsync(Uri, content);
-                if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
+                response.EnsureSuccessStatusCode();
             }
             catch (Exception) { throw; }
         }
@@ -111,7 +111,7 @@ namespace MoneyTransfer.UI.MAUI.Services
             try
             {
                 HttpResponseMessage response = await _client.PutAsync(Uri, content);
-                if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
+                response.EnsureSuccessStatusCode();
             }
             catch (Exception) { throw; }
         }
@@ -134,7 +134,7 @@ namespace MoneyTransfer.UI.MAUI.Services
                 content.Headers.ContentType = new("application/json");
 
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
-                if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
+                response.EnsureSuccessStatusCode();
             }
             catch (Exception) { throw; }
         }
@@ -157,7 +157,7 @@ namespace MoneyTransfer.UI.MAUI.Services
                 content.Headers.ContentType = new("application/json");
 
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
-                if (!response.IsSuccessStatusCode) { throw new HttpRequestException(); }  //TODO: Is this the right exception to throw here?
+                response.EnsureSuccessStatusCode();
             }
             catch (Exception) { throw; }
         }
