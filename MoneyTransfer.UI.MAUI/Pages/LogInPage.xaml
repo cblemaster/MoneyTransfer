@@ -1,51 +1,28 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:converters="clr-namespace:MoneyTransfer.UI.MAUI.Converters"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:pageModels="clr-namespace:MoneyTransfer.UI.MAUI.PageModels"
              x:Class="MoneyTransfer.UI.MAUI.Pages.LogInPage"
-             Title="LogInPage">
+             x:DataType="{x:Type pageModels:LogInPageModel}"
+             Title="Log In">
     <ContentPage.Resources>
-        <converters:IntRangeToBoolConverter x:Key="UsernameConverter"
-                                            MinValue="1" MaxValue="50" />
-        <converters:IntRangeToBoolConverter x:Key="PasswordConverter"
-                                            MinValue="1" MaxValue="200" />
+        <Style x:Key="InvalidEntryStyle" TargetType="Entry">
+            <Setter Property="TextColor" Value="{StaticResource Magenta}" />
+            <Setter Property="BackgroundColor" Value="{StaticResource LightPink}" />
+        </Style>
     </ContentPage.Resources>
-    <VerticalStackLayout Spacing="30" Style="{StaticResource ContainerVerticalStackLayoutStyle}">
-        <Entry x:Name="UsernameEntry" Placeholder="Username, max length 50" MaxLength="50">
-            <Entry.Triggers>
-                <DataTrigger TargetType="Entry"
-                             Binding="{Binding Source={x:Reference UsernameEntry}, Path=Text.Length, Mode=OneWay, Converter={StaticResource UsernameConverter}}"
-                             Value="False">
-                    <Setter Property="BackgroundColor" Value="{StaticResource LightPink}" />
-                    <Setter Property="PlaceholderColor" Value="{StaticResource White}" />
-                </DataTrigger>
-            </Entry.Triggers>
+    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}" Spacing="20">
+        <Entry Text="{Binding Username, Mode=TwoWay}" Placeholder="Username" WidthRequest="200">
+            <Entry.Behaviors>
+                <toolkit:TextValidationBehavior InvalidStyle="{StaticResource InvalidEntryStyle}" Flags="ValidateOnValueChanged" MaximumLength="50" MinimumLength="1" />
+            </Entry.Behaviors>
         </Entry>
-        <Entry x:Name="PasswordEntry" IsPassword="True" Placeholder="Password, max length 200" 
-               MaxLength="200">
-            <Entry.Triggers>
-                <DataTrigger TargetType="Entry"
-                             Binding="{Binding Source={x:Reference PasswordEntry}, Path=Text.Length, Mode=OneWay, Converter={StaticResource PasswordConverter}}"
-                             Value="False">
-                    <Setter Property="BackgroundColor" Value="{StaticResource LightPink}" />
-                    <Setter Property="PlaceholderColor" Value="{StaticResource White}" />
-                </DataTrigger>
-            </Entry.Triggers>
+        <Entry Text="{Binding Password, Mode=TwoWay}" Placeholder="Password" IsPassword="True" WidthRequest="200">
+            <Entry.Behaviors>
+                <toolkit:TextValidationBehavior InvalidStyle="{StaticResource InvalidEntryStyle}" Flags="ValidateOnValueChanged" MaximumLength="200" MinimumLength="4" />
+            </Entry.Behaviors>
         </Entry>
-        <Button x:Name="LogInButton" Text="Log In">
-            <Button.Triggers>
-                <DataTrigger TargetType="Button"
-                             Binding="{Binding Source={x:Reference UsernameEntry}, Path=Text.Length, Mode=OneWay, Converter={StaticResource UsernameConverter}}"
-                             Value="False">
-                    <Setter Property="IsEnabled" Value="False" />
-                </DataTrigger>
-                <DataTrigger TargetType="Button"
-                             Binding="{Binding Source={x:Reference PasswordEntry}, Path=Text.Length, Mode=OneWay, Converter={StaticResource PasswordConverter}}"
-                             Value="False">
-                    <Setter Property="IsEnabled" Value="False" />
-                </DataTrigger>
-            </Button.Triggers>
-        </Button>
-        <Button Text="Register, if you do not already have an account" />
+        <Button Command="{Binding LogInCommand, Mode=OneWay}" IsEnabled="{Binding CanLogIn, Mode=OneWay}" Text="Log In" />
     </VerticalStackLayout>
 </ContentPage>
