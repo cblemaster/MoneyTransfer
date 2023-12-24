@@ -281,10 +281,8 @@ app.MapGet("/User/Transfer/Completed/{id}", async Task<object> (int id, MoneyTra
                     UserFromName = a.AccountIdFromNavigation.User.Username,
                     UserToName = a.AccountIdToNavigation.User.Username,
                 })
-            .OrderByDescending(a => a.DateCreated)
-            .ThenBy(a => a.TransferType)
-            .ThenBy(a => a.Amount)
-            .ToListAsync();
+                .OrderByDescending(a => a.DateCreated)
+                .ToListAsync();
     });
 
 app.MapGet("/User/Transfer/Pending/{id}", async Task<object> (int id, MoneyTransferContext context) =>
@@ -332,10 +330,8 @@ app.MapGet("/User/Transfer/Pending/{id}", async Task<object> (int id, MoneyTrans
                         UserFromName = a.AccountIdFromNavigation.User.Username,
                         UserToName = a.AccountIdToNavigation.User.Username,
                     })
-                .OrderByDescending(a => a.DateCreated)
-                .ThenBy(a => a.TransferType)
-                .ThenBy(a => a.Amount)
-                .ToListAsync();
+                    .OrderByDescending(a => a.DateCreated)
+                    .ToListAsync();
     });
 
 app.Run();
