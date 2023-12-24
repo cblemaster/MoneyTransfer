@@ -32,6 +32,7 @@
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand, Mode=OneWay}" />
     </ContentPage.Behaviors>
     <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}" Spacing="10">
+        <Label Text="Step One: Select a user to request from:" TextColor="{StaticResource Primary}" />
         <CollectionView ItemsSource="{Binding Users, Mode=OneWay}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}" SelectionMode="Single">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10" />
@@ -47,6 +48,7 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        <Label Text="Step Two: Enter the amount you are requesting:" TextColor="{StaticResource Primary}" />
         <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
             <Label Text="Amount:" FontSize="18" VerticalOptions="Center" />
             <Entry Text="{Binding Amount, StringFormat='{0:C}', Mode=TwoWay}" FontSize="24" Keyboard="Numeric" 
@@ -56,6 +58,7 @@
                 </Entry.Behaviors>
             </Entry>            
         </HorizontalStackLayout>
+        <Label Text="Step Three: Click Request transfer:" TextColor="{StaticResource Primary}" />
         <Button Command="{Binding RequestTransferCommand, Mode=OneWay}" IsEnabled="{Binding CanRequestTransfer, Mode=OneWay}" Text="Request transfer" />
     </VerticalStackLayout>
 </ContentPage>
