@@ -40,7 +40,7 @@
 
 ## Improvement opportunities:
 - There is some xaml duplication in the MAUI project pages that have similar functionality (send transfer/request transfer, approve transfer request/reject transfer request, completed transfers/pending transfers); this could be remediated with content templates but this might also introduce complications with data bindings
-- TBD
+- The http data service in the MAUI project seems a bit slow, look for performance improvements there
 
 ## What I learned from this project:
 - TBD
