@@ -26,31 +26,18 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private async Task SendTransfer()
         {
             if (!CanSendTransfer) { return; }
-            if (SelectedUser is null)
-            {
-                CanSendTransfer = false;
-                return;
-            }
+            if (SelectedUser is null) { return; }
             if (!decimal.TryParse(Amount, out decimal amount) || amount <= 0)
-            {
-                CanSendTransfer = false;
-                return;
-            }
+                { return; }
 
             User UserFrom = (await _mockUserService.GetLoggedInUserAsync())!;
             User UserTo = (await _mockUserService.GetUserById(SelectedUser.Id))!;
+            if (UserFrom.Id == UserTo.Id) { return; }
 
             decimal userFromBalance = (await _dataService.GetAccountDetailsForUserAsync(UserFrom.Id)).CurrentBalance;
             if (userFromBalance < amount)
             {
                 await Shell.Current.DisplayAlert("Error!", "Only transfer requests with an amount less than or equal to your current balance can be sent.", "OK");
-                CanSendTransfer = false;
-                return;
-            }
-
-            if (UserFrom.Id == UserTo.Id)
-            {
-                CanSendTransfer = false;
                 return;
             }
 

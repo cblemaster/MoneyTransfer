@@ -26,25 +26,14 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private async Task RequestTransfer()
         {
             if (!CanRequestTransfer) { return; }
-            if (SelectedUser is null)
-            {
-                CanRequestTransfer = false;
-                return;
-            }
+            if (SelectedUser is null) { return; }
             if (!decimal.TryParse(Amount, out decimal amount) || amount <= 0)
-            {
-                CanRequestTransfer = false;
-                return;
-            }
+                { return; }
 
             User UserTo = (await _mockUserService.GetLoggedInUserAsync())!;
             User UserFrom = (await _mockUserService.GetUserById(SelectedUser.Id))!;
 
-            if (UserFrom.Id == UserTo.Id)
-            {
-                CanRequestTransfer = false;
-                return;
-            }
+            if (UserFrom.Id == UserTo.Id) { return; }
 
             await _dataService.RequestTransferAsync(UserFrom.Username, UserTo.Username, amount);
             await Shell.Current.DisplayAlert("Success!", "Request submitted, go to Pending Transfers to see it.", "OK");
