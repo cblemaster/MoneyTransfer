@@ -1,5 +1,4 @@
-﻿using MoneyTransfer.UI.MAUI.Services.Models;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace MoneyTransfer.UI.MAUI.Services
 {
@@ -7,6 +6,7 @@ namespace MoneyTransfer.UI.MAUI.Services
     {
         Task<User?> GetLoggedInUserAsync();
         Task<ReadOnlyCollection<User>?> AllUsersNotLoggedIn(User loggedInUser);
+        Task<User?> GetUserById(int id);
     }
 
     public class User

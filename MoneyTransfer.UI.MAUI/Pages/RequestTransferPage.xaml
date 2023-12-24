@@ -1,9 +1,61 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:pageModels="clr-namespace:MoneyTransfer.UI.MAUI.PageModels"
+             xmlns:services="clr-namespace:MoneyTransfer.UI.MAUI.Services"
              x:Class="MoneyTransfer.UI.MAUI.Pages.RequestTransferPage"
-             Title="RequestTransferPage">
-    <Grid Style="{StaticResource ContainerGridStyle}">
-        
-    </Grid>
+             x:DataType="{x:Type pageModels:RequestTransferPageModel}"
+             Title="Request Transfer">
+    <ContentPage.Resources>
+        <Style TargetType="Frame">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor"
+                                        Value="{StaticResource LightYellowAccent}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+        <Style x:Key="InvalidEntryStyle" TargetType="Entry">
+            <Setter Property="TextColor" Value="{StaticResource Magenta}" />
+            <Setter Property="BackgroundColor" Value="{StaticResource LightPink}" />
+        </Style>
+    </ContentPage.Resources>
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand, Mode=OneWay}" />
+    </ContentPage.Behaviors>
+    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}" Spacing="10">
+        <CollectionView ItemsSource="{Binding Users, Mode=OneWay}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}" SelectionMode="Single">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="{x:Type services:User}">
+                    <Frame WidthRequest="100" HeightRequest="140">
+                        <VerticalStackLayout>
+                            <Image Source="user_solid.png" />
+                            <Label Text="{Binding Username, Mode=OneWay}" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+            <Label Text="Amount:" FontSize="18" VerticalOptions="Center" />
+            <Entry Text="{Binding Amount, StringFormat='{0:C}', Mode=TwoWay}" FontSize="24" Keyboard="Numeric" 
+                   WidthRequest="100">
+                <Entry.Behaviors>
+                    <toolkit:NumericValidationBehavior InvalidStyle="{StaticResource InvalidEntryStyle}" MaximumDecimalPlaces="2" MinimumValue="0.01" Flags="ValidateOnValueChanged" />
+                </Entry.Behaviors>
+            </Entry>            
+        </HorizontalStackLayout>
+        <Button Command="{Binding RequestTransferCommand, Mode=OneWay}" IsEnabled="{Binding CanRequestTransfer, Mode=OneWay}" Text="Request transfer" />
+    </VerticalStackLayout>
 </ContentPage>

@@ -20,7 +20,7 @@ namespace MoneyTransfer.UI.MAUI.Services
         {
             if (loggedInUser is null || loggedInUser.Id <= 0) { return null!; }
 
-            Uri = new($"{BASE_URI}//User/NotLoggedIn");
+            Uri = new($"{BASE_URI}/User/NotLoggedIn");
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
@@ -34,6 +34,19 @@ namespace MoneyTransfer.UI.MAUI.Services
         public async Task<User?> GetLoggedInUserAsync()
         {
             Uri = new($"{BASE_URI}/User/LoggedIn");
+            try
+            {
+                HttpResponseMessage response = await _client.GetAsync(Uri);
+                return response.IsSuccessStatusCode && response.Content is not null
+                    ? await response.Content.ReadFromJsonAsync<User>()
+                    : null;
+            }
+            catch (Exception) { throw; }
+        }
+
+        public async Task<User?> GetUserById(int id)
+        {
+            Uri = new($"{BASE_URI}/User/{id}");
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);

@@ -21,6 +21,7 @@
 
     <Color x:Key="LightPink">LightPink</Color>
     <Color x:Key="AquaAccent">#DAF0EB</Color>
+    <Color x:Key="LightYellowAccent">#FFFF99</Color>
 
     <Color x:Key="Gray100">#E1E1E1</Color>
     <Color x:Key="Gray200">#C8C8C8</Color>

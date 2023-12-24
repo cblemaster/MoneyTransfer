@@ -128,11 +128,10 @@ namespace MoneyTransfer.UI.MAUI.Services
             if (!Helpers.AddTransferIsValid(transfer)) { return; }
 
             Uri = new($"{BASE_URI}/Transfer/Request");
+            StringContent content = new(JsonSerializer.Serialize(transfer));
+            content.Headers.ContentType = new("application/json");
             try
             {
-                StringContent content = new(JsonSerializer.Serialize(transfer));
-                content.Headers.ContentType = new("application/json");
-
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
                 response.EnsureSuccessStatusCode();
             }
