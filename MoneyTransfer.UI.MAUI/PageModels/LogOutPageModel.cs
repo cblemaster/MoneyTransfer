@@ -8,8 +8,12 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         [RelayCommand]
         private async Task LogOut()
         {
+            if (!CanLogOut) { return; }
             //TODO: Logic to log out current logged in user
             await Shell.Current.GoToAsync("///LogIn");
         }
+
+        [ObservableProperty]
+        private bool _canLogOut = true;
     }
 }

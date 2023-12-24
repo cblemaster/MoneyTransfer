@@ -6,6 +6,6 @@
              x:DataType="{x:Type pageModels:LogOutPageModel}"
              Title="Log Out">
     <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}">
-        <Button Command="{Binding LogOutCommand, Mode=OneWay}" Text="Log Out" />
+        <Button Command="{Binding LogOutCommand, Mode=OneWay}" IsEnabled="{Binding CanLogOut, Mode=OneWay}" Text="Log Out" />
     </VerticalStackLayout>
 </ContentPage>
