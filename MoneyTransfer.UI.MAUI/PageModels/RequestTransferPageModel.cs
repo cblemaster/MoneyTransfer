@@ -31,24 +31,22 @@ namespace MoneyTransfer.UI.MAUI.PageModels
                 CanRequestTransfer = false;
                 return;
             }
-
-            decimal amount;
-            if (!decimal.TryParse(Amount, out amount) || amount <= 0)
+            if (!decimal.TryParse(Amount, out decimal amount) || amount <= 0)
             {
                 CanRequestTransfer = false;
                 return;
             }
 
-            User userTo = (await _mockUserService.GetLoggedInUserAsync())!;
+            User UserTo = (await _mockUserService.GetLoggedInUserAsync())!;
             User UserFrom = (await _mockUserService.GetUserById(SelectedUser.Id))!;
 
-            if (UserFrom.Id == userTo.Id)
+            if (UserFrom.Id == UserTo.Id)
             {
                 CanRequestTransfer = false;
                 return;
             }
 
-            await _dataService.RequestTransferAsync(UserFrom.Username, userTo.Username, amount);
+            await _dataService.RequestTransferAsync(UserFrom.Username, UserTo.Username, amount);
             await Shell.Current.DisplayAlert("Success!", "Request submitted, go to Pending Transfers to see it.", "OK");
         }
 

@@ -173,6 +173,12 @@ app.MapPost("/Transfer/Send", async (AddTransfer transfer, MoneyTransferContext 
     return Results.Created($"/Transfer/Details/{transferToAdd.Id}", transferToAdd);
 });
 
+app.MapGet("/User/{id}", async (int id, MoneyTransferContext context) =>
+{
+    if (context is null || context.Users is null) { return null; }  // TODO: return null object instead of null
+    return await context.Users.SingleOrDefaultAsync(user => user.Id == id);
+});
+
 app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext context) =>
     {
         if (id <= 0) { return Results.BadRequest(); }
@@ -217,6 +223,18 @@ app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext con
         ? Results.Ok(account)
         : Results.NotFound();
     });
+
+app.MapGet("/User/LoggedIn", async (MoneyTransferContext context) =>
+{
+    if (context is null || context.Users is null) { return null; }  // TODO: return null object instead of null
+    return await context.Users.SingleOrDefaultAsync(user => user.Username == "brian"); // TODO: Change this to return actual logged in user after auth is in place
+});
+
+app.MapGet("/User/NotLoggedIn", async (MoneyTransferContext context) =>
+{
+    if (context is null || context.Users is null) { return null; }  // TODO: return null object instead of null
+    return await context.Users.Where(user => user.Username != "brian").ToListAsync(); // TODO: Change this to return actual not logged in users after auth is in place
+});
 
 app.MapGet("/User/Transfer/Completed/{id}", async Task<object> (int id, MoneyTransferContext context) =>
     {
@@ -268,24 +286,6 @@ app.MapGet("/User/Transfer/Completed/{id}", async Task<object> (int id, MoneyTra
             .ThenBy(a => a.Amount)
             .ToListAsync();
     });
-
-app.MapGet("/User/LoggedIn", async (MoneyTransferContext context) =>
-{
-    if (context is null || context.Users is null) { return null; }  // TODO: return null object instead of null
-    return await context.Users.SingleOrDefaultAsync(user => user.Username == "brian"); // TODO: Change this to return actual logged in user after auth is in place
-});
-
-app.MapGet("/User/NotLoggedIn", async (MoneyTransferContext context) =>
-{
-    if (context is null || context.Users is null) { return null; }  // TODO: return null object instead of null
-    return await context.Users.Where(user => user.Username != "brian").ToListAsync(); // TODO: Change this to return actual not logged in users after auth is in place
-});
-
-app.MapGet("/User/{id}", async (int id, MoneyTransferContext context) =>
-{
-    if (context is null || context.Users is null) { return null; }  // TODO: return null object instead of null
-    return await context.Users.SingleOrDefaultAsync(user => user.Id == id);
-});
 
 app.MapGet("/User/Transfer/Pending/{id}", async Task<object> (int id, MoneyTransferContext context) =>
     {
