@@ -2,15 +2,16 @@
 using CommunityToolkit.Mvvm.Input;
 using MoneyTransfer.UI.MAUI.Pages;
 using MoneyTransfer.UI.MAUI.Services;
-using MoneyTransfer.UI.MAUI.Services.Models;
+using MoneyTransfer.UI.MAUI.Services.Data;
+using MoneyTransfer.UI.MAUI.Services.User;
 using System.Collections.ObjectModel;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class CompletedTransfersPageModel(IDataService dataService, IMockUserService userService) : ObservableObject
+    public partial class CompletedTransfersPageModel(IDataService dataService, IUserService userService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
-        private readonly IMockUserService _mockUserService = userService;
+        private readonly IUserService _userService = userService;
 
         [ObservableProperty]
         private ReadOnlyCollection<TransferDetails> _transferDetails = default!;
@@ -32,7 +33,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            User loggedInUser = (await _mockUserService.GetLoggedInUserAsync())!;
+            UserDTO loggedInUser = await _userService.GetUserById(_userService.GetUserId());
             TransferDetails = await _dataService.GetCompletedTransfersForUserAsync(loggedInUser.Id) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
         }
     }

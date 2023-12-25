@@ -2,14 +2,15 @@
 using CommunityToolkit.Mvvm.Input;
 using MoneyTransfer.UI.MAUI.Pages;
 using MoneyTransfer.UI.MAUI.Services;
-using MoneyTransfer.UI.MAUI.Services.Models;
+using MoneyTransfer.UI.MAUI.Services.Data;
+using MoneyTransfer.UI.MAUI.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class TransferDetailsPageModel(IDataService dataService, IMockUserService userService) : ObservableObject
+    public partial class TransferDetailsPageModel(IDataService dataService, IUserService userService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
-        private readonly IMockUserService _mockUserService = userService;
+        private readonly IUserService _userService = userService;
 
         [ObservableProperty]
         private TransferDetails _transferDetails = default!;
@@ -56,7 +57,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (TransferId > 0)
             {
                 TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
-                User loggedInUser = (await _mockUserService.GetLoggedInUserAsync())!;
+                UserDTO loggedInUser = await _userService.GetUserById(_userService.GetUserId());
 
                 CanApprove = TransferDetails.TransferStatus == "Pending" && TransferDetails.TransferType == "Request" && TransferDetails.UserFromName == loggedInUser!.Username;
                 CanReject = CanApprove;

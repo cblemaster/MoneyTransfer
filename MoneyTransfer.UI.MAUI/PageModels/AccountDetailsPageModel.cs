@@ -1,14 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MoneyTransfer.UI.MAUI.Services;
-using MoneyTransfer.UI.MAUI.Services.Models;
+using MoneyTransfer.UI.MAUI.Services.Data;
+using MoneyTransfer.UI.MAUI.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class AccountDetailsPageModel(IDataService dataService, IMockUserService userService) : ObservableObject
+    public partial class AccountDetailsPageModel(IDataService dataService, IUserService userService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
-        private readonly IMockUserService _mockUserService = userService;
+        private readonly IUserService _userService = userService;
 
         [ObservableProperty]
         private AccountDetails _accountDetails = default!;
@@ -18,8 +19,11 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            User loggedInUser = (await _mockUserService.GetLoggedInUserAsync())!;
-            AccountDetails = await _dataService.GetAccountDetailsForUserAsync(loggedInUser.Id) ?? Helpers.AccountNotFound;
+            int currentUserId = _userService.GetUserId();
+            if (currentUserId > 0)
+            {
+                AccountDetails = await _dataService.GetAccountDetailsForUserAsync(currentUserId) ?? Helpers.AccountNotFound;
+            }
         }
     }
 }

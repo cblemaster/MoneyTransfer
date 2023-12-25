@@ -1,14 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MoneyTransfer.UI.MAUI.Services;
+using MoneyTransfer.UI.MAUI.Services.Data;
+using MoneyTransfer.UI.MAUI.Services.User;
 using System.Collections.ObjectModel;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class SendTransferPageModel(IDataService dataService, IMockUserService mockUserService) : ObservableObject
+    public partial class SendTransferPageModel(IDataService dataService, IUserService mockUserService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
-        private readonly IMockUserService _mockUserService = mockUserService;
+        private readonly IUserService _userService = mockUserService;
 
         [ObservableProperty]
         private ReadOnlyCollection<User> _users = default!;
@@ -30,8 +31,8 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (!decimal.TryParse(Amount, out decimal amount) || amount <= 0)
                 { return; }
 
-            User UserFrom = (await _mockUserService.GetLoggedInUserAsync())!;
-            User UserTo = (await _mockUserService.GetUserById(SelectedUser.Id))!;
+            UserDTO UserFrom = await _userService.GetUserById(_userService.GetUserId());
+            UserDTO UserTo = await _userService.GetUserById(SelectedUser.Id);
             if (UserFrom.Id == UserTo.Id) { return; }
 
             decimal userFromBalance = (await _dataService.GetAccountDetailsForUserAsync(UserFrom.Id)).CurrentBalance;
@@ -50,8 +51,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            User loggedInUser = (await _mockUserService.GetLoggedInUserAsync())!;
-            Users = (await _mockUserService.AllUsersNotLoggedIn(loggedInUser))!;
+            Users = (await _userService.GetUsersNotLoggedIn())!;
         }
     }
 }
