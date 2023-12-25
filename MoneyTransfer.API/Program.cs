@@ -1,6 +1,11 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MoneyTransfer.API.Context;
 using MoneyTransfer.API.Entities;
+using MoneyTransfer.Security;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,12 +16,37 @@ var config = new ConfigurationBuilder()
             .Build();
 
 string connectionString = config.GetConnectionString("Project") ?? "Error retrieving connection string!";
+string jwtSecret = config.GetValue<string>("JwtSecret") ?? "Error retreiving jwt config!";
+
+// configure jwt authentication
+var key = Encoding.ASCII.GetBytes(jwtSecret);
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap[JwtRegisteredClaimNames.Sub] = "sub";
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        NameClaimType = "name"
+    };
+});
 
 builder.Services
     .AddDbContext<MoneyTransferContext>(options =>
         options.UseSqlServer(connectionString))
     .ConfigureHttpJsonOptions(options =>
-        options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+        options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
+    .AddSingleton<ITokenGenerator>(tk => new JwtGenerator(jwtSecret))
+    .AddSingleton<IPasswordHasher>(ph => new PasswordHasher());
 
 var app = builder.Build();
 
@@ -132,7 +162,7 @@ app.MapPost("/Transfer/Request", async (AddTransfer transfer, MoneyTransferConte
 
     if (!transferToAdd.IsValidForAdd) { return Results.BadRequest(); }
 
-    context.Transfers.Add(transferToAdd);
+    await context.Transfers.AddAsync(transferToAdd);
     await context.SaveChangesAsync();
     return Results.Created($"/Transfer/Details/{transferToAdd.Id}", transferToAdd);
 });
@@ -171,12 +201,6 @@ app.MapPost("/Transfer/Send", async (AddTransfer transfer, MoneyTransferContext 
     context.Transfers.Add(transferToAdd);
     await context.SaveChangesAsync();
     return Results.Created($"/Transfer/Details/{transferToAdd.Id}", transferToAdd);
-});
-
-app.MapGet("/User/{id}", async (int id, MoneyTransferContext context) =>
-{
-    if (context is null || context.Users is null) { return null; }  // TODO: return null object instead of null
-    return await context.Users.SingleOrDefaultAsync(user => user.Id == id);
 });
 
 app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext context) =>
@@ -224,16 +248,109 @@ app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext con
         : Results.NotFound();
     });
 
-app.MapGet("/User/LoggedIn", async (MoneyTransferContext context) =>
+app.MapGet("/User/{id}", async (int id, MoneyTransferContext context) =>
 {
-    if (context is null || context.Users is null) { return null; }  // TODO: return null object instead of null
-    return await context.Users.SingleOrDefaultAsync(user => user.Username == "brian"); // TODO: Change this to return actual logged in user after auth is in place
+    if (id <= 0) { return Results.BadRequest(); }
+    if (context is null || context.Users is null) { return Results.StatusCode(500); }
+
+    return await context.Users
+            .Where(user => user.Id == id)
+            .Select(user => new ReturnUser()
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Token = null!,
+                })
+            .Select(a => new
+                {
+                    Id = a.Id,
+                    Username = a.Username,
+                    Token = a.Token,
+                    Message = string.Empty,
+                })
+            .SingleOrDefaultAsync() is object user
+                ? Results.Ok(user)
+                : Results.NotFound();
 });
 
-app.MapGet("/User/NotLoggedIn", async (MoneyTransferContext context) =>
+app.MapGet("/User/GetUsers", async Task<object> (MoneyTransferContext context) =>
 {
-    if (context is null || context.Users is null) { return null; }  // TODO: return null object instead of null
-    return await context.Users.Where(user => user.Username != "brian").ToListAsync(); // TODO: Change this to return actual not logged in users after auth is in place
+    if (context is null || context.Users is null) { return Results.StatusCode(500); }
+
+    return await context.Users
+            .Select(user => new ReturnUser()
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Token = null!,
+            })
+            .Select(a => new
+            {
+                Id = a.Id,
+                Username = a.Username,
+                Token = a.Token,
+                Message = string.Empty,
+            })
+            .OrderBy(a => a.Username)
+            .ToListAsync();
+});
+
+app.MapPost("/User/LogIn", async (LogInUser logInUser, MoneyTransferContext context, IPasswordHasher passwordHasher, ITokenGenerator tokenGenerator) =>
+{
+    // Get the user by username
+    User user = await context.Users.SingleOrDefaultAsync(u => u.Username == logInUser.Username) ?? User.NotFound;
+
+    // If we found a user and the password hash matches
+    if (user.Id > 0 && passwordHasher.VerifyHashMatch(user.PasswordHash, logInUser.Password, user.Salt))
+    {
+        // Create an authentication token
+        string token = tokenGenerator.GenerateToken(user.Id, user.Username);
+
+        // Create a ReturnUser object to return to the client
+        ReturnUser retUser = new ReturnUser() { Id = user.Id, Username = user.Username, Token = token };
+
+        Results.Ok(retUser);
+    }
+
+    Results.BadRequest();
+});
+
+app.MapPost("/User/Register", async (LogInUser logInUser, MoneyTransferContext context, IPasswordHasher passwordHasher) =>
+{
+    if (logInUser is null || 
+        string.IsNullOrWhiteSpace(logInUser.Username) ||
+        logInUser.Username == string.Empty ||
+        logInUser.Username.Length > 50 ||
+        string.IsNullOrWhiteSpace(logInUser.Password) ||
+        logInUser.Password == string.Empty ||
+        logInUser.Password.Length > 200)
+            { return Results.BadRequest(); }
+
+    if (context is null || context.Users is null) { return Results.StatusCode(500); }
+
+    User existingUser = await context.Users.SingleOrDefaultAsync(u => u.Username == logInUser.Username) ?? User.NotFound;
+    if (existingUser != null)
+    {
+        return Results.Conflict(new { message = "Username already taken. Please choose a different username." });
+    }
+
+    PasswordHash hash = passwordHasher.ComputeHash(logInUser.Password);
+
+    User userToRegister = new()
+    {
+        Username = logInUser.Username,
+        PasswordHash = hash.Password,
+        Salt = hash.Salt,
+        Account = new()
+        {
+            StartingBalance = 1000M,
+            DateCreated = DateOnly.FromDateTime(DateTime.Today),
+        },
+    };
+
+    await context.Users.AddAsync(userToRegister);
+    await context.SaveChangesAsync();
+    return Results.Created($"/User/{userToRegister.Id}", userToRegister);
 });
 
 app.MapGet("/User/Transfer/Completed/{id}", async Task<object> (int id, MoneyTransferContext context) =>
