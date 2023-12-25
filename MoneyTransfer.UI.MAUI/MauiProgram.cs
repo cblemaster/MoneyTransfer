@@ -2,7 +2,8 @@
 using Microsoft.Extensions.Logging;
 using MoneyTransfer.UI.MAUI.PageModels;
 using MoneyTransfer.UI.MAUI.Pages;
-using MoneyTransfer.UI.MAUI.Services;
+using MoneyTransfer.UI.MAUI.Services.Data;
+using MoneyTransfer.UI.MAUI.Services.User;
 
 namespace MoneyTransfer.UI.MAUI
 {
@@ -23,7 +24,7 @@ namespace MoneyTransfer.UI.MAUI
                 .Services
                     .AddSingleton<AppShell>()
                     .AddSingleton<IDataService, HttpDataService>()
-                    .AddSingleton<IMockUserService, MockHttpUserService>()
+                    .AddSingleton<IUserService, HttpUserService>()
                     .AddTransient<AccountDetailsPageModel>()
                     .AddTransient<AccountDetailsPage>()
                     .AddTransient<CompletedTransfersPageModel>()
