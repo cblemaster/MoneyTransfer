@@ -1,9 +1,8 @@
-﻿using MoneyTransfer.UI.MAUI.Services.Models;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace MoneyTransfer.UI.MAUI.Services
+namespace MoneyTransfer.UI.MAUI.Services.Data
 {
     public class HttpDataService : IDataService
     {
@@ -61,7 +60,7 @@ namespace MoneyTransfer.UI.MAUI.Services
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<TransferDetails>((response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!).ToBlockingEnumerable<TransferDetails>().ToList()) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
+                    ? new ReadOnlyCollection<TransferDetails>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!.ToBlockingEnumerable().ToList()) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
                     : new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
             }
             catch (Exception) { throw; }
@@ -79,7 +78,7 @@ namespace MoneyTransfer.UI.MAUI.Services
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<TransferDetails>((response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!).ToBlockingEnumerable<TransferDetails>().ToList()) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
+                    ? new ReadOnlyCollection<TransferDetails>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!.ToBlockingEnumerable().ToList()) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
                     : new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
             }
             catch (Exception) { throw; }

@@ -1,7 +1,6 @@
-﻿using MoneyTransfer.UI.MAUI.Services.Models;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
-namespace MoneyTransfer.UI.MAUI.Services
+namespace MoneyTransfer.UI.MAUI.Services.Data
 {
     public interface IDataService
     {

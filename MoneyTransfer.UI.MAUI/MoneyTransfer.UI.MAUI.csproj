@@ -100,4 +100,8 @@
 	  </MauiXaml>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\MoneyTransfer.Security\MoneyTransfer.Security.csproj" />
+	</ItemGroup>
+
 </Project>

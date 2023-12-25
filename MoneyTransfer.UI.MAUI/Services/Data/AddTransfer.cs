@@ -1,4 +1,4 @@
-﻿namespace MoneyTransfer.UI.MAUI.Services.Models
+﻿namespace MoneyTransfer.UI.MAUI.Services.Data
 {
     public class AddTransfer
     {

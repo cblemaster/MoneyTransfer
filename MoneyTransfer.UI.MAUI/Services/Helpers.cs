@@ -1,4 +1,7 @@
-﻿namespace MoneyTransfer.UI.MAUI.Services.Models
+﻿using MoneyTransfer.UI.MAUI.Services.Data;
+using MoneyTransfer.UI.MAUI.Services.User;
+
+namespace MoneyTransfer.UI.MAUI.Services
 {
     public static class Helpers
     {
@@ -59,6 +62,38 @@
                 DateCreated = DateOnly.MinValue,
                 UserToName = "search param not valid",
                 UserFromName = "search param not valid"
+            };
+
+        public static readonly UserDTO UserDTONotFound =
+            new()
+            {
+                Id = 0,
+                Username = "not found",
+                Token = "not found",
+                Message = "not found",
+            };
+
+        public static readonly UserDTO UserDTOSearchParamNotValid =
+            new()
+            {
+                Id = 0,
+                Username = "search param not valid",
+                Token = "search param not valid",
+                Message = "search param not valid",
+            };
+
+        public static readonly User.User UserNotFound =
+             new()
+             {
+                 Id = 0,
+                 Username = "not found",
+             };
+
+        public static readonly User.User UserSearchParamNotValid =
+            new()
+            {
+                Id = 0,
+                Username = "search param not valid",
             };
     }
 }
