@@ -12,7 +12,7 @@ public partial class User
 
     public virtual Account? Account { get; set; }
 
-    public static readonly User NotFound = new User { Id = 0, Username = "not found", PasswordHash = "not found", Salt = "not found", Account = null };
+    public static readonly User NotFound = new() { Id = 0, Username = "not found", PasswordHash = "not found", Salt = "not found", Account = null };
 }
 
 public class ReturnUser

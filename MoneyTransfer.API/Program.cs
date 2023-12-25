@@ -72,10 +72,11 @@ app.MapPut("/Transfer/Approve/{id}", async (int id, object transfer, MoneyTransf
 
 app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context) =>
 {
-    if (id <= 0) { return Results.BadRequest(); }
-    if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
-
-    return await context.Transfers.Where(transfer => transfer.Id == id).Select(t =>
+    return id <= 0
+        ? Results.BadRequest()
+        : context is null || context.Transfers is null
+        ? Results.StatusCode(500)
+        : await context.Transfers.Where(transfer => transfer.Id == id).Select(t =>
         new
         {
             Id = t.Id,
@@ -205,69 +206,71 @@ app.MapPost("/Transfer/Send", async (AddTransfer transfer, MoneyTransferContext 
 
 app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext context) =>
     {
-        if (id <= 0) { return Results.BadRequest(); }
-        if (context is null || context.Accounts is null) { return Results.StatusCode(500); }
-
-        return await context.Accounts.Where(a => a.User.Id == id).Select(a =>
-            new Account
-            {
-                Id = a.Id,
-                StartingBalance = a.StartingBalance,
-                DateCreated = a.DateCreated,
-                TransferAccountIdFromNavigations =
-                    a.TransferAccountIdFromNavigations
-                        .Select(t => new Transfer
-                        {
-                            Id = t.Id,
-                            Amount = t.Amount,
-                            TransferStatusId = t.TransferStatusId,
-                        }).ToList(),
-                TransferAccountIdToNavigations =
-                    a.TransferAccountIdToNavigations
-                        .Select(t => new Transfer
-                        {
-                            Id = t.Id,
-                            Amount = t.Amount,
-                            TransferStatusId = t.TransferStatusId,
-                        }).ToList(),
-                User = new User
-                {
-                    Id = a.User.Id,
-                    Username = a.User.Username
-                },
-            })
-            .Select(a =>
-                new
+        return id <= 0
+            ? Results.BadRequest()
+            : context is null || context.Accounts is null
+                ? Results.StatusCode(500)
+                : await context.Accounts.Where(a => a.User.Id == id).Select(a =>
+                new Account
                 {
                     Id = a.Id,
-                    Username = a.User.Username,
-                    CurrentBalance = a.CurrentBalance(),
+                    StartingBalance = a.StartingBalance,
                     DateCreated = a.DateCreated,
-                }).SingleOrDefaultAsync() is object account
-        ? Results.Ok(account)
-        : Results.NotFound();
+                    TransferAccountIdFromNavigations =
+                        a.TransferAccountIdFromNavigations
+                            .Select(t => new Transfer
+                            {
+                                Id = t.Id,
+                                Amount = t.Amount,
+                                TransferStatusId = t.TransferStatusId,
+                            }).ToList(),
+                    TransferAccountIdToNavigations =
+                        a.TransferAccountIdToNavigations
+                            .Select(t => new Transfer
+                            {
+                                Id = t.Id,
+                                Amount = t.Amount,
+                                TransferStatusId = t.TransferStatusId,
+                            }).ToList(),
+                    User = new User
+                    {
+                        Id = a.User.Id,
+                        Username = a.User.Username
+                    },
+                })
+                .Select(a =>
+                    new
+                    {
+                        Id = a.Id,
+                        Username = a.User.Username,
+                        CurrentBalance = a.CurrentBalance(),
+                        DateCreated = a.DateCreated,
+                    }).SingleOrDefaultAsync() is object account
+            ? Results.Ok(account)
+            : Results.NotFound();
     });
 
 app.MapGet("/User/{id}", async (int id, MoneyTransferContext context) =>
 {
-    if (id <= 0) { return Results.BadRequest(); }
-    if (context is null || context.Users is null) { return Results.StatusCode(500); }
-
-    return await context.Users
+    return id <= 0
+        ? Results.BadRequest()
+        : context is null || context.Users is null
+        ? Results.StatusCode(500)
+        : await context.Users
             .Where(user => user.Id == id)
             .Select(user => new ReturnUser()
-                {
-                    Id = user.Id,
-                    Username = user.Username,
-                    Token = null!,
-                })
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Token = null!,
+            })
             .Select(a => new
-                {
-                    Id = a.Id,
-                    Username = a.Username,
-                    Token = a.Token,
-                    Message = string.Empty,
-                })
+            {
+                Id = a.Id,
+                Username = a.Username,
+                Token = a.Token,
+                Message = string.Empty,
+            })
             .SingleOrDefaultAsync() is object user
                 ? Results.Ok(user)
                 : Results.NotFound();
@@ -275,9 +278,9 @@ app.MapGet("/User/{id}", async (int id, MoneyTransferContext context) =>
 
 app.MapGet("/User/GetUsers", async Task<object> (MoneyTransferContext context) =>
 {
-    if (context is null || context.Users is null) { return Results.StatusCode(500); }
-
-    return await context.Users
+    return context is null || context.Users is null
+        ? Results.StatusCode(500)
+        : await context.Users
             .Select(user => new ReturnUser()
             {
                 Id = user.Id,
@@ -307,7 +310,7 @@ app.MapPost("/User/LogIn", async (LogInUser logInUser, MoneyTransferContext cont
         string token = tokenGenerator.GenerateToken(user.Id, user.Username);
 
         // Create a ReturnUser object to return to the client
-        ReturnUser retUser = new ReturnUser() { Id = user.Id, Username = user.Username, Token = token };
+        ReturnUser retUser = new() { Id = user.Id, Username = user.Username, Token = token };
 
         Results.Ok(retUser);
     }
@@ -317,14 +320,14 @@ app.MapPost("/User/LogIn", async (LogInUser logInUser, MoneyTransferContext cont
 
 app.MapPost("/User/Register", async (LogInUser logInUser, MoneyTransferContext context, IPasswordHasher passwordHasher) =>
 {
-    if (logInUser is null || 
+    if (logInUser is null ||
         string.IsNullOrWhiteSpace(logInUser.Username) ||
         logInUser.Username == string.Empty ||
         logInUser.Username.Length > 50 ||
         string.IsNullOrWhiteSpace(logInUser.Password) ||
         logInUser.Password == string.Empty ||
         logInUser.Password.Length > 200)
-            { return Results.BadRequest(); }
+    { return Results.BadRequest(); }
 
     if (context is null || context.Users is null) { return Results.StatusCode(500); }
 
@@ -355,62 +358,14 @@ app.MapPost("/User/Register", async (LogInUser logInUser, MoneyTransferContext c
 
 app.MapGet("/User/Transfer/Completed/{id}", async Task<object> (int id, MoneyTransferContext context) =>
     {
-        if (id <= 0) { return Results.BadRequest(); }
-        if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
-
-        return await context.Transfers.Where(transfer =>
-            (transfer.AccountIdFromNavigation.UserId == id
-              || transfer.AccountIdToNavigation.UserId == id)
-              && transfer.TransferStatusId != (int)TransferStatus.Pending)
-            .Select(t => new
-            {
-                Id = t.Id,
-                Amount = t.Amount,
-                TransferStatus = t.TransferStatus.ToString(),
-                TransferType = t.TransferType.ToString(),
-                DateCreated = t.DateCreated,
-                AccountIdFromNavigation = new Account
-                {
-                    Id = t.AccountIdFromNavigation.Id,
-                    User = new User
-                    {
-                        Id = t.AccountIdFromNavigation.User.Id,
-                        Username = t.AccountIdFromNavigation.User.Username
-                    },
-                },
-                AccountIdToNavigation = new Account
-                {
-                    Id = t.AccountIdToNavigation.Id,
-                    User = new User
-                    {
-                        Id = t.AccountIdToNavigation.User.Id,
-                        Username = t.AccountIdToNavigation.User.Username,
-                    },
-                },
-            }).Select(a =>
-                new
-                {
-                    Id = a.Id,
-                    DateCreated = a.DateCreated,
-                    Amount = a.Amount,
-                    TransferStatus = a.TransferStatus,
-                    TransferType = a.TransferType,
-                    UserFromName = a.AccountIdFromNavigation.User.Username,
-                    UserToName = a.AccountIdToNavigation.User.Username,
-                })
-                .OrderByDescending(a => a.DateCreated)
-                .ToListAsync();
-    });
-
-app.MapGet("/User/Transfer/Pending/{id}", async Task<object> (int id, MoneyTransferContext context) =>
-    {
-        if (id <= 0) { return Results.BadRequest(); }
-        if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
-
-        return await context.Transfers.Where(transfer =>
+        return id <= 0
+            ? Results.BadRequest()
+            : context is null || context.Transfers is null
+                ? Results.StatusCode(500)
+                : await context.Transfers.Where(transfer =>
                 (transfer.AccountIdFromNavigation.UserId == id
                   || transfer.AccountIdToNavigation.UserId == id)
-                  && transfer.TransferStatusId == (int)TransferStatus.Pending)
+                  && transfer.TransferStatusId != (int)TransferStatus.Pending)
                 .Select(t => new
                 {
                     Id = t.Id,
@@ -424,7 +379,7 @@ app.MapGet("/User/Transfer/Pending/{id}", async Task<object> (int id, MoneyTrans
                         User = new User
                         {
                             Id = t.AccountIdFromNavigation.User.Id,
-                            Username = t.AccountIdFromNavigation.User.Username,
+                            Username = t.AccountIdFromNavigation.User.Username
                         },
                     },
                     AccountIdToNavigation = new Account
@@ -449,6 +404,56 @@ app.MapGet("/User/Transfer/Pending/{id}", async Task<object> (int id, MoneyTrans
                     })
                     .OrderByDescending(a => a.DateCreated)
                     .ToListAsync();
+    });
+
+app.MapGet("/User/Transfer/Pending/{id}", async Task<object> (int id, MoneyTransferContext context) =>
+    {
+        return id <= 0
+            ? Results.BadRequest()
+            : context is null || context.Transfers is null
+                ? Results.StatusCode(500)
+                : await context.Transfers.Where(transfer =>
+                    (transfer.AccountIdFromNavigation.UserId == id
+                      || transfer.AccountIdToNavigation.UserId == id)
+                      && transfer.TransferStatusId == (int)TransferStatus.Pending)
+                    .Select(t => new
+                    {
+                        Id = t.Id,
+                        Amount = t.Amount,
+                        TransferStatus = t.TransferStatus.ToString(),
+                        TransferType = t.TransferType.ToString(),
+                        DateCreated = t.DateCreated,
+                        AccountIdFromNavigation = new Account
+                        {
+                            Id = t.AccountIdFromNavigation.Id,
+                            User = new User
+                            {
+                                Id = t.AccountIdFromNavigation.User.Id,
+                                Username = t.AccountIdFromNavigation.User.Username,
+                            },
+                        },
+                        AccountIdToNavigation = new Account
+                        {
+                            Id = t.AccountIdToNavigation.Id,
+                            User = new User
+                            {
+                                Id = t.AccountIdToNavigation.User.Id,
+                                Username = t.AccountIdToNavigation.User.Username,
+                            },
+                        },
+                    }).Select(a =>
+                        new
+                        {
+                            Id = a.Id,
+                            DateCreated = a.DateCreated,
+                            Amount = a.Amount,
+                            TransferStatus = a.TransferStatus,
+                            TransferType = a.TransferType,
+                            UserFromName = a.AccountIdFromNavigation.User.Username,
+                            UserToName = a.AccountIdToNavigation.User.Username,
+                        })
+                        .OrderByDescending(a => a.DateCreated)
+                        .ToListAsync();
     });
 
 app.Run();

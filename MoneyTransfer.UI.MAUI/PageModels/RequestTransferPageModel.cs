@@ -21,7 +21,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private string _amount = default!;
 
         [RelayCommand]
-        private void PageAppearing() => LoadData();
+        private async Task PageAppearing() => await LoadData();
 
         [RelayCommand]
         private async Task RequestTransfer()
@@ -29,7 +29,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (!CanRequestTransfer) { return; }
             if (SelectedUser is null) { return; }
             if (!decimal.TryParse(Amount, out decimal amount) || amount <= 0)
-                { return; }
+            { return; }
 
             UserDTO UserTo = await _userService.GetUserById(_userService.GetUserId());
             UserDTO UserFrom = await _userService.GetUserById(SelectedUser.Id);
@@ -43,9 +43,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         [ObservableProperty]
         private bool _canRequestTransfer = true;
 
-        private async Task LoadData()
-        {            
-            Users = (await _userService.GetUsersNotLoggedIn())!;
-        }
+        private async Task LoadData() => Users = (await _userService.GetUsersNotLoggedIn())!;
     }
 }

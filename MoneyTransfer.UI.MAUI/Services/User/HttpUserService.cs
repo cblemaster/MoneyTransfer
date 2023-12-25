@@ -8,7 +8,7 @@ namespace MoneyTransfer.UI.MAUI.Services.User
     {
         private readonly HttpClient _client;
         private const string BASE_URI = "https://localhost:7144";
-        public static UserDTO _user = default!;
+        private static UserDTO _user = default!;
 
         public HttpUserService()
         {
@@ -96,27 +96,17 @@ namespace MoneyTransfer.UI.MAUI.Services.User
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
                 response.EnsureSuccessStatusCode();
 
-                return response.IsSuccessStatusCode && response.Content is not null
-                    ? true : false;
+                return response.IsSuccessStatusCode && response.Content is not null;
             }
             catch (Exception) { throw; }
-        }        
-
-        public static string GetToken()
-        {
-            return _user?.Token ?? string.Empty;
         }
+
+        public static string GetToken() => _user?.Token ?? string.Empty;
 
         public int GetUserId() => _user.Id;
 
-        public static bool IsLoggedIn()
-        {
-            return !string.IsNullOrWhiteSpace(_user.Token);
-        }
+        public static bool IsLoggedIn() => !string.IsNullOrWhiteSpace(_user.Token);
 
-        public static void SetLogin(UserDTO user)
-        {
-            _user = user;
-        }
+        public static void SetLogin(UserDTO user) => _user = user;
     }
 }

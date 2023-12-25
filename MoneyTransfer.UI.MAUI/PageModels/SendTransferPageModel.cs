@@ -29,7 +29,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (!CanSendTransfer) { return; }
             if (SelectedUser is null) { return; }
             if (!decimal.TryParse(Amount, out decimal amount) || amount <= 0)
-                { return; }
+            { return; }
 
             UserDTO UserFrom = await _userService.GetUserById(_userService.GetUserId());
             UserDTO UserTo = await _userService.GetUserById(SelectedUser.Id);
@@ -49,9 +49,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         [ObservableProperty]
         private bool _canSendTransfer = true;
 
-        private async void LoadData()
-        {
-            Users = (await _userService.GetUsersNotLoggedIn())!;
-        }
+        private async void LoadData() => Users = (await _userService.GetUsersNotLoggedIn())!;
     }
 }

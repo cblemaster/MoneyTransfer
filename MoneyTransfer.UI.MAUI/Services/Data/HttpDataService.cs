@@ -60,7 +60,7 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<TransferDetails>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!.ToBlockingEnumerable().ToList()) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
+                    ? new ReadOnlyCollection<TransferDetails>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
                     : new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
             }
             catch (Exception) { throw; }
@@ -78,7 +78,7 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<TransferDetails>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!.ToBlockingEnumerable().ToList()) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
+                    ? new ReadOnlyCollection<TransferDetails>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
                     : new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
             }
             catch (Exception) { throw; }
