@@ -75,7 +75,7 @@ namespace MoneyTransfer.UI.MAUI.Services.User
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
                 response.EnsureSuccessStatusCode();
 
-                return response.IsSuccessStatusCode && response.Content is not null
+                return response.Content is not null
                     ? await response.Content.ReadFromJsonAsync<UserDTO>() ?? Helpers.UserDTONotFound
                     : Helpers.UserDTONotFound;
             }
@@ -103,7 +103,7 @@ namespace MoneyTransfer.UI.MAUI.Services.User
 
         public static string GetToken() => _user?.Token ?? string.Empty;
 
-        public int GetUserId() => _user.Id;
+        public static int GetUserId() => _user.Id;
 
         public static bool IsLoggedIn() => !string.IsNullOrWhiteSpace(_user.Token);
 
