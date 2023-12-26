@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MoneyTransfer.UI.MAUI.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
@@ -9,7 +10,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private async Task LogOut()
         {
             if (!CanLogOut) { return; }
-            //TODO: Logic to log out current logged in user
+            HttpUserService.LogOut();
             await Shell.Current.GoToAsync("///LogIn");
         }
 

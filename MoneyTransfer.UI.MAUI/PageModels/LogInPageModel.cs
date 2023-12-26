@@ -1,10 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MoneyTransfer.UI.MAUI.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class LogInPageModel() : ObservableObject
+    public partial class LogInPageModel(IUserService userService) : ObservableObject
     {
+        private readonly IUserService _userService = userService;
+        
         [ObservableProperty]
         private string _username = default!;
 
@@ -12,10 +15,11 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private string _password = default!;
 
         [RelayCommand]
-        private void LogIn()
+        private async Task LogIn()
         {
-            if (!CanLogIn) { return; }
-            // TODO: Logic for logging in a user
+            if (!CanLogIn) { return; }  // TODO: Validation
+            UserDTO loggedInUser = await _userService.LogIn(new LogInUser { Username = Username, Password = Password });
+            HttpUserService.SetLogin(loggedInUser); 
         }
 
         [ObservableProperty]
