@@ -1,6 +1,6 @@
 ﻿namespace MoneyTransfer.UI.MAUI.Services.User
 {
-    public class AuthenticatedUserService
+    public static class AuthenticatedUserService
     {
         private static UserDTO _user = default!;
         public static void LogOut() => _user = null!;
