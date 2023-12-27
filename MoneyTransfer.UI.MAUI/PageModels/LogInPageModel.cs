@@ -32,6 +32,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         }
 
         [ObservableProperty]
-        private bool _canLogIn = true;
+        private bool _canLogIn = !AuthenticatedUserService.IsLoggedIn();
     }
 }
