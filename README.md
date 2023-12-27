@@ -39,6 +39,7 @@
 - TBD
 
 ## Improvement opportunities:
+- Review and revise the api for appropriate return types and status codes, appropriate use of validation, appropriate route names (nouns not verbs, e.g., post to '/Items' rather than '/Items/Create'), whether or not returning anonymous objects is a good idea and why...
 - There is some xaml duplication in the MAUI project pages that have similar functionality (send transfer/request transfer, approve transfer request/reject transfer request, completed transfers/pending transfers); this could be remediated with content templates but this might also introduce complications with data bindings
 - The http data service in the MAUI project seems a bit slow, look for performance improvements there
 - Implement community toolkit validation: https://learn.microsoft.com/en-us/dotnet/architecture/maui/validation
