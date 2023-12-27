@@ -64,11 +64,12 @@ namespace MoneyTransfer.UI.MAUI.Services.User
 
         public async Task<UserDTO> LogIn(LogInUser logInUser)
         {
-            //TODO: Validation
+            if (!Helpers.LogInUserIsValid(logInUser)) { return Helpers.UserDTONotValid; }
 
             Uri = new($"{BASE_URI}/User/LogIn");
             StringContent content = new(JsonSerializer.Serialize(logInUser));
             content.Headers.ContentType = new("application/json");
+            
             try
             {
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MoneyTransfer.UI.MAUI.Services;
 using MoneyTransfer.UI.MAUI.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
@@ -17,8 +18,12 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         [RelayCommand]
         private async Task LogIn()
         {
-            if (!CanLogIn) { return; }  // TODO: Validation
-            UserDTO loggedInUser = await _userService.LogIn(new LogInUser { Username = Username, Password = Password });
+            if (!CanLogIn) { return; }
+
+            LogInUser logInUser = new LogInUser { Username = Username, Password = Password };
+            if (!Helpers.LogInUserIsValid(logInUser)) { return; }
+
+            UserDTO loggedInUser = await _userService.LogIn(logInUser);
             AuthenticatedUserService.SetLogin(loggedInUser);
             await Shell.Current.DisplayAlert("Success!", "You are logged into the system.", "OK");
 

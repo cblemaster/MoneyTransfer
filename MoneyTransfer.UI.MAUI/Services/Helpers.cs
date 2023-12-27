@@ -72,6 +72,14 @@ namespace MoneyTransfer.UI.MAUI.Services
                 Token = "not found",
             };
 
+        public static readonly UserDTO UserDTONotValid =
+            new()
+            {
+                Id = 0,
+                Username = "not valid",
+                Token = "not valid",
+            };
+
         public static readonly UserDTO UserDTOSearchParamNotValid =
             new()
             {

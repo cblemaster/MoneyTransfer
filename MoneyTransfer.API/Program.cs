@@ -306,7 +306,7 @@ app.MapPost("/User/LogIn", async (LogInUser logInUser, MoneyTransferContext cont
         { return Results.StatusCode(500); }
     
     // Get the user by username
-    User user = await context.Users.SingleOrDefaultAsync(u => u.Username == logInUser.Username) ?? User.NotFound;
+    User user = await context.Users.SingleOrDefaultAsync(user => user.Username == logInUser.Username) ?? User.NotFound;
 
     // If we found a user and the password hash matches
     if (user.Id > 0 && passwordHasher.VerifyHashMatch(user.PasswordHash, logInUser.Password, user.Salt))
@@ -323,30 +323,23 @@ app.MapPost("/User/LogIn", async (LogInUser logInUser, MoneyTransferContext cont
     return Results.BadRequest();
 });
 
-app.MapPost("/User/Register", async (LogInUser logInUser, MoneyTransferContext context, IPasswordHasher passwordHasher) =>
+app.MapPost("/User/Register", async (LogInUser registerUser, MoneyTransferContext context, IPasswordHasher passwordHasher) =>
 {
-    if (logInUser is null ||
-        string.IsNullOrWhiteSpace(logInUser.Username) ||
-        logInUser.Username == string.Empty ||
-        logInUser.Username.Length > 50 ||
-        string.IsNullOrWhiteSpace(logInUser.Password) ||
-        logInUser.Password == string.Empty ||
-        logInUser.Password.Length > 200)
-    { return Results.BadRequest(); }
+    if (registerUser is null || !registerUser.IsValid()) { return Results.BadRequest(); }
+    if (context is null || context.Users is null || passwordHasher is null)
+        { return Results.StatusCode(500); }
 
-    if (context is null || context.Users is null) { return Results.StatusCode(500); }
-
-    User existingUser = await context.Users.SingleOrDefaultAsync(user => user.Username == logInUser.Username) ?? User.NotFound;
+    User existingUser = await context.Users.SingleOrDefaultAsync(user => user.Username == registerUser.Username) ?? User.NotFound;
     if (existingUser.Id > 0)
     {
         return Results.Conflict(new { message = "Username already taken. Please choose a different username." });
     }
 
-    PasswordHash hash = passwordHasher.ComputeHash(logInUser.Password);
+    PasswordHash hash = passwordHasher.ComputeHash(registerUser.Password);
 
     User userToRegister = new()
     {
-        Username = logInUser.Username,
+        Username = registerUser.Username,
         PasswordHash = hash.Password,
         Salt = hash.Salt,
         Account = new()
