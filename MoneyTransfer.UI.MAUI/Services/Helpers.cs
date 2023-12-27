@@ -93,5 +93,16 @@ namespace MoneyTransfer.UI.MAUI.Services
                 Id = 0,
                 Username = "search param not valid",
             };
+
+        public static bool LogInUserIsValid(LogInUser logInUser)
+        {
+            bool usernameIsValid = !string.IsNullOrWhiteSpace(logInUser.Username) && 
+                logInUser.Username.Length >= 1 && 
+                logInUser.Username.Length <= 50;
+            bool passwordIsValid = !string.IsNullOrWhiteSpace(logInUser.Password) && 
+                logInUser.Password.Length >= 1 &&
+                logInUser.Password.Length <= 200;
+            return usernameIsValid && passwordIsValid;
+        }
     }
 }

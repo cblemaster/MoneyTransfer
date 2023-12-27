@@ -83,17 +83,18 @@ namespace MoneyTransfer.UI.MAUI.Services.User
 
         public async Task<bool> Register(LogInUser registerUser)
         {
-            //TODO: Validation
+            if (!Helpers.LogInUserIsValid(registerUser)) { return false; }
 
             Uri = new($"{BASE_URI}/User/Register");
             StringContent content = new(JsonSerializer.Serialize(registerUser));
             content.Headers.ContentType = new("application/json");
+            
             try
             {
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
                 response.EnsureSuccessStatusCode();
 
-                return response.IsSuccessStatusCode && response.Content is not null;
+                return response.Content is not null;
             }
             catch (Exception) { throw; }
         }

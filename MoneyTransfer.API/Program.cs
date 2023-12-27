@@ -43,10 +43,11 @@ builder.Services.AddAuthentication(x =>
 builder.Services
     .AddDbContext<MoneyTransferContext>(options =>
         options.UseSqlServer(connectionString))
-    .ConfigureHttpJsonOptions(options =>
-        options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
-    .AddSingleton<ITokenGenerator>(tk => new JwtGenerator(jwtSecret))
-    .AddSingleton<IPasswordHasher>(ph => new PasswordHasher());
+    //.ConfigureHttpJsonOptions(options =>
+    //    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
+    //.AddSingleton<ITokenGenerator>(tk => new JwtGenerator(jwtSecret))
+    //.AddSingleton<IPasswordHasher>(ph => new PasswordHasher())
+    ;
 
 var app = builder.Build();
 
@@ -300,6 +301,10 @@ app.MapGet("/User/GetUsers", async Task<object> (MoneyTransferContext context) =
 
 app.MapPost("/User/LogIn", async (LogInUser logInUser, MoneyTransferContext context, IPasswordHasher passwordHasher, ITokenGenerator tokenGenerator) =>
 {
+    if (logInUser is null || !logInUser.IsValid()) { return Results.BadRequest(); }
+    if (context is null || context.Users is null || passwordHasher is null || tokenGenerator is null)
+        { return Results.StatusCode(500); }
+    
     // Get the user by username
     User user = await context.Users.SingleOrDefaultAsync(u => u.Username == logInUser.Username) ?? User.NotFound;
 
@@ -331,7 +336,7 @@ app.MapPost("/User/Register", async (LogInUser logInUser, MoneyTransferContext c
 
     if (context is null || context.Users is null) { return Results.StatusCode(500); }
 
-    User existingUser = await context.Users.SingleOrDefaultAsync(u => u.Username == logInUser.Username) ?? User.NotFound;
+    User existingUser = await context.Users.SingleOrDefaultAsync(user => user.Username == logInUser.Username) ?? User.NotFound;
     if (existingUser.Id > 0)
     {
         return Results.Conflict(new { message = "Username already taken. Please choose a different username." });
@@ -351,7 +356,7 @@ app.MapPost("/User/Register", async (LogInUser logInUser, MoneyTransferContext c
         },
     };
 
-    await context.Users.AddAsync(userToRegister);
+    context.Users.Add(userToRegister);
     await context.SaveChangesAsync();
     return Results.Created($"/User/{userToRegister.Id}", userToRegister);
 });

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MoneyTransfer.UI.MAUI.Services;
 using MoneyTransfer.UI.MAUI.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
@@ -18,6 +19,10 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private async Task Register()
         {
             if (!CanRegister) { return; }
+            
+            LogInUser logInUser = new LogInUser { Username = Username, Password = Password };
+            if (!Helpers.LogInUserIsValid(logInUser)) { return; }
+
             bool isRegistered = await _userService.Register(new LogInUser { Username = Username, Password = Password });
             if (isRegistered)
             {
