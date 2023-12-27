@@ -7,7 +7,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
     public partial class LogInPageModel(IUserService userService) : ObservableObject
     {
         private readonly IUserService _userService = userService;
-        
+
         [ObservableProperty]
         private string _username = default!;
 

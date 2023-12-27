@@ -5,23 +5,15 @@ using System.Text;
 
 namespace MoneyTransfer.Security
 {
-    public class JwtGenerator : ITokenGenerator
+    public class JwtGenerator(string secret) : ITokenGenerator
     {
-        private readonly string JwtSecret;
+        private readonly string JwtSecret = secret;
 
-        public JwtGenerator(string secret)
-        {
-            JwtSecret = secret;
-        }
-
-        public string GenerateToken(int userId, string username)
-        {
-            return GenerateToken(userId, username, string.Empty);
-        }
+        public string GenerateToken(int userId, string username) => GenerateToken(userId, username, string.Empty);
 
         public string GenerateToken(int userId, string username, string role)
         {
-            List<Claim> claims = new List<Claim>()
+            List<Claim> claims = new()
             {
                 new Claim("sub", userId.ToString()),
                 new Claim("name", username),

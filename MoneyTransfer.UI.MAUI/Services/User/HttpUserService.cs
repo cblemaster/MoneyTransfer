@@ -7,7 +7,7 @@ namespace MoneyTransfer.UI.MAUI.Services.User
     public class HttpUserService : IUserService
     {
         private readonly HttpClient _client;
-        private const string BASE_URI = "https://localhost:7144";        
+        private const string BASE_URI = "https://localhost:7144";
 
         public HttpUserService()
         {
