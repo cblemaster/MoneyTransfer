@@ -24,7 +24,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         {
             if (!CanApprove) { return; }
 
-            UserDTO loggedInUser = await _userService.GetUserById(_userService.GetUserId());
+            UserDTO loggedInUser = await _userService.GetUserById(AuthenticatedUserService.GetUserId());
             decimal currentBalance = (await _dataService.GetAccountDetailsForUserAsync(loggedInUser.Id)).CurrentBalance;
             if (currentBalance <= 0 || currentBalance < TransferDetails.Amount)
             {
@@ -54,7 +54,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (TransferId > 0)
             {
                 TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
-                UserDTO loggedInUser = await _userService.GetUserById(_userService.GetUserId()); ;
+                UserDTO loggedInUser = await _userService.GetUserById(AuthenticatedUserService.GetUserId()); ;
 
                 CanApprove = TransferDetails.TransferStatus == "Pending" && TransferDetails.TransferType == "Request" && TransferDetails.UserFromName == loggedInUser!.Username;
             }

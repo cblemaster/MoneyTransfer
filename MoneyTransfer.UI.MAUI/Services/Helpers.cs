@@ -70,7 +70,6 @@ namespace MoneyTransfer.UI.MAUI.Services
                 Id = 0,
                 Username = "not found",
                 Token = "not found",
-                Message = "not found",
             };
 
         public static readonly UserDTO UserDTOSearchParamNotValid =
@@ -79,7 +78,6 @@ namespace MoneyTransfer.UI.MAUI.Services
                 Id = 0,
                 Username = "search param not valid",
                 Token = "search param not valid",
-                Message = "search param not valid",
             };
 
         public static readonly User.User UserNotFound =

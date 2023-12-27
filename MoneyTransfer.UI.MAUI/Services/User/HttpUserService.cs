@@ -7,8 +7,7 @@ namespace MoneyTransfer.UI.MAUI.Services.User
     public class HttpUserService : IUserService
     {
         private readonly HttpClient _client;
-        private const string BASE_URI = "https://localhost:7144";
-        private static UserDTO _user = default!;
+        private const string BASE_URI = "https://localhost:7144";        
 
         public HttpUserService()
         {
@@ -50,14 +49,14 @@ namespace MoneyTransfer.UI.MAUI.Services.User
 
         public async Task<ReadOnlyCollection<User>> GetUsersNotLoggedIn()
         {
-            if (GetUserId() <= 0) { return new ReadOnlyCollection<User>(new List<User> { Helpers.UserSearchParamNotValid }); }
+            if (AuthenticatedUserService.GetUserId() <= 0) { return new ReadOnlyCollection<User>(new List<User> { Helpers.UserSearchParamNotValid }); }
 
             Uri = new($"{BASE_URI}/User/GetUsers");
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(Uri);
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<User>((response.Content.ReadFromJsonAsAsyncEnumerable<User>()!).ToBlockingEnumerable<User>().Where(user => user.Id != GetUserId()).ToList()) ?? new ReadOnlyCollection<User>(new List<User> { Helpers.UserNotFound })
+                    ? new ReadOnlyCollection<User>((response.Content.ReadFromJsonAsAsyncEnumerable<User>()!).ToBlockingEnumerable<User>().Where(user => user.Id != AuthenticatedUserService.GetUserId()).ToList()) ?? new ReadOnlyCollection<User>(new List<User> { Helpers.UserNotFound })
                     : new ReadOnlyCollection<User>(new List<User> { Helpers.UserNotFound });
             }
             catch (Exception) { throw; }
@@ -82,8 +81,6 @@ namespace MoneyTransfer.UI.MAUI.Services.User
             catch (Exception) { throw; }
         }
 
-        public static void LogOut() => _user = null!;
-
         public async Task<bool> Register(LogInUser registerUser)
         {
             //TODO: Validation
@@ -100,13 +97,5 @@ namespace MoneyTransfer.UI.MAUI.Services.User
             }
             catch (Exception) { throw; }
         }
-
-        public static string GetToken() => _user?.Token ?? string.Empty;
-
-        public static int GetUserId() => _user.Id;
-
-        public static bool IsLoggedIn() => !string.IsNullOrWhiteSpace(_user.Token);
-
-        public static void SetLogin(UserDTO user) => _user = user;
     }
 }

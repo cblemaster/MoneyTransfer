@@ -6,10 +6,9 @@ using MoneyTransfer.UI.MAUI.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class AccountDetailsPageModel(IDataService dataService, IUserService userService) : ObservableObject
+    public partial class AccountDetailsPageModel(IDataService dataService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
-        private readonly IUserService _userService = userService;
 
         [ObservableProperty]
         private AccountDetails _accountDetails = default!;
@@ -19,7 +18,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            int currentUserId = _userService.GetUserId();
+            int currentUserId = AuthenticatedUserService.GetUserId();
             if (currentUserId > 0)
             {
                 AccountDetails = await _dataService.GetAccountDetailsForUserAsync(currentUserId) ?? Helpers.AccountNotFound;

@@ -19,7 +19,11 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         {
             if (!CanLogIn) { return; }  // TODO: Validation
             UserDTO loggedInUser = await _userService.LogIn(new LogInUser { Username = Username, Password = Password });
-            HttpUserService.SetLogin(loggedInUser); 
+            AuthenticatedUserService.SetLogin(loggedInUser);
+            await Shell.Current.DisplayAlert("Success!", "You are logged into the system.", "OK");
+
+            Username = string.Empty;
+            Password = string.Empty;
         }
 
         [ObservableProperty]

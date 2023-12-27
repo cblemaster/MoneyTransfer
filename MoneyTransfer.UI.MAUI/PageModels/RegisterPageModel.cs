@@ -19,7 +19,11 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         {
             if (!CanRegister) { return; }
             bool isRegistered = await _userService.Register(new LogInUser { Username = Username, Password = Password });
-            if (isRegistered) { await Shell.Current.GoToAsync("///LogIn"); }
+            if (isRegistered)
+            {
+                await Shell.Current.DisplayAlert("Success!", "You have been registered, and you will be directed to the Log In page.", "OK");
+                await Shell.Current.GoToAsync("///LogIn");
+            }
         }
 
         [ObservableProperty]

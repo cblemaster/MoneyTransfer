@@ -312,10 +312,10 @@ app.MapPost("/User/LogIn", async (LogInUser logInUser, MoneyTransferContext cont
         // Create a ReturnUser object to return to the client
         ReturnUser retUser = new() { Id = user.Id, Username = user.Username, Token = token };
 
-        Results.Ok(retUser);
+        return Results.Ok(retUser);
     }
 
-    Results.BadRequest();
+    return Results.BadRequest();
 });
 
 app.MapPost("/User/Register", async (LogInUser logInUser, MoneyTransferContext context, IPasswordHasher passwordHasher) =>
@@ -332,7 +332,7 @@ app.MapPost("/User/Register", async (LogInUser logInUser, MoneyTransferContext c
     if (context is null || context.Users is null) { return Results.StatusCode(500); }
 
     User existingUser = await context.Users.SingleOrDefaultAsync(u => u.Username == logInUser.Username) ?? User.NotFound;
-    if (existingUser != null)
+    if (existingUser.Id > 0)
     {
         return Results.Conflict(new { message = "Username already taken. Please choose a different username." });
     }

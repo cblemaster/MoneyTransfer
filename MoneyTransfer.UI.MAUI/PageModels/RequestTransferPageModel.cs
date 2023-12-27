@@ -31,7 +31,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (!decimal.TryParse(Amount, out decimal amount) || amount <= 0)
             { return; }
 
-            UserDTO UserTo = await _userService.GetUserById(_userService.GetUserId());
+            UserDTO UserTo = await _userService.GetUserById(AuthenticatedUserService.GetUserId());
             UserDTO UserFrom = await _userService.GetUserById(SelectedUser.Id);
 
             if (UserFrom.Id == UserTo.Id) { return; }

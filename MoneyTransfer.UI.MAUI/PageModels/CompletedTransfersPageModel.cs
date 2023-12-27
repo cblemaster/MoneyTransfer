@@ -33,7 +33,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            UserDTO loggedInUser = await _userService.GetUserById(_userService.GetUserId());
+            UserDTO loggedInUser = await _userService.GetUserById(AuthenticatedUserService.GetUserId());
             TransferDetails = await _dataService.GetCompletedTransfersForUserAsync(loggedInUser.Id) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
         }
     }

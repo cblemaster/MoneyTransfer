@@ -47,7 +47,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (TransferId > 0)
             {
                 TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
-                UserDTO loggedInUser = await _userService.GetUserById(_userService.GetUserId());
+                UserDTO loggedInUser = await _userService.GetUserById(AuthenticatedUserService.GetUserId());
 
                 CanReject = TransferDetails.TransferStatus == "Pending" && TransferDetails.TransferType == "Request" && TransferDetails.UserFromName == loggedInUser!.Username;
             }
