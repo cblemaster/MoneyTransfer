@@ -2,12 +2,12 @@
 {
     public class AccountDetails
     {
-        public int Id { get; init; }
+        public required int Id { get; init; }
 
         public required string Username { get; init; }
 
-        public decimal CurrentBalance { get; init; }
+        public required decimal CurrentBalance { get; init; }
 
-        public DateOnly DateCreated { get; init; }
+        public required DateOnly DateCreated { get; init; }
     }
 }

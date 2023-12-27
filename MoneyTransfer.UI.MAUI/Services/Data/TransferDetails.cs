@@ -2,11 +2,11 @@
 {
     public class TransferDetails
     {
-        public int Id { get; init; }
+        public required int Id { get; init; }
 
-        public DateOnly DateCreated { get; init; }
+        public required DateOnly DateCreated { get; init; }
 
-        public decimal Amount { get; init; }
+        public required decimal Amount { get; init; }
 
         public required string TransferStatus { get; init; }
 

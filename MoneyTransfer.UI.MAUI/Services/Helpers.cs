@@ -7,7 +7,6 @@ namespace MoneyTransfer.UI.MAUI.Services
     {
         public static bool StringIsValid(string eval, int minLength, int maxLength) =>
             !string.IsNullOrWhiteSpace(eval) &&
-            eval != string.Empty &&
             eval.Length >= minLength &&
             eval.Length <= maxLength;
 
@@ -20,6 +19,17 @@ namespace MoneyTransfer.UI.MAUI.Services
 
             return amountIsValid && userFromNameIsValid &&
                 userToNameIsValid && userToAndUserFromAreNotTheSame;
+        }
+
+        public static bool LogInUserIsValid(LogInUser logInUser)
+        {
+            bool usernameIsValid = !string.IsNullOrWhiteSpace(logInUser.Username) &&
+                logInUser.Username.Length >= 1 &&
+                logInUser.Username.Length <= 50;
+            bool passwordIsValid = !string.IsNullOrWhiteSpace(logInUser.Password) &&
+                logInUser.Password.Length >= 1 &&
+                logInUser.Password.Length <= 200;
+            return usernameIsValid && passwordIsValid;
         }
 
         public static readonly AccountDetails AccountNotFound =
@@ -101,16 +111,5 @@ namespace MoneyTransfer.UI.MAUI.Services
                 Id = 0,
                 Username = "search param not valid",
             };
-
-        public static bool LogInUserIsValid(LogInUser logInUser)
-        {
-            bool usernameIsValid = !string.IsNullOrWhiteSpace(logInUser.Username) && 
-                logInUser.Username.Length >= 1 && 
-                logInUser.Username.Length <= 50;
-            bool passwordIsValid = !string.IsNullOrWhiteSpace(logInUser.Password) && 
-                logInUser.Password.Length >= 1 &&
-                logInUser.Password.Length <= 200;
-            return usernameIsValid && passwordIsValid;
-        }
     }
 }

@@ -2,11 +2,11 @@
 {
     public class AddTransfer
     {
-        public string UserFromName { get; set; } = string.Empty;
+        public required string UserFromName { get; set; } = string.Empty;
 
-        public string UserToName { get; set; } = string.Empty;
+        public required string UserToName { get; set; } = string.Empty;
 
-        public decimal Amount { get; set; }
+        public required decimal Amount { get; set; }
 
         public bool IsValid =>
             UsernameIsValid(UserFromName) &&

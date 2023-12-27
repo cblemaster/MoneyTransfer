@@ -10,7 +10,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private async Task LogOut()
         {
             if (!CanLogOut) { return; }
-            
+
             AuthenticatedUserService.LogOut();
             await Shell.Current.DisplayAlert("Success!", "You are logged out of the system, and you will be directed to the Log In page.", "OK");
             await Shell.Current.GoToAsync("///LogIn");

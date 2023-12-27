@@ -19,8 +19,8 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private async Task Register()
         {
             if (!CanRegister) { return; }
-            
-            LogInUser logInUser = new LogInUser { Username = Username, Password = Password };
+
+            LogInUser logInUser = new() { Username = Username, Password = Password };
             if (!Helpers.LogInUserIsValid(logInUser)) { return; }
 
             bool isRegistered = await _userService.Register(new LogInUser { Username = Username, Password = Password });

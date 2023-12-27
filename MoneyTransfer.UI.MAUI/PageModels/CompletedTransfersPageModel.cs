@@ -8,10 +8,9 @@ using System.Collections.ObjectModel;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class CompletedTransfersPageModel(IDataService dataService, IUserService userService) : ObservableObject
+    public partial class CompletedTransfersPageModel(IDataService dataService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
-        private readonly IUserService _userService = userService;
 
         [ObservableProperty]
         private ReadOnlyCollection<TransferDetails> _transferDetails = default!;
@@ -31,10 +30,8 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             }
         }
 
-        private async void LoadData()
-        {
-            UserDTO loggedInUser = await _userService.GetUserById(AuthenticatedUserService.GetUserId());
-            TransferDetails = await _dataService.GetCompletedTransfersForUserAsync(loggedInUser.Id) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
-        }
+        private async void LoadData() => TransferDetails = 
+            await _dataService.GetCompletedTransfersForUserAsync(AuthenticatedUserService.GetUserId())
+                ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
     }
 }

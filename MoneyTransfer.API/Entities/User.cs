@@ -17,7 +17,7 @@ public partial class User
 
 public class ReturnUser
 {
-    public int Id { get; set; }
+    public required int Id { get; set; }
     public required string Username { get; set; }
     public required string Token { get; set; }
 }

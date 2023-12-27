@@ -6,7 +6,6 @@ using MoneyTransfer.API.Entities;
 using MoneyTransfer.Security;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,8 +44,8 @@ builder.Services
         options.UseSqlServer(connectionString))
     //.ConfigureHttpJsonOptions(options =>
     //    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
-    //.AddSingleton<ITokenGenerator>(tk => new JwtGenerator(jwtSecret))
-    //.AddSingleton<IPasswordHasher>(ph => new PasswordHasher())
+    .AddSingleton<ITokenGenerator>(tk => new JwtGenerator(jwtSecret))
+    .AddSingleton<IPasswordHasher>(ph => new PasswordHasher())
     ;
 
 var app = builder.Build();
@@ -303,8 +302,8 @@ app.MapPost("/User/LogIn", async (LogInUser logInUser, MoneyTransferContext cont
 {
     if (logInUser is null || !logInUser.IsValid()) { return Results.BadRequest(); }
     if (context is null || context.Users is null || passwordHasher is null || tokenGenerator is null)
-        { return Results.StatusCode(500); }
-    
+    { return Results.StatusCode(500); }
+
     // Get the user by username
     User user = await context.Users.SingleOrDefaultAsync(user => user.Username == logInUser.Username) ?? User.NotFound;
 
@@ -327,7 +326,7 @@ app.MapPost("/User/Register", async (LogInUser registerUser, MoneyTransferContex
 {
     if (registerUser is null || !registerUser.IsValid()) { return Results.BadRequest(); }
     if (context is null || context.Users is null || passwordHasher is null)
-        { return Results.StatusCode(500); }
+    { return Results.StatusCode(500); }
 
     User existingUser = await context.Users.SingleOrDefaultAsync(user => user.Username == registerUser.Username) ?? User.NotFound;
     if (existingUser.Id > 0)

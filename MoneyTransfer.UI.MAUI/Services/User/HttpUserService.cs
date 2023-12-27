@@ -69,7 +69,7 @@ namespace MoneyTransfer.UI.MAUI.Services.User
             Uri = new($"{BASE_URI}/User/LogIn");
             StringContent content = new(JsonSerializer.Serialize(logInUser));
             content.Headers.ContentType = new("application/json");
-            
+
             try
             {
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);
@@ -89,7 +89,7 @@ namespace MoneyTransfer.UI.MAUI.Services.User
             Uri = new($"{BASE_URI}/User/Register");
             StringContent content = new(JsonSerializer.Serialize(registerUser));
             content.Headers.ContentType = new("application/json");
-            
+
             try
             {
                 HttpResponseMessage response = await _client.PostAsync(Uri, content);

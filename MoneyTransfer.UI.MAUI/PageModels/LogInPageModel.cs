@@ -20,7 +20,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         {
             if (!CanLogIn) { return; }
 
-            LogInUser logInUser = new LogInUser { Username = Username, Password = Password };
+            LogInUser logInUser = new() { Username = Username, Password = Password };
             if (!Helpers.LogInUserIsValid(logInUser)) { return; }
 
             UserDTO loggedInUser = await _userService.LogIn(logInUser);
