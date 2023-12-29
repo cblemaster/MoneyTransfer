@@ -44,6 +44,7 @@
 - The http data service in the MAUI project seems a bit slow, look for performance improvements there
 - Implement community toolkit validation: https://learn.microsoft.com/en-us/dotnet/architecture/maui/validation
 - In the MAUI project, move the base url used in the http data service and the user service into configuration (appsettings.json)
+- Implement password requirements
 
 ## What I learned from this project:
 - TBD
