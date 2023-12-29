@@ -35,12 +35,15 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (!Helpers.LogInUserIsValid(logInUser)) { return; }
 
             UserDTO loggedInUser = await _userService.LogIn(logInUser);
-            AuthenticatedUserService.SetLogin(loggedInUser);
-            WeakReferenceMessenger.Default.Send(new LoggedInUserChangedMessage(AuthenticatedUserService.IsLoggedIn()));
+            if (loggedInUser.Id > 0)
+            {
+                AuthenticatedUserService.SetLogin(loggedInUser);
+                WeakReferenceMessenger.Default.Send(new LoggedInUserChangedMessage(AuthenticatedUserService.IsLoggedIn()));
 
-            await Shell.Current.DisplayAlert("Success!", "You are logged into the system.", "OK");
+                await Shell.Current.DisplayAlert("Success!", "You are logged into the system.", "OK");
 
-            await Shell.Current.GoToAsync("///AccountDetails");
+                await Shell.Current.GoToAsync("///AccountDetails");
+            }
         }
 
         [ObservableProperty]

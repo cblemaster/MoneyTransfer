@@ -42,6 +42,9 @@ namespace MoneyTransfer.UI.MAUI
                     .AddTransient<RequestTransferPage>()
                     .AddTransient<SendTransferPageModel>()
                     .AddTransient<SendTransferPage>()
+                    .AddTransient<TransferDetailsPageModel>()
+                    .AddTransient<ApproveTransferRequestPageModel>()
+                    .AddTransient<RejectTransferRequestPageModel>()
                     ;
 
 #if DEBUG

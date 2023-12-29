@@ -6,6 +6,7 @@ using MoneyTransfer.API.Entities;
 using MoneyTransfer.Security;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,8 +45,13 @@ builder.Services.AddAuthorizationBuilder()
 
 builder.Services.AddDbContext<MoneyTransferContext>(options =>
     options.UseSqlServer(connectionString));
-//.ConfigureHttpJsonOptions(options =>
-//    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
+
+// TODO: I don't like to set this serializer option, because it hides the issue
+//      of using entity objects directly in the api, but I couldn't add a user with
+//      an associated account to the db without getting cycle errors in postman
+//      unless I set this serializer option
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 builder.Services
     .AddSingleton<ITokenGenerator>(tk => new JwtGenerator(jwtSecret))
@@ -64,9 +70,9 @@ app.MapPut("/Transfer/Approve/{id}", async (int id, object transfer, MoneyTransf
         .SingleOrDefaultAsync(transfer => transfer.Id == id))!;
 
     if (findTransfer is null) { return Results.NotFound(); }
-    if (!findTransfer.IsValidForApproveOrReject ||
-        !AccountFromHasSufficientFundsForTransfer(findTransfer.Amount,
-            findTransfer.AccountIdFromNavigation.CurrentBalance(), context)) { return Results.BadRequest(); }
+    if (!findTransfer.IsValidForApproveOrReject) { return Results.BadRequest(); }
+    if (!AccountFromHasSufficientFundsForTransfer(findTransfer.Amount, findTransfer.AccountIdFromNavigation.CurrentBalance(), context))
+    { return Results.StatusCode(402); }
 
     findTransfer.TransferStatusId = (int)TransferStatus.Approved;
     await context.SaveChangesAsync();
@@ -311,15 +317,22 @@ app.MapPost("/User/LogIn", async (LogInUser logInUser, MoneyTransferContext cont
     User user = await context.Users.SingleOrDefaultAsync(user => user.Username == logInUser.Username) ?? User.NotFound;
 
     // If we found a user and the password hash matches
-    if (user.Id > 0 && passwordHasher.VerifyHashMatch(user.PasswordHash, logInUser.Password, user.Salt))
+    if (user.Id > 0)
     {
-        // Create an authentication token
-        string token = tokenGenerator.GenerateToken(user.Id, user.Username);
+        if (passwordHasher.VerifyHashMatch(user.PasswordHash, logInUser.Password, user.Salt))
+        {
+            // Create an authentication token
+            string token = tokenGenerator.GenerateToken(user.Id, user.Username);
 
-        // Create a ReturnUser object to return to the client
-        ReturnUser retUser = new() { Id = user.Id, Username = user.Username, Token = token };
+            // Create a ReturnUser object to return to the client
+            ReturnUser retUser = new() { Id = user.Id, Username = user.Username, Token = token };
 
-        return Results.Ok(retUser);
+            return Results.Ok(retUser);
+        }
+        else
+        {
+            return Results.Unauthorized();
+        }
     }
 
     return Results.BadRequest();

@@ -29,6 +29,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             if (currentBalance <= 0 || currentBalance < TransferDetails.Amount)
             {
                 await Shell.Current.DisplayAlert("Error!", "Only transfer requests with an amount less than or equal to your current balance can be approved.", "OK");
+                return;
             }
 
             await _dataService.ApproveTransferRequestAsync(TransferDetails.Id, TransferDetails);

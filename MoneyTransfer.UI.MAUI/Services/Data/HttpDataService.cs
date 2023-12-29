@@ -26,6 +26,13 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.PutAsync($"/Transfer/Approve/{transferId}", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.PaymentRequired)
+                    {
+                        return;
+                    }
+                }
                 response.EnsureSuccessStatusCode();
             }
             catch (Exception) { throw; }
