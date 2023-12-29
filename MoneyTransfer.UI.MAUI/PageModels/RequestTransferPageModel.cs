@@ -6,10 +6,10 @@ using System.Collections.ObjectModel;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
-    public partial class RequestTransferPageModel(IDataService dataService, IUserService mockUserService) : ObservableObject
+    public partial class RequestTransferPageModel(IDataService dataService, IUserService userService) : ObservableObject
     {
         private readonly IDataService _dataService = dataService;
-        private readonly IUserService _userService = mockUserService;
+        private readonly IUserService _userService = userService;
 
         [ObservableProperty]
         private ReadOnlyCollection<User> _users = default!;
@@ -20,8 +20,15 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         [ObservableProperty]
         private string _amount = default!;
 
+        [ObservableProperty]
+        private bool _canRequestTransfer = true;
+
         [RelayCommand]
-        private async Task PageAppearing() => await LoadData();
+        private async Task PageAppearing()
+        {
+            await LoadData();
+            Amount = string.Empty;
+        }
 
         [RelayCommand]
         private async Task RequestTransfer()
@@ -39,9 +46,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             await _dataService.RequestTransferAsync(UserFrom.Username, UserTo.Username, amount);
             await Shell.Current.DisplayAlert("Success!", "Request submitted, go to Pending Transfers to see it.", "OK");
         }
-
-        [ObservableProperty]
-        private bool _canRequestTransfer = true;
 
         private async Task LoadData() => Users = (await _userService.GetUsersNotLoggedIn())!;
     }

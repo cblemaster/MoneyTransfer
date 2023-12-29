@@ -17,6 +17,9 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         [ObservableProperty]
         private string _password = default!;
 
+        [ObservableProperty]
+        private bool _canLogIn = !AuthenticatedUserService.IsLoggedIn();
+
         [RelayCommand]
         private async Task LogIn()
         {
@@ -34,7 +37,11 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             await Shell.Current.GoToAsync("///AccountDetails");
         }
 
-        [ObservableProperty]
-        private bool _canLogIn = !AuthenticatedUserService.IsLoggedIn();
+        [RelayCommand]
+        private void PageAppearing()
+        {
+            Username = string.Empty;
+            Password = string.Empty;
+        }
     }
 }

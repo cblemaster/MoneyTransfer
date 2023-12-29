@@ -6,6 +6,9 @@
              x:Class="MoneyTransfer.UI.MAUI.Pages.LogInPage"
              x:DataType="{x:Type pageModels:LogInPageModel}"
              Title="Log In">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand, Mode=OneWay}" />
+    </ContentPage.Behaviors>
     <ContentPage.Resources>
         <Style x:Key="InvalidEntryStyle" TargetType="Entry">
             <Setter Property="TextColor" Value="{StaticResource Magenta}" />
