@@ -11,11 +11,10 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
         private readonly HttpClient _client;
         private const string BASE_URI = "https://localhost:7144";
 
-        public HttpDataService()
+        public HttpDataService() => _client = new HttpClient
         {
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri(BASE_URI);
-        }
+            BaseAddress = new Uri(BASE_URI)
+        };
 
 
         public async Task ApproveTransferRequestAsync(int transferId, TransferDetails transfer)
@@ -38,12 +37,9 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/Account/Details/{userId}");
-                if (response.IsSuccessStatusCode && response.Content is not null)
-                {
-                    return await response.Content.ReadFromJsonAsync<AccountDetails>() ?? Helpers.AccountNotFound;
-                }
-                return response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? Helpers.AccountUserNotAuthorized : Helpers.AccountHttpResponseUnsuccessful;
-
+                return response.IsSuccessStatusCode && response.Content is not null
+                    ? await response.Content.ReadFromJsonAsync<AccountDetails>() ?? Helpers.AccountNotFound
+                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? Helpers.AccountUserNotAuthorized : Helpers.AccountHttpResponseUnsuccessful;
             }
             catch (Exception) { throw; }
         }
@@ -54,11 +50,9 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/Transfer/Completed/{userId}");
-                if (response.IsSuccessStatusCode && response.Content is not null)
-                {
-                    return new ReadOnlyCollection<TransferDetails>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
-                }
-                return response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferHttpResponseUnsuccessful });
+                return response.IsSuccessStatusCode && response.Content is not null
+                    ? new ReadOnlyCollection<TransferDetails>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
+                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferHttpResponseUnsuccessful });
             }
             catch (Exception) { throw; }
         }
@@ -69,11 +63,9 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/Transfer/Pending/{userId}");
-                if (response.IsSuccessStatusCode && response.Content is not null)
-                {
-                    return new ReadOnlyCollection<TransferDetails>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
-                }
-                return response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferHttpResponseUnsuccessful });
+                return response.IsSuccessStatusCode && response.Content is not null
+                    ? new ReadOnlyCollection<TransferDetails>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetails>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound })
+                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferHttpResponseUnsuccessful });
             }
             catch (Exception) { throw; }
         }
@@ -84,12 +76,9 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/Transfer/Details/{transferId}");
-                if (response.IsSuccessStatusCode && response.Content is not null)
-                {
-                    return await response.Content.ReadFromJsonAsync<TransferDetails>() ?? Helpers.TransferNotFound;
-                }
-                return response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? Helpers.TransferUserNotAuthorized : Helpers.TransferHttpResponseUnsuccessful;
-
+                return response.IsSuccessStatusCode && response.Content is not null
+                    ? await response.Content.ReadFromJsonAsync<TransferDetails>() ?? Helpers.TransferNotFound
+                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? Helpers.TransferUserNotAuthorized : Helpers.TransferHttpResponseUnsuccessful;
             }
             catch (Exception) { throw; }
         }

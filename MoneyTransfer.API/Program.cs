@@ -44,9 +44,9 @@ builder.Services.AddAuthorizationBuilder()
 
 builder.Services.AddDbContext<MoneyTransferContext>(options =>
     options.UseSqlServer(connectionString));
-    //.ConfigureHttpJsonOptions(options =>
-    //    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
-    
+//.ConfigureHttpJsonOptions(options =>
+//    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
+
 builder.Services
     .AddSingleton<ITokenGenerator>(tk => new JwtGenerator(jwtSecret))
     .AddSingleton<IPasswordHasher>(ph => new PasswordHasher());

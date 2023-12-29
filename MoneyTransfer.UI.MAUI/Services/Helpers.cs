@@ -41,15 +41,6 @@ namespace MoneyTransfer.UI.MAUI.Services
                 DateCreated = DateOnly.MinValue
             };
 
-        public static readonly AccountDetails AccountSearchParamNotValid =
-            new()
-            {
-                Id = 0,
-                Username = "search param not valid",
-                CurrentBalance = 0M,
-                DateCreated = DateOnly.MinValue
-            };
-
         public static readonly AccountDetails AccountUserNotAuthorized =
             new()
             {
@@ -78,18 +69,6 @@ namespace MoneyTransfer.UI.MAUI.Services
                 DateCreated = DateOnly.MinValue,
                 UserToName = "not found",
                 UserFromName = "not found",
-            };
-
-        public static readonly TransferDetails TransferSearchParamNotValid =
-            new()
-            {
-                Id = 0,
-                Amount = 0M,
-                TransferStatus = "search param not valid",
-                TransferType = "search param not valid",
-                DateCreated = DateOnly.MinValue,
-                UserToName = "search param not valid",
-                UserFromName = "search param not valid",
             };
 
         public static readonly TransferDetails TransferUserNotAuthorized =
@@ -132,12 +111,20 @@ namespace MoneyTransfer.UI.MAUI.Services
                 Token = "not valid",
             };
 
-        public static readonly UserDTO UserDTOSearchParamNotValid =
+        public static readonly UserDTO UserDTOUserNotAuthorized =
             new()
             {
                 Id = 0,
-                Username = "search param not valid",
-                Token = "search param not valid",
+                Username = "not authorized",
+                Token = "not authorized",
+            };
+
+        public static readonly UserDTO UserDTOHttpResponseUnsuccessful =
+            new()
+            {
+                Id = 0,
+                Username = "http response unsuccessful",
+                Token = "http response unsuccessful",
             };
 
         public static readonly User.User UserNotFound =
@@ -146,12 +133,5 @@ namespace MoneyTransfer.UI.MAUI.Services
                  Id = 0,
                  Username = "not found",
              };
-
-        public static readonly User.User UserSearchParamNotValid =
-            new()
-            {
-                Id = 0,
-                Username = "search param not valid",
-            };
     }
 }

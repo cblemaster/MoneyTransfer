@@ -1,13 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Messaging.Messages;
-using MoneyTransfer.UI.MAUI.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.Messages
 {
-    public class LoggedInUserChangedMessage : ValueChangedMessage<bool>
+    public class LoggedInUserChangedMessage(bool value) : ValueChangedMessage<bool>(value)
     {
-        public LoggedInUserChangedMessage(bool value) : base(value)
-        {
-
-        }
     }
 }

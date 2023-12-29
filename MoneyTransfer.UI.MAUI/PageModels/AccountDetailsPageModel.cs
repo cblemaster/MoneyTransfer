@@ -16,9 +16,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         [RelayCommand]
         private void PageAppearing() => LoadData();
 
-        private async void LoadData()
-        {
-            AccountDetails = await _dataService.GetAccountDetailsForUserAsync(AuthenticatedUserService.GetUserId()) ?? Helpers.AccountNotFound;
-        }
+        private async void LoadData() => AccountDetails = await _dataService.GetAccountDetailsForUserAsync(AuthenticatedUserService.GetUserId()) ?? Helpers.AccountNotFound;
     }
 }

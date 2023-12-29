@@ -9,11 +9,10 @@ namespace MoneyTransfer.UI.MAUI.Services.User
         private readonly HttpClient _client;
         private const string BASE_URI = "https://localhost:7144";
 
-        public HttpUserService()
+        public HttpUserService() => _client = new HttpClient
         {
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri(BASE_URI);
-        }
+            BaseAddress = new Uri(BASE_URI)
+        };
 
         public async Task<UserDTO> GetUserById(int userId)
         {
