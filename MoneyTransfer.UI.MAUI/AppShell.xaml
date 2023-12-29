@@ -4,16 +4,22 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
         xmlns:local="clr-namespace:MoneyTransfer.UI.MAUI"
         xmlns:pages="clr-namespace:MoneyTransfer.UI.MAUI.Pages"
+        xmlns:pageModels="clr-namespace:MoneyTransfer.UI.MAUI.PageModels"
+        xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
         Shell.FlyoutBehavior="Disabled"
+        x:DataType="{x:Type pageModels:AppShellModel}"
         Title="MoneyTransfer MAUI">
+    <Shell.Resources>
+        <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+    </Shell.Resources>
     <TabBar>
-        <ShellContent Title="Register" ContentTemplate="{DataTemplate pages:RegisterPage}" Route="Register" />
-        <ShellContent Title="Log In" ContentTemplate="{DataTemplate pages:LogInPage}" Route="LogIn" />
-        <ShellContent Title="Log Out" ContentTemplate="{DataTemplate pages:LogOutPage}" Route="LogOut" />
-        <ShellContent Title="Account Details" ContentTemplate="{DataTemplate pages:AccountDetailsPage}" Route="AccountDetails" />
-        <ShellContent Title="Request Transfer" ContentTemplate="{DataTemplate pages:RequestTransferPage}" Route="RequestTransfer" />
-        <ShellContent Title="Send Transfer" ContentTemplate="{DataTemplate pages:SendTransferPage}" Route="SendTransfer" />
-        <ShellContent Title="Completed Transfers" ContentTemplate="{DataTemplate pages:CompletedTransfersPage}" Route="CompletedTransfers" />
-        <ShellContent Title="Pending Transfers" ContentTemplate="{DataTemplate pages:PendingTransfersPage}" Route="PendingTransfers" />
+        <ShellContent IsVisible="{Binding IsUserLoggedIn, Mode=OneWay, Converter={StaticResource InvertedBoolConverter}}" Title="Register" ContentTemplate="{DataTemplate pages:RegisterPage}" Route="Register" />
+        <ShellContent IsVisible="{Binding IsUserLoggedIn, Mode=OneWay, Converter={StaticResource InvertedBoolConverter}}" Title="Log In" ContentTemplate="{DataTemplate pages:LogInPage}" Route="LogIn" />
+        <ShellContent IsVisible="{Binding IsUserLoggedIn, Mode=OneWay}" Title="Log Out" ContentTemplate="{DataTemplate pages:LogOutPage}" Route="LogOut" />
+        <ShellContent IsVisible="{Binding IsUserLoggedIn, Mode=OneWay}" Title="Account Details" ContentTemplate="{DataTemplate pages:AccountDetailsPage}" Route="AccountDetails" />
+        <ShellContent IsVisible="{Binding IsUserLoggedIn, Mode=OneWay}" Title="Request Transfer" ContentTemplate="{DataTemplate pages:RequestTransferPage}" Route="RequestTransfer" />
+        <ShellContent IsVisible="{Binding IsUserLoggedIn, Mode=OneWay}" Title="Send Transfer" ContentTemplate="{DataTemplate pages:SendTransferPage}" Route="SendTransfer" />
+        <ShellContent IsVisible="{Binding IsUserLoggedIn, Mode=OneWay}" Title="Completed Transfers" ContentTemplate="{DataTemplate pages:CompletedTransfersPage}" Route="CompletedTransfers" />
+        <ShellContent IsVisible="{Binding IsUserLoggedIn, Mode=OneWay}" Title="Pending Transfers" ContentTemplate="{DataTemplate pages:PendingTransfersPage}" Route="PendingTransfers" />
     </TabBar>
 </Shell>

@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using MoneyTransfer.UI.MAUI.Messages;
 using MoneyTransfer.UI.MAUI.Services;
 using MoneyTransfer.UI.MAUI.Services.User;
 
@@ -25,10 +27,11 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
             UserDTO loggedInUser = await _userService.LogIn(logInUser);
             AuthenticatedUserService.SetLogin(loggedInUser);
+            WeakReferenceMessenger.Default.Send(new LoggedInUserChangedMessage(AuthenticatedUserService.IsLoggedIn()));
+
             await Shell.Current.DisplayAlert("Success!", "You are logged into the system.", "OK");
 
-            Username = string.Empty;
-            Password = string.Empty;
+            await Shell.Current.GoToAsync("///AccountDetails");
         }
 
         [ObservableProperty]

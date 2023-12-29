@@ -1,7 +1,13 @@
-﻿namespace MoneyTransfer.UI.MAUI
+﻿using MoneyTransfer.UI.MAUI.PageModels;
+
+namespace MoneyTransfer.UI.MAUI
 {
     public partial class AppShell : Shell
     {
-        public AppShell() => InitializeComponent();
+        public AppShell(AppShellModel shellModel)
+        {
+            InitializeComponent();
+            BindingContext = shellModel;
+        }
     }
 }
