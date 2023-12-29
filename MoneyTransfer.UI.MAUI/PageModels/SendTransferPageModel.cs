@@ -20,9 +20,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         [ObservableProperty]
         private string _amount = default!;
 
-        [ObservableProperty]
-        private bool _canSendTransfer = true;
-
         [RelayCommand]
         private async Task PageAppearing()
         {
@@ -52,6 +49,9 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             await _dataService.SendTransferAsync(UserFrom.Username, UserTo.Username, amount);
             await Shell.Current.DisplayAlert("Success!", "Transfer sent, go to Completed Transfers to see it.", "OK");
         }
+
+        [ObservableProperty]
+        private bool _canSendTransfer = true;
 
         private async Task LoadData() => Users = (await _userService.GetUsersNotLoggedIn())!;
     }

@@ -8,9 +8,6 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 {
     public partial class LogOutPageModel() : ObservableObject
     {
-        [ObservableProperty]
-        private bool _canLogOut = AuthenticatedUserService.IsLoggedIn();
-
         [RelayCommand]
         private void PageAppearing() => CanLogOut = AuthenticatedUserService.IsLoggedIn();
 
@@ -25,5 +22,8 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             await Shell.Current.DisplayAlert("Success!", "You are logged out of the system, and you will be directed to the Log In page.", "OK");
             await Shell.Current.GoToAsync("///LogIn");
         }
+
+        [ObservableProperty]
+        private bool _canLogOut = AuthenticatedUserService.IsLoggedIn();
     }
 }

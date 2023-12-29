@@ -15,8 +15,14 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         [ObservableProperty]
         private string _password = default!;
 
-        [ObservableProperty]
-        private bool _canRegister = true;
+        [RelayCommand]
+        private void PageAppearing()
+        {
+            Username = string.Empty;
+            Password = string.Empty;
+
+            CanRegister = !AuthenticatedUserService.IsLoggedIn();
+        }
 
         [RelayCommand]
         private async Task Register()
@@ -34,11 +40,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             }
         }
 
-        [RelayCommand]
-        private void PageAppearing()
-        {
-            Username = string.Empty;
-            Password = string.Empty;
-        }
+        [ObservableProperty]
+        private bool _canRegister = !AuthenticatedUserService.IsLoggedIn();
     }
 }
