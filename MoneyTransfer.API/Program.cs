@@ -17,9 +17,9 @@ var config = new ConfigurationBuilder()
 string connectionString = config.GetConnectionString("Project") ?? "Error retrieving connection string!";
 string jwtSecret = config.GetValue<string>("JwtSecret") ?? "Error retreiving jwt config!";
 
-// configure jwt authentication
 var key = Encoding.ASCII.GetBytes(jwtSecret);
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap[JwtRegisteredClaimNames.Sub] = "sub";
+
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -39,14 +39,17 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-builder.Services
-    .AddDbContext<MoneyTransferContext>(options =>
-        options.UseSqlServer(connectionString))
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("requireauthuser", policy => policy.RequireAuthenticatedUser());
+
+builder.Services.AddDbContext<MoneyTransferContext>(options =>
+    options.UseSqlServer(connectionString));
     //.ConfigureHttpJsonOptions(options =>
     //    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
+    
+builder.Services
     .AddSingleton<ITokenGenerator>(tk => new JwtGenerator(jwtSecret))
-    .AddSingleton<IPasswordHasher>(ph => new PasswordHasher())
-    ;
+    .AddSingleton<IPasswordHasher>(ph => new PasswordHasher());
 
 var app = builder.Build();
 
@@ -68,7 +71,7 @@ app.MapPut("/Transfer/Approve/{id}", async (int id, object transfer, MoneyTransf
     findTransfer.TransferStatusId = (int)TransferStatus.Approved;
     await context.SaveChangesAsync();
     return Results.NoContent();
-});
+}).RequireAuthorization("requireauthuser");
 
 app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context) =>
 {
@@ -116,7 +119,7 @@ app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context
                 }).SingleOrDefaultAsync() is object transfer
         ? Results.Ok(transfer)
         : Results.NotFound();
-});
+}).RequireAuthorization("requireauthuser");
 
 app.MapPut("/Transfer/Reject/{id}", async (int id, object transfer, MoneyTransferContext context) =>
 {
@@ -132,7 +135,7 @@ app.MapPut("/Transfer/Reject/{id}", async (int id, object transfer, MoneyTransfe
     findTransfer.TransferStatusId = (int)TransferStatus.Rejected;
     await context.SaveChangesAsync();
     return Results.NoContent();
-});
+}).RequireAuthorization("requireauthuser");
 
 app.MapPost("/Transfer/Request", async (AddTransfer transfer, MoneyTransferContext context) =>
 {
@@ -166,7 +169,7 @@ app.MapPost("/Transfer/Request", async (AddTransfer transfer, MoneyTransferConte
     await context.Transfers.AddAsync(transferToAdd);
     await context.SaveChangesAsync();
     return Results.Created($"/Transfer/Details/{transferToAdd.Id}", transferToAdd);
-});
+}).RequireAuthorization("requireauthuser");
 
 app.MapPost("/Transfer/Send", async (AddTransfer transfer, MoneyTransferContext context) =>
 {
@@ -202,7 +205,7 @@ app.MapPost("/Transfer/Send", async (AddTransfer transfer, MoneyTransferContext 
     context.Transfers.Add(transferToAdd);
     await context.SaveChangesAsync();
     return Results.Created($"/Transfer/Details/{transferToAdd.Id}", transferToAdd);
-});
+}).RequireAuthorization("requireauthuser");
 
 app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext context) =>
     {
@@ -248,7 +251,7 @@ app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext con
                     }).SingleOrDefaultAsync() is object account
             ? Results.Ok(account)
             : Results.NotFound();
-    });
+    }).RequireAuthorization("requireauthuser");
 
 app.MapGet("/User/{id}", async (int id, MoneyTransferContext context) =>
 {
@@ -274,7 +277,7 @@ app.MapGet("/User/{id}", async (int id, MoneyTransferContext context) =>
             .SingleOrDefaultAsync() is object user
                 ? Results.Ok(user)
                 : Results.NotFound();
-});
+}).RequireAuthorization("requireauthuser");
 
 app.MapGet("/User/GetUsers", async Task<object> (MoneyTransferContext context) =>
 {
@@ -296,7 +299,7 @@ app.MapGet("/User/GetUsers", async Task<object> (MoneyTransferContext context) =
             })
             .OrderBy(a => a.Username)
             .ToListAsync();
-});
+}).RequireAuthorization("requireauthuser");
 
 app.MapPost("/User/LogIn", async (LogInUser logInUser, MoneyTransferContext context, IPasswordHasher passwordHasher, ITokenGenerator tokenGenerator) =>
 {
@@ -401,7 +404,7 @@ app.MapGet("/User/Transfer/Completed/{id}", async Task<object> (int id, MoneyTra
                     })
                     .OrderByDescending(a => a.DateCreated)
                     .ToListAsync();
-    });
+    }).RequireAuthorization("requireauthuser");
 
 app.MapGet("/User/Transfer/Pending/{id}", async Task<object> (int id, MoneyTransferContext context) =>
     {
@@ -451,7 +454,7 @@ app.MapGet("/User/Transfer/Pending/{id}", async Task<object> (int id, MoneyTrans
                         })
                         .OrderByDescending(a => a.DateCreated)
                         .ToListAsync();
-    });
+    }).RequireAuthorization("requireauthuser");
 
 app.Run();
 

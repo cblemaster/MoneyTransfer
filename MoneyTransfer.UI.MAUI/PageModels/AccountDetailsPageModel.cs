@@ -18,11 +18,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
 
         private async void LoadData()
         {
-            int currentUserId = AuthenticatedUserService.GetUserId();
-            if (currentUserId > 0)
-            {
-                AccountDetails = await _dataService.GetAccountDetailsForUserAsync(currentUserId) ?? Helpers.AccountNotFound;
-            }
+            AccountDetails = await _dataService.GetAccountDetailsForUserAsync(AuthenticatedUserService.GetUserId()) ?? Helpers.AccountNotFound;
         }
     }
 }

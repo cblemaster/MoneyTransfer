@@ -50,6 +50,24 @@ namespace MoneyTransfer.UI.MAUI.Services
                 DateCreated = DateOnly.MinValue
             };
 
+        public static readonly AccountDetails AccountUserNotAuthorized =
+            new()
+            {
+                Id = 0,
+                Username = "not authorized",
+                CurrentBalance = 0M,
+                DateCreated = DateOnly.MinValue
+            };
+
+        public static readonly AccountDetails AccountHttpResponseUnsuccessful =
+            new()
+            {
+                Id = 0,
+                Username = "http response unsuccessful",
+                CurrentBalance = 0M,
+                DateCreated = DateOnly.MinValue
+            };
+
         public static readonly TransferDetails TransferNotFound =
             new()
             {
@@ -59,7 +77,7 @@ namespace MoneyTransfer.UI.MAUI.Services
                 TransferType = "not found",
                 DateCreated = DateOnly.MinValue,
                 UserToName = "not found",
-                UserFromName = "not found"
+                UserFromName = "not found",
             };
 
         public static readonly TransferDetails TransferSearchParamNotValid =
@@ -71,7 +89,31 @@ namespace MoneyTransfer.UI.MAUI.Services
                 TransferType = "search param not valid",
                 DateCreated = DateOnly.MinValue,
                 UserToName = "search param not valid",
-                UserFromName = "search param not valid"
+                UserFromName = "search param not valid",
+            };
+
+        public static readonly TransferDetails TransferUserNotAuthorized =
+            new()
+            {
+                Id = 0,
+                Amount = 0M,
+                TransferStatus = "not authorized",
+                TransferType = "not authorized",
+                DateCreated = DateOnly.MinValue,
+                UserToName = "not authorized",
+                UserFromName = "not authorized",
+            };
+
+        public static readonly TransferDetails TransferHttpResponseUnsuccessful =
+            new()
+            {
+                Id = 0,
+                Amount = 0M,
+                TransferStatus = "http response unsuccessful",
+                TransferType = "http response unsuccessful",
+                DateCreated = DateOnly.MinValue,
+                UserToName = "http response unsuccessful",
+                UserFromName = "http response unsuccessful",
             };
 
         public static readonly UserDTO UserDTONotFound =

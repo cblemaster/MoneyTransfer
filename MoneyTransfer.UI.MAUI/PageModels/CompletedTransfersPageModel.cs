@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MoneyTransfer.UI.MAUI.Pages;
-using MoneyTransfer.UI.MAUI.Services;
 using MoneyTransfer.UI.MAUI.Services.Data;
 using MoneyTransfer.UI.MAUI.Services.User;
 using System.Collections.ObjectModel;
@@ -30,8 +29,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
             }
         }
 
-        private async void LoadData() => TransferDetails = 
-            await _dataService.GetCompletedTransfersForUserAsync(AuthenticatedUserService.GetUserId())
-                ?? new ReadOnlyCollection<TransferDetails>(new List<TransferDetails> { Helpers.TransferNotFound });
+        private async void LoadData() => TransferDetails =
+            await _dataService.GetCompletedTransfersForUserAsync(AuthenticatedUserService.GetUserId());
     }
 }
