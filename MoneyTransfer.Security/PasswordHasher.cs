@@ -8,7 +8,7 @@ namespace MoneyTransfer.Security
     /// </summary>
     public class PasswordHasher : IPasswordHasher
     {
-        private const int WorkFactor = 10000;
+        private const int WORK_FACTOR = 10000;
 
         /// <summary>
         /// Hashes a plain text password.
@@ -18,7 +18,7 @@ namespace MoneyTransfer.Security
         public PasswordHash ComputeHash(string plainTextPassword)
         {
             //Create the hashing provider
-            Rfc2898DeriveBytes rfc = new Rfc2898DeriveBytes(plainTextPassword, 8, WorkFactor);
+            Rfc2898DeriveBytes rfc = new(plainTextPassword, 8, WORK_FACTOR, HashAlgorithmName.SHA256);
 
             //Get the Hashed Password
             byte[] hash = rfc.GetBytes(20);
@@ -42,7 +42,7 @@ namespace MoneyTransfer.Security
             byte[] saltArray = Convert.FromBase64String(salt);      //gets us the byte[] array representation
 
             //Create the hashing provider
-            Rfc2898DeriveBytes rfc = new Rfc2898DeriveBytes(plainTextPassword, saltArray, WorkFactor);
+            Rfc2898DeriveBytes rfc = new(plainTextPassword, saltArray, WORK_FACTOR, HashAlgorithmName.SHA256);
 
             //Get the hashed password
             byte[] hash = rfc.GetBytes(20);
