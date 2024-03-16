@@ -23,16 +23,18 @@ GO
 
 -- create tables
 CREATE TABLE TransferTypes (
-	Id					int IDENTITY(1,1)					NOT NULL,
+	Id					int									NOT NULL,
 	TransferType		varchar(10)							NOT NULL,
-	CONSTRAINT PK_TransferTypes PRIMARY KEY (Id),
+	
+	CONSTRAINT PK_TransferTypes PRIMARY KEY(Id),
 )
 GO
 
 CREATE TABLE TransferStatuses (
-	Id					int IDENTITY(1,1)					NOT NULL,
+	Id					int									NOT NULL,
 	TransferStatus		varchar(10)							NOT NULL,
-	CONSTRAINT PK_TransferStatuses PRIMARY KEY (Id),
+	
+	CONSTRAINT PK_TransferStatuses PRIMARY KEY(Id),
 )
 GO
 
@@ -41,8 +43,9 @@ CREATE TABLE Users (
 	Username			varchar(50)							NOT NULL,
 	PasswordHash		varchar(200)						NOT NULL,
 	Salt				varchar(200)						NOT NULL,
-	CONSTRAINT PK_Users PRIMARY KEY (Id),
-	CONSTRAINT UC_Username UNIQUE (Username),
+	
+	CONSTRAINT PK_Users PRIMARY KEY(Id),
+	CONSTRAINT UC_Username UNIQUE(Username),
 )
 GO
 
@@ -51,9 +54,10 @@ CREATE TABLE Accounts (
 	UserId				int									NOT NULL,
 	StartingBalance		decimal(13, 2)						NOT NULL,
 	DateCreated			date								NOT NULL,	
-	CONSTRAINT PK_Accounts PRIMARY KEY (Id),
-	CONSTRAINT UC_UserId UNIQUE (UserId),
-	CONSTRAINT FK_Accounts_Users FOREIGN KEY (UserId) REFERENCES Users (Id),
+	
+	CONSTRAINT PK_Accounts PRIMARY KEY(Id),
+	CONSTRAINT UC_UserId UNIQUE(UserId),
+	CONSTRAINT FK_Accounts_Users FOREIGN KEY(UserId) REFERENCES Users(Id),
 )
 GO
 
@@ -65,23 +69,24 @@ CREATE TABLE Transfers (
 	AccountIdTo			int									NOT NULL,
 	Amount				decimal(13, 2)						NOT NULL,
 	DateCreated			date								NOT NULL,
-	CONSTRAINT PK_Transfers PRIMARY KEY (Id),
-	CONSTRAINT FK_Transfers_AccountsFrom FOREIGN KEY (AccountIdFrom) REFERENCES Accounts (Id),
-	CONSTRAINT FK_Transfers_AccountsTo FOREIGN KEY (AccountIdTo) REFERENCES Accounts (Id),
-	CONSTRAINT FK_Transfers_TransferStatuses FOREIGN KEY (TransferStatusId) REFERENCES TransferStatuses (Id),
-	CONSTRAINT FK_Transfers_TransferTypes FOREIGN KEY (TransferTypeId) REFERENCES TransferTypes (Id),
-	CONSTRAINT CK_Transfers_not_same_account CHECK  ((AccountIdFrom <> AccountIdTo)),
-	CONSTRAINT CK_transfers_amount_gt_0 CHECK ((amount > 0)),
+	
+	CONSTRAINT PK_Transfers PRIMARY KEY(Id),
+	CONSTRAINT FK_Transfers_AccountsFrom FOREIGN KEY(AccountIdFrom) REFERENCES Accounts(Id),
+	CONSTRAINT FK_Transfers_AccountsTo FOREIGN KEY(AccountIdTo) REFERENCES Accounts(Id),
+	CONSTRAINT FK_Transfers_TransferStatuses FOREIGN KEY(TransferStatusId) REFERENCES TransferStatuses(Id),
+	CONSTRAINT FK_Transfers_TransferTypes FOREIGN KEY(TransferTypeId) REFERENCES TransferTypes(Id),
+	CONSTRAINT CK_Transfers_not_same_account CHECK(AccountIdFrom <> AccountIdTo),
+	CONSTRAINT CK_transfers_amount_gt_0 CHECK(amount > 0),
 )
 GO
 
 -- data required for application
-INSERT INTO TransferStatuses (TransferStatus) VALUES ('Pending');
-INSERT INTO TransferStatuses (TransferStatus) VALUES ('Approved');
-INSERT INTO TransferStatuses (TransferStatus) VALUES ('Rejected');
+INSERT INTO TransferStatuses(Id, TransferStatus) VALUES(1,'Pending');
+INSERT INTO TransferStatuses(Id, TransferStatus) VALUES(2,'Approved');
+INSERT INTO TransferStatuses(Id, TransferStatus) VALUES(3,'Rejected');
 
-INSERT INTO TransferTypes (TransferType) VALUES ('Request');
-INSERT INTO TransferTypes (TransferType) VALUES ('Send');
+INSERT INTO TransferTypes(Id, TransferType) VALUES(1,'Request');
+INSERT INTO TransferTypes(Id, TransferType) VALUES(2,'Send');
 
 -- optional sample data
 --INSERT INTO Users (Username, PasswordHash, Salt) VALUES ('brian','placeholder','placeholder');
