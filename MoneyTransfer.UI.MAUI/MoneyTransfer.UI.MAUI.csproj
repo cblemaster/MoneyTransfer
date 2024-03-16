@@ -101,6 +101,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\MoneyTransfer.Core\MoneyTransfer.Core.csproj" />
 	  <ProjectReference Include="..\MoneyTransfer.Security\MoneyTransfer.Security.csproj" />
 	</ItemGroup>
 
