@@ -1,4 +1,4 @@
-﻿namespace MoneyTransfer.API.Entities;
+﻿namespace MoneyTransfer.Core.Entities;
 
 public partial class User
 {

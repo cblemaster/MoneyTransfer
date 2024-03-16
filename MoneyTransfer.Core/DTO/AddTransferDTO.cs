@@ -1,6 +1,6 @@
-﻿namespace MoneyTransfer.API.Entities
+﻿namespace MoneyTransfer.Core.DTO
 {
-    public class AddTransfer
+    public class AddTransferDTO
     {
         public required string UserFromName { get; set; } = string.Empty;
 
