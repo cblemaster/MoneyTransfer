@@ -1,4 +1,6 @@
-﻿namespace MoneyTransfer.UI.MAUI.Services.User
+﻿using MoneyTransfer.Core.DTO;
+
+namespace MoneyTransfer.UI.MAUI.Services.User
 {
     public static class AuthenticatedUserService
     {

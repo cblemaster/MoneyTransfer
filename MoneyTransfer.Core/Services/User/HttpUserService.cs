@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using MoneyTransfer.Core.DTO;
+using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -54,7 +55,7 @@ namespace MoneyTransfer.UI.MAUI.Services.User
             catch (Exception) { throw; }
         }
 
-        public async Task<UserDTO> LogIn(LogInUser logInUser)
+        public async Task<UserDTO> LogIn(LogInUserDTO logInUser)
         {
             if (!Helpers.LogInUserIsValid(logInUser)) { return Helpers.UserDTONotValid; }
 
@@ -87,7 +88,7 @@ namespace MoneyTransfer.UI.MAUI.Services.User
             catch (Exception) { throw; }
         }
 
-        public async Task<bool> Register(LogInUser registerUser)
+        public async Task<bool> Register(LogInUserDTO registerUser)
         {
             if (!Helpers.LogInUserIsValid(registerUser)) { return false; }
 
