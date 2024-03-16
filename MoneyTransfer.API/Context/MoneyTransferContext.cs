@@ -5,14 +5,10 @@ namespace MoneyTransfer.API.Context;
 
 public partial class MoneyTransferContext : DbContext
 {
-    public MoneyTransferContext()
-    {
-    }
+    public MoneyTransferContext() { }
 
     public MoneyTransferContext(DbContextOptions<MoneyTransferContext> options)
-        : base(options)
-    {
-    }
+        : base(options) { }
 
     public virtual DbSet<Account> Accounts { get; set; }
 
@@ -20,9 +16,7 @@ public partial class MoneyTransferContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
