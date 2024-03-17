@@ -29,7 +29,7 @@ public partial class Transfer
     public ValidationResult Validate()
     {
         bool isValid = TransferTypeId > 0 && TransferStatusId > 0 && AccountIdFrom > 0
-            && AccountIdTo > 0 && Amount > 0 && AccountIdFrom != AccountIdTo;
+            && AccountIdTo > 0 && Amount > 0 && !AccountIdFrom.Equals(AccountIdTo);
 
         string errorMessage = "One or more invalid values for this transfer.";
 

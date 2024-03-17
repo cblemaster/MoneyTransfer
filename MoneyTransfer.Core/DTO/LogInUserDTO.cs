@@ -11,7 +11,7 @@ public class LogInUserDTO
     public ValidationResult Validate()
     {
         bool usernameIsValid = StringIsValid(Username, 50, 1);
-        
+
         bool passwordIsValid = StringIsValid(Password, 200, 1);
 
         StringBuilder sb = new();
@@ -42,5 +42,5 @@ public class LogInUserDTO
         }
     }
 
-    
+
 }

@@ -7,8 +7,8 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
     {
         Task ApproveTransferRequestAsync(int transferId, TransferDetailsDTO transfer);
         Task<AccountDetailsDTO> GetAccountDetailsForUserAsync(int userId);
-        Task<ReadOnlyCollection<TransferDetailsDTO>> GetCompletedTransfersForUserAsync(int userId);
-        Task<ReadOnlyCollection<TransferDetailsDTO>> GetPendingTransfersForUserAsync(int userId);
+        Task<ReadOnlyCollection<TransferDetailsDTO?>> GetCompletedTransfersForUserAsync(int userId);
+        Task<ReadOnlyCollection<TransferDetailsDTO?>> GetPendingTransfersForUserAsync(int userId);
         Task<TransferDetailsDTO> GetTransferDetailsAsync(int transferId);
         Task RejectTransferRequestAsync(int transferId, TransferDetailsDTO transfer);
         Task RequestTransferAsync(string userFromName, string userToName, decimal amount);

@@ -84,11 +84,11 @@ app.MapPut("/Transfer/Approve/{id:int}", async Task<Results<BadRequest<string>, 
     {
         return TypedResults.BadRequest("Insufficient funds to complete the transfer.");
     }
-    
+
     entity.TransferStatusId = (int)TransferStatus.Approved;
-    
+
     await context.SaveChangesAsync();
-    
+
     return TypedResults.NoContent();
 
 }).RequireAuthorization("requireauthuser");
@@ -133,7 +133,7 @@ app.MapPost("/Transfer/Request", async Task<Results<BadRequest<string>, Created<
     {
         return TypedResults.BadRequest("The information provided with the request is invalid.");
     }
-    
+
     Account accountFrom = ((await context.Accounts
         .SingleOrDefaultAsync(a => a.User.Username.Equals(dto.UserFromName))))!;
 
@@ -267,9 +267,9 @@ app.MapPost("/User/Register", async Task<Results<BadRequest<string>, Conflict<st
     {
         return TypedResults.BadRequest("The information provided with the request is invalid.");
     }
-    
+
     User existingUser = await context.Users.SingleOrDefaultAsync(u => u.Username.Equals(registerUser.Username)) ?? User.NotFound;
-    
+
     if (existingUser.Id > 0)
     {
         return TypedResults.Conflict("Username already taken. Please choose a different username.");
@@ -297,7 +297,8 @@ app.MapPost("/User/Register", async Task<Results<BadRequest<string>, Conflict<st
     {
         Id = userToRegister.Id,
         Username = userToRegister.Username,
-        Token = string.Empty };
+        Token = string.Empty
+    };
 
     return TypedResults.Created($"/User/{dto.Id}", dto);
 });

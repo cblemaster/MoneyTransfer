@@ -29,28 +29,28 @@ namespace MoneyTransfer.UI.MAUI.Services.User
             catch (Exception) { throw; }
         }
 
-        public async Task<ReadOnlyCollection<UserDTO>> GetUsers()
+        public async Task<ReadOnlyCollection<UserDTO?>> GetUsers()
         {
             try
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
-                HttpResponseMessage response = await _client.GetAsync($"/User/GetUsers");
+                HttpResponseMessage response = await _client.GetAsync($"/User");
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<UserDTO>((response.Content.ReadFromJsonAsAsyncEnumerable<UserDTO>()!).ToBlockingEnumerable<UserDTO>().ToList()) ?? new ReadOnlyCollection<UserDTO>(new List<UserDTO> { UserDTO.UserDTONotFound })
-                    : new ReadOnlyCollection<UserDTO>(new List<UserDTO> { UserDTO.UserDTONotFound });
+                    ? new ReadOnlyCollection<UserDTO?>((response.Content.ReadFromJsonAsAsyncEnumerable<UserDTO?>()).ToBlockingEnumerable<UserDTO?>().ToList()) ?? new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound })
+                    : new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound });
             }
             catch (Exception) { throw; }
         }
 
-        public async Task<ReadOnlyCollection<UserDTO>> GetUsersNotLoggedIn()
+        public async Task<ReadOnlyCollection<UserDTO?>> GetUsersNotLoggedIn()
         {
             try
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/GetUsers");
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<UserDTO>((response.Content.ReadFromJsonAsAsyncEnumerable<UserDTO>()!).ToBlockingEnumerable<UserDTO>().Where(user => user.Id != AuthenticatedUserService.GetUserId()).ToList()) ?? new ReadOnlyCollection<UserDTO>(new List<UserDTO> { UserDTO.UserDTONotFound })
-                    : new ReadOnlyCollection<UserDTO>(new List<UserDTO> { UserDTO.UserDTONotFound });
+                    ? new ReadOnlyCollection<UserDTO?>((response.Content.ReadFromJsonAsAsyncEnumerable<UserDTO?>()).ToBlockingEnumerable<UserDTO?>().Where(u => !(u?.Id).Equals(AuthenticatedUserService.GetUserId())).ToList()) ?? new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound })
+                    : new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound });
             }
             catch (Exception) { throw; }
         }

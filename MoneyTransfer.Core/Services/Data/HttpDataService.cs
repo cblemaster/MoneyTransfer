@@ -52,28 +52,28 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
             catch (Exception) { throw; }
         }
 
-        public async Task<ReadOnlyCollection<TransferDetailsDTO>> GetCompletedTransfersForUserAsync(int userId)
+        public async Task<ReadOnlyCollection<TransferDetailsDTO?>> GetCompletedTransfersForUserAsync(int userId)
         {
             try
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/Transfer/Completed/{userId}");
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<TransferDetailsDTO>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetailsDTO>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferNotFound })
-                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferHttpResponseUnsuccessful });
+                    ? new ReadOnlyCollection<TransferDetailsDTO?>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetailsDTO?>().ToBlockingEnumerable().ToList()) ?? new ReadOnlyCollection<TransferDetailsDTO?>(new List<TransferDetailsDTO?> { TransferDetailsDTO.TransferNotFound })
+                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetailsDTO?>(new List<TransferDetailsDTO?> { TransferDetailsDTO.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetailsDTO?>(new List<TransferDetailsDTO?> { TransferDetailsDTO.TransferHttpResponseUnsuccessful });
             }
             catch (Exception) { throw; }
         }
 
-        public async Task<ReadOnlyCollection<TransferDetailsDTO>> GetPendingTransfersForUserAsync(int userId)
+        public async Task<ReadOnlyCollection<TransferDetailsDTO?>> GetPendingTransfersForUserAsync(int userId)
         {
             try
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/Transfer/Pending/{userId}");
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<TransferDetailsDTO>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetailsDTO>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferNotFound })
-                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferHttpResponseUnsuccessful });
+                    ? new ReadOnlyCollection<TransferDetailsDTO?>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetailsDTO?>().ToBlockingEnumerable().ToList()) ?? new ReadOnlyCollection<TransferDetailsDTO?>(new List<TransferDetailsDTO?> { TransferDetailsDTO.TransferNotFound })
+                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetailsDTO?>(new List<TransferDetailsDTO?> { TransferDetailsDTO.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetailsDTO?>(new List<TransferDetailsDTO?> { TransferDetailsDTO.TransferHttpResponseUnsuccessful });
             }
             catch (Exception) { throw; }
         }
