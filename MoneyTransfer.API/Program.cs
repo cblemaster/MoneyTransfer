@@ -70,7 +70,7 @@ app.MapPut("/Transfer/Approve/{id:int}", async Task<Results<BadRequest<string>, 
         return TypedResults.BadRequest($"Transfer id mismatch. The id provided with the http request is {id}, and the id provided with the request content is {dto.Id}.");
     }
 
-    Transfer entity = await context.Transfers.Include(t => t.AccountIdFromNavigation).SingleOrDefaultAsync(t => t.Id.Equals(id));
+    Transfer entity = (await context.Transfers.Include(t => t.AccountIdFromNavigation).SingleOrDefaultAsync(t => t.Id.Equals(id)))!;
 
     if (entity is null)
     {
@@ -108,7 +108,7 @@ app.MapPut("/Transfer/Reject/{id:int}", async Task<Results<BadRequest<string>, N
         return TypedResults.BadRequest($"Transfer id mismatch. The id provided with the http request is {id}, and the id provided with the request content is {dto.Id}.");
     }
 
-    Transfer entity = await context.Transfers.SingleOrDefaultAsync(t => t.Id.Equals(id));
+    Transfer entity = (await context.Transfers.SingleOrDefaultAsync(t => t.Id.Equals(id)))!;
 
     if (entity is null)
     {
@@ -134,10 +134,10 @@ app.MapPost("/Transfer/Request", async Task<Results<BadRequest<string>, Created<
         return TypedResults.BadRequest("The information provided with the request is invalid.");
     }
     
-    Account accountFrom = (await context.Accounts
+    Account accountFrom = ((await context.Accounts
         .Include(account => account.TransferAccountIdFromNavigations)
         .Include(account => account.TransferAccountIdToNavigations)
-        .SingleOrDefaultAsync(a => a.User.Username.Equals(dto.UserFromName)));
+        .SingleOrDefaultAsync(a => a.User.Username.Equals(dto.UserFromName))))!;
 
     if (accountFrom is null)
     {
@@ -189,10 +189,10 @@ app.MapPost("/Transfer/Send", async Task<Results<BadRequest<string>, Created<Tra
         return TypedResults.BadRequest("The information provided with the request is invalid.");
     }
 
-    Account accountFrom = (await context.Accounts
+    Account accountFrom = ((await context.Accounts
         .Include(account => account.TransferAccountIdFromNavigations)
         .Include(account => account.TransferAccountIdToNavigations)
-        .SingleOrDefaultAsync(account => account.User.Username.Equals(dto.UserFromName)));
+        .SingleOrDefaultAsync(account => account.User.Username.Equals(dto.UserFromName))))!;
 
     if (accountFrom is null)
     {
@@ -243,7 +243,7 @@ app.MapGet("/Transfer/Details/{id:int}", async Task<Results<BadRequest<string>, 
         return TypedResults.BadRequest("Invalid transfer id.");
     }
 
-    Transfer entity = await context.Transfers.SingleOrDefaultAsync(t => t.Id.Equals(id));
+    Transfer entity = (await context.Transfers.SingleOrDefaultAsync(t => t.Id.Equals(id)))!;
 
     if (entity is null)
     {
@@ -344,7 +344,7 @@ app.MapGet("/User/Account/Details/{id:int}", async Task<Results<BadRequest<strin
         return TypedResults.BadRequest("Invalid user id.");
     }
 
-    Account entity = await context.Accounts.SingleOrDefaultAsync(a => a.User.Id.Equals(id));
+    Account entity = (await context.Accounts.SingleOrDefaultAsync(a => a.User.Id.Equals(id)))!;
 
     if (entity is null)
     {
@@ -370,7 +370,7 @@ app.MapGet("/User/{id:int}", async Task<Results<BadRequest<string>, NotFound<str
         return TypedResults.BadRequest("Invalid user id.");
     }
 
-    User entity = await context.Users.SingleOrDefaultAsync(u => u.Id.Equals(id));
+    User entity = (await context.Users.SingleOrDefaultAsync(u => u.Id.Equals(id)))!;
 
     if (entity is null)
     {
@@ -388,7 +388,7 @@ app.MapGet("/User/{id:int}", async Task<Results<BadRequest<string>, NotFound<str
 
 }).RequireAuthorization("requireauthuser");
 
-app.MapGet("/User", async Task<Results<BadRequest<string>, NotFound<string>, Ok<IEnumerable<UserDTO>>>> (Context context) =>
+app.MapGet("/User", Results<BadRequest<string>, NotFound<string>, Ok<IEnumerable<UserDTO>>> (Context context) =>
 {
     IOrderedQueryable<User> entities = context.Users.OrderBy(u => u.Username);
 
@@ -415,7 +415,7 @@ app.MapGet("/User", async Task<Results<BadRequest<string>, NotFound<string>, Ok<
 
 }).RequireAuthorization("requireauthuser");
 
-app.MapGet("/User/Transfer/Completed/{id:int}", async Task<Results<BadRequest<string>, NotFound<string>, Ok<IEnumerable<TransferDetailsDTO>>>> (Context context, int id) =>
+app.MapGet("/User/Transfer/Completed/{id:int}", Results<BadRequest<string>, NotFound<string>, Ok<IEnumerable<TransferDetailsDTO>>> (Context context, int id) =>
 {
     if (id < 1)
     {
@@ -455,7 +455,7 @@ app.MapGet("/User/Transfer/Completed/{id:int}", async Task<Results<BadRequest<st
 
 }).RequireAuthorization("requireauthuser");
 
-app.MapGet("/User/Transfer/Pending/{id}", async Task<Results<BadRequest<string>, NotFound<string>, Ok<IEnumerable<TransferDetailsDTO>>>> (Context context, int id) =>
+app.MapGet("/User/Transfer/Pending/{id}", Results<BadRequest<string>, NotFound<string>, Ok<IEnumerable<TransferDetailsDTO>>> (Context context, int id) =>
 {
     if (id < 1)
     {
