@@ -46,8 +46,8 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/Account/Details/{userId}");
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? await response.Content.ReadFromJsonAsync<AccountDetailsDTO>() ?? Helpers.AccountNotFound
-                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? Helpers.AccountUserNotAuthorized : Helpers.AccountHttpResponseUnsuccessful;
+                    ? await response.Content.ReadFromJsonAsync<AccountDetailsDTO>() ?? AccountDetailsDTO.AccountNotFound
+                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? AccountDetailsDTO.AccountUserNotAuthorized : AccountDetailsDTO.AccountHttpResponseUnsuccessful;
             }
             catch (Exception) { throw; }
         }
@@ -59,8 +59,8 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/Transfer/Completed/{userId}");
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<TransferDetailsDTO>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetailsDTO>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { Helpers.TransferNotFound })
-                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { Helpers.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { Helpers.TransferHttpResponseUnsuccessful });
+                    ? new ReadOnlyCollection<TransferDetailsDTO>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetailsDTO>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferNotFound })
+                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferHttpResponseUnsuccessful });
             }
             catch (Exception) { throw; }
         }
@@ -72,8 +72,8 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/Transfer/Pending/{userId}");
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<TransferDetailsDTO>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetailsDTO>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { Helpers.TransferNotFound })
-                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { Helpers.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { Helpers.TransferHttpResponseUnsuccessful });
+                    ? new ReadOnlyCollection<TransferDetailsDTO>(response.Content.ReadFromJsonAsAsyncEnumerable<TransferDetailsDTO>()!.ToBlockingEnumerable().ToList()!) ?? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferNotFound })
+                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferUserNotAuthorized }) : new ReadOnlyCollection<TransferDetailsDTO>(new List<TransferDetailsDTO> { TransferDetailsDTO.TransferHttpResponseUnsuccessful });
             }
             catch (Exception) { throw; }
         }
@@ -85,8 +85,8 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/Transfer/Details/{transferId}");
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? await response.Content.ReadFromJsonAsync<TransferDetailsDTO>() ?? Helpers.TransferNotFound
-                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? Helpers.TransferUserNotAuthorized : Helpers.TransferHttpResponseUnsuccessful;
+                    ? await response.Content.ReadFromJsonAsync<TransferDetailsDTO>() ?? TransferDetailsDTO.TransferNotFound
+                    : response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? TransferDetailsDTO.TransferUserNotAuthorized : TransferDetailsDTO.TransferHttpResponseUnsuccessful;
             }
             catch (Exception) { throw; }
         }
@@ -107,14 +107,14 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
 
         public async Task RequestTransferAsync(string userFromName, string userToName, decimal amount)
         {
-            AddTransfer transfer = new()
+            AddTransferDTO transfer = new()
             {
                 UserFromName = userFromName,
                 UserToName = userToName,
                 Amount = amount,
             };
 
-            if (!Helpers.AddTransferIsValid(transfer)) { return; }
+            if (!transfer.Validate().IsValid) { return; }
 
             StringContent content = new(JsonSerializer.Serialize(transfer));
             content.Headers.ContentType = new("application/json");
@@ -130,14 +130,14 @@ namespace MoneyTransfer.UI.MAUI.Services.Data
 
         public async Task SendTransferAsync(string userFromName, string userToName, decimal amount)
         {
-            AddTransfer transfer = new()
+            AddTransferDTO transfer = new()
             {
                 UserFromName = userFromName,
                 UserToName = userToName,
                 Amount = amount,
             };
 
-            if (!Helpers.AddTransferIsValid(transfer)) { return; }
+            if (!transfer.Validate().IsValid) { return; }
 
             StringContent content = new(JsonSerializer.Serialize(transfer));
             content.Headers.ContentType = new("application/json");

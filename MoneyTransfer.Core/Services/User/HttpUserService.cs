@@ -23,41 +23,41 @@ namespace MoneyTransfer.UI.MAUI.Services.User
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/{userId}");
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? await response.Content.ReadFromJsonAsync<UserDTO>() ?? Helpers.UserDTONotFound
-                    : Helpers.UserDTONotFound;
+                    ? await response.Content.ReadFromJsonAsync<UserDTO>() ?? UserDTO.UserDTONotFound
+                    : UserDTO.UserDTONotFound;
             }
             catch (Exception) { throw; }
         }
 
-        public async Task<ReadOnlyCollection<User>> GetUsers()
+        public async Task<ReadOnlyCollection<UserDTO>> GetUsers()
         {
             try
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/GetUsers");
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<User>((response.Content.ReadFromJsonAsAsyncEnumerable<User>()!).ToBlockingEnumerable<User>().ToList()) ?? new ReadOnlyCollection<User>(new List<User> { Helpers.UserNotFound })
-                    : new ReadOnlyCollection<User>(new List<User> { Helpers.UserNotFound });
+                    ? new ReadOnlyCollection<UserDTO>((response.Content.ReadFromJsonAsAsyncEnumerable<UserDTO>()!).ToBlockingEnumerable<UserDTO>().ToList()) ?? new ReadOnlyCollection<UserDTO>(new List<UserDTO> { UserDTO.UserDTONotFound })
+                    : new ReadOnlyCollection<UserDTO>(new List<UserDTO> { UserDTO.UserDTONotFound });
             }
             catch (Exception) { throw; }
         }
 
-        public async Task<ReadOnlyCollection<User>> GetUsersNotLoggedIn()
+        public async Task<ReadOnlyCollection<UserDTO>> GetUsersNotLoggedIn()
         {
             try
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
                 HttpResponseMessage response = await _client.GetAsync($"/User/GetUsers");
                 return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<User>((response.Content.ReadFromJsonAsAsyncEnumerable<User>()!).ToBlockingEnumerable<User>().Where(user => user.Id != AuthenticatedUserService.GetUserId()).ToList()) ?? new ReadOnlyCollection<User>(new List<User> { Helpers.UserNotFound })
-                    : new ReadOnlyCollection<User>(new List<User> { Helpers.UserNotFound });
+                    ? new ReadOnlyCollection<UserDTO>((response.Content.ReadFromJsonAsAsyncEnumerable<UserDTO>()!).ToBlockingEnumerable<UserDTO>().Where(user => user.Id != AuthenticatedUserService.GetUserId()).ToList()) ?? new ReadOnlyCollection<UserDTO>(new List<UserDTO> { UserDTO.UserDTONotFound })
+                    : new ReadOnlyCollection<UserDTO>(new List<UserDTO> { UserDTO.UserDTONotFound });
             }
             catch (Exception) { throw; }
         }
 
         public async Task<UserDTO> LogIn(LogInUserDTO logInUser)
         {
-            if (!Helpers.LogInUserIsValid(logInUser)) { return Helpers.UserDTONotValid; }
+            if (!logInUser.Validate().IsValid) { return UserDTO.UserDTONotValid; }
 
             StringContent content = new(JsonSerializer.Serialize(logInUser));
             content.Headers.ContentType = new("application/json");
@@ -65,32 +65,20 @@ namespace MoneyTransfer.UI.MAUI.Services.User
             try
             {
                 HttpResponseMessage response = await _client.PostAsync($"/User/LogIn", content);
-                if (!response.IsSuccessStatusCode)
-                {
-                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    {
-                        return Helpers.UserDTOUserNotAuthorized;
-                    }
-                    else
-                    {
-                        return Helpers.UserDTOHttpResponseUnsuccessful;
-                    }
-                }
-                else if (response.Content is not null)
-                {
-                    return await response.Content.ReadFromJsonAsync<UserDTO>() ?? Helpers.UserDTONotFound;
-                }
-                else
-                {
-                    return Helpers.UserDTONotFound;
-                }
+                return !response.IsSuccessStatusCode
+                    ? response.StatusCode == System.Net.HttpStatusCode.Unauthorized
+                        ? UserDTO.UserDTOUserNotAuthorized
+                        : UserDTO.UserDTOHttpResponseUnsuccessful
+                    : response.Content is not null
+                        ? await response.Content.ReadFromJsonAsync<UserDTO>() ?? UserDTO.UserDTONotFound
+                        : UserDTO.UserDTONotFound;
             }
             catch (Exception) { throw; }
         }
 
         public async Task<bool> Register(LogInUserDTO registerUser)
         {
-            if (!Helpers.LogInUserIsValid(registerUser)) { return false; }
+            if (!registerUser.Validate().IsValid) { return false; }
 
             StringContent content = new(JsonSerializer.Serialize(registerUser));
             content.Headers.ContentType = new("application/json");
@@ -98,12 +86,7 @@ namespace MoneyTransfer.UI.MAUI.Services.User
             try
             {
                 HttpResponseMessage response = await _client.PostAsync($"/User/Register", content);
-                if (response.IsSuccessStatusCode && response.Content is not null)
-                {
-                    return true;
-                }
-                
-                return false;
+                return response.IsSuccessStatusCode && response.Content is not null;
             }
             catch (Exception) { throw; }
         }
