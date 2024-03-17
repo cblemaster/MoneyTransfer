@@ -1,7 +1,7 @@
 ﻿using MoneyTransfer.Core.DTO;
 
-namespace MoneyTransfer.UI.MAUI.Services.User
-{
+namespace MoneyTransfer.Core.Services.User;
+
     public static class AuthenticatedUserService
     {
         private static UserDTO _user = default!;
@@ -16,4 +16,3 @@ namespace MoneyTransfer.UI.MAUI.Services.User
 
         public static void SetLogin(UserDTO user) => _user = user;
     }
-}

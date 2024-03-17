@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:pageModels="clr-namespace:MoneyTransfer.UI.MAUI.PageModels"
-             xmlns:userservice="clr-namespace:MoneyTransfer.UI.MAUI.Services.User"
+             xmlns:dto="clr-namespace:MoneyTransfer.Core.DTO;assembly=MoneyTransfer.Core"
              x:Class="MoneyTransfer.UI.MAUI.Pages.SendTransferPage"
              x:DataType="{x:Type pageModels:SendTransferPageModel}"
              Title="Send Transfer">
@@ -38,7 +38,7 @@
                 <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="{x:Type userservice:User}">
+                <DataTemplate x:DataType="{x:Type dto:UserDTO}">
                     <Frame WidthRequest="100" HeightRequest="140">
                         <VerticalStackLayout>
                             <Image Source="user_solid.png" />

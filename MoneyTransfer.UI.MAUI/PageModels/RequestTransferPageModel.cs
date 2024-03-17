@@ -1,7 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MoneyTransfer.UI.MAUI.Services.Data;
-using MoneyTransfer.UI.MAUI.Services.User;
+using MoneyTransfer.Core.DTO;
+using MoneyTransfer.Core.Services.Data;
+using MoneyTransfer.Core.Services.User;
 using System.Collections.ObjectModel;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
@@ -12,15 +13,15 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private readonly IUserService _userService = userService;
 
         [ObservableProperty]
-        private ReadOnlyCollection<User> _users = default!;
+        private ReadOnlyCollection<UserDTO> _users = default!;
 
         [ObservableProperty]
-        private User _selectedUser = default!;
+        private UserDTO _selectedUser = default!;
 
         [ObservableProperty]
         private string _amount = default!;
 
-       [RelayCommand]
+        [RelayCommand]
         private async Task PageAppearing()
         {
             await LoadData();

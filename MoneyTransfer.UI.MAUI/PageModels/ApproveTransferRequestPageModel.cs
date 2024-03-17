@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MoneyTransfer.UI.MAUI.Services;
-using MoneyTransfer.UI.MAUI.Services.Data;
-using MoneyTransfer.UI.MAUI.Services.User;
+using MoneyTransfer.Core.DTO;
+using MoneyTransfer.Core.Services.Data;
+using MoneyTransfer.Core.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
@@ -12,7 +12,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private readonly IUserService _userService = userService;
 
         [ObservableProperty]
-        private TransferDetails _transferDetails = default!;
+        private TransferDetailsDTO _transferDetails = default!;
 
         [ObservableProperty]
         private int transferId;
@@ -54,7 +54,7 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         {
             if (TransferId > 0)
             {
-                TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? Helpers.TransferNotFound;
+                TransferDetails = await _dataService.GetTransferDetailsAsync(TransferId) ?? TransferDetailsDTO.TransferNotFound;
                 UserDTO loggedInUser = await _userService.GetUserById(AuthenticatedUserService.GetUserId());
 
                 CanApprove = TransferDetails.TransferStatus == "Pending" && TransferDetails.TransferType == "Request" && TransferDetails.UserFromName == loggedInUser.Username;

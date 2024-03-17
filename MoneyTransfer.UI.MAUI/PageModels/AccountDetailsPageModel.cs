@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MoneyTransfer.UI.MAUI.Services;
-using MoneyTransfer.UI.MAUI.Services.Data;
-using MoneyTransfer.UI.MAUI.Services.User;
+using MoneyTransfer.Core.DTO;
+using MoneyTransfer.Core.Services.Data;
+using MoneyTransfer.Core.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
@@ -11,11 +11,11 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private readonly IDataService _dataService = dataService;
 
         [ObservableProperty]
-        private AccountDetails _accountDetails = default!;
+        private AccountDetailsDTO _accountDetails = default!;
 
         [RelayCommand]
         private void PageAppearing() => LoadData();
 
-        private async void LoadData() => AccountDetails = await _dataService.GetAccountDetailsForUserAsync(AuthenticatedUserService.GetUserId()) ?? Helpers.AccountNotFound;
+        private async void LoadData() => AccountDetails = await _dataService.GetAccountDetailsForUserAsync(AuthenticatedUserService.GetUserId()) ?? AccountDetailsDTO.AccountNotFound;
     }
 }

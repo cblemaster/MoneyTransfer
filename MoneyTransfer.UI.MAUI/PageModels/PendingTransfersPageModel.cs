@@ -1,8 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MoneyTransfer.Core.DTO;
+using MoneyTransfer.Core.Services.Data;
+using MoneyTransfer.Core.Services.User;
 using MoneyTransfer.UI.MAUI.Pages;
-using MoneyTransfer.UI.MAUI.Services.Data;
-using MoneyTransfer.UI.MAUI.Services.User;
 using System.Collections.ObjectModel;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
@@ -12,10 +13,10 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         private readonly IDataService _dataService = dataService;
 
         [ObservableProperty]
-        private ReadOnlyCollection<TransferDetails> _transferDetails = default!;
+        private ReadOnlyCollection<TransferDetailsDTO?> _transferDetails = default!;
 
         [ObservableProperty]
-        private TransferDetails _selectedTransfer = default!;
+        private TransferDetailsDTO _selectedTransfer = default!;
 
         [RelayCommand]
         private void PageAppearing() => LoadData();

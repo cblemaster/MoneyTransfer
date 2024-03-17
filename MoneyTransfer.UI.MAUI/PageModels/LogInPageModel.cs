@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using MoneyTransfer.Core.DTO;
+using MoneyTransfer.Core.Services.User;
 using MoneyTransfer.UI.MAUI.Messages;
-using MoneyTransfer.UI.MAUI.Services;
-using MoneyTransfer.UI.MAUI.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
@@ -31,8 +31,8 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         {
             if (!CanLogIn) { return; }
 
-            LogInUser logInUser = new() { Username = Username, Password = Password };
-            if (!Helpers.LogInUserIsValid(logInUser)) { return; }
+            LogInUserDTO logInUser = new() { Username = Username, Password = Password };
+            if (!logInUser.Validate().IsValid) { return; }
 
             UserDTO loggedInUser = await _userService.LogIn(logInUser);
             if (loggedInUser.Id > 0)

@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MoneyTransfer.UI.MAUI.Services;
-using MoneyTransfer.UI.MAUI.Services.User;
+using MoneyTransfer.Core.DTO;
+using MoneyTransfer.Core.Services.User;
 
 namespace MoneyTransfer.UI.MAUI.PageModels
 {
@@ -29,10 +29,10 @@ namespace MoneyTransfer.UI.MAUI.PageModels
         {
             if (!CanRegister) { return; }
 
-            LogInUser logInUser = new() { Username = Username, Password = Password };
-            if (!Helpers.LogInUserIsValid(logInUser)) { return; }
+            LogInUserDTO logInUser = new() { Username = Username, Password = Password };
+            if (!logInUser.Validate().IsValid) { return; }
 
-            bool isRegistered = await _userService.Register(new LogInUser { Username = Username, Password = Password });
+            bool isRegistered = await _userService.Register(new LogInUserDTO { Username = Username, Password = Password });
             if (isRegistered)
             {
                 await Shell.Current.DisplayAlert("Success!", "You have been registered, and you will be directed to the Log In page.", "OK");

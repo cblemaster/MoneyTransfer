@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using MoneyTransfer.Core.Services.Data;
+using MoneyTransfer.Core.Services.User;
 using MoneyTransfer.UI.MAUI.PageModels;
 using MoneyTransfer.UI.MAUI.Pages;
-using MoneyTransfer.UI.MAUI.Services.Data;
-using MoneyTransfer.UI.MAUI.Services.User;
 
 namespace MoneyTransfer.UI.MAUI
 {
