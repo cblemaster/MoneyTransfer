@@ -4,91 +4,90 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace MoneyTransfer.UI.MAUI.Services.User
+namespace MoneyTransfer.Core.Services.User;
+
+public class HttpUserService : IUserService
 {
-    public class HttpUserService : IUserService
+    private readonly HttpClient _client;
+    private const string BASE_URI = "https://localhost:7144";
+
+    public HttpUserService() => _client = new HttpClient
     {
-        private readonly HttpClient _client;
-        private const string BASE_URI = "https://localhost:7144";
+        BaseAddress = new Uri(BASE_URI)
+    };
 
-        public HttpUserService() => _client = new HttpClient
+    public async Task<UserDTO> GetUserById(int userId)
+    {
+        try
         {
-            BaseAddress = new Uri(BASE_URI)
-        };
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
+            HttpResponseMessage response = await _client.GetAsync($"/User/{userId}");
+            return response.IsSuccessStatusCode && response.Content is not null
+                ? await response.Content.ReadFromJsonAsync<UserDTO>() ?? UserDTO.UserDTONotFound
+                : UserDTO.UserDTONotFound;
+        }
+        catch (Exception) { throw; }
+    }
 
-        public async Task<UserDTO> GetUserById(int userId)
+    public async Task<ReadOnlyCollection<UserDTO?>> GetUsers()
+    {
+        try
         {
-            try
-            {
-                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
-                HttpResponseMessage response = await _client.GetAsync($"/User/{userId}");
-                return response.IsSuccessStatusCode && response.Content is not null
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
+            HttpResponseMessage response = await _client.GetAsync($"/User");
+            return response.IsSuccessStatusCode && response.Content is not null
+                ? new ReadOnlyCollection<UserDTO?>((response.Content.ReadFromJsonAsAsyncEnumerable<UserDTO?>()).ToBlockingEnumerable<UserDTO?>().ToList()) ?? new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound })
+                : new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound });
+        }
+        catch (Exception) { throw; }
+    }
+
+    public async Task<ReadOnlyCollection<UserDTO?>> GetUsersNotLoggedIn()
+    {
+        try
+        {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
+            HttpResponseMessage response = await _client.GetAsync($"/User/GetUsers");
+            return response.IsSuccessStatusCode && response.Content is not null
+                ? new ReadOnlyCollection<UserDTO?>((response.Content.ReadFromJsonAsAsyncEnumerable<UserDTO?>()).ToBlockingEnumerable<UserDTO?>().Where(u => !(u?.Id).Equals(AuthenticatedUserService.GetUserId())).ToList()) ?? new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound })
+                : new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound });
+        }
+        catch (Exception) { throw; }
+    }
+
+    public async Task<UserDTO> LogIn(LogInUserDTO logInUser)
+    {
+        if (!logInUser.Validate().IsValid) { return UserDTO.UserDTONotValid; }
+
+        StringContent content = new(JsonSerializer.Serialize(logInUser));
+        content.Headers.ContentType = new("application/json");
+
+        try
+        {
+            HttpResponseMessage response = await _client.PostAsync($"/User/LogIn", content);
+            return !response.IsSuccessStatusCode
+                ? response.StatusCode == System.Net.HttpStatusCode.Unauthorized
+                    ? UserDTO.UserDTOUserNotAuthorized
+                    : UserDTO.UserDTOHttpResponseUnsuccessful
+                : response.Content is not null
                     ? await response.Content.ReadFromJsonAsync<UserDTO>() ?? UserDTO.UserDTONotFound
                     : UserDTO.UserDTONotFound;
-            }
-            catch (Exception) { throw; }
         }
+        catch (Exception) { throw; }
+    }
 
-        public async Task<ReadOnlyCollection<UserDTO?>> GetUsers()
+    public async Task<bool> Register(LogInUserDTO registerUser)
+    {
+        if (!registerUser.Validate().IsValid) { return false; }
+
+        StringContent content = new(JsonSerializer.Serialize(registerUser));
+        content.Headers.ContentType = new("application/json");
+
+        try
         {
-            try
-            {
-                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
-                HttpResponseMessage response = await _client.GetAsync($"/User");
-                return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<UserDTO?>((response.Content.ReadFromJsonAsAsyncEnumerable<UserDTO?>()).ToBlockingEnumerable<UserDTO?>().ToList()) ?? new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound })
-                    : new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound });
-            }
-            catch (Exception) { throw; }
+            HttpResponseMessage response = await _client.PostAsync($"/User/Register", content);
+            return response.IsSuccessStatusCode && response.Content is not null;
         }
-
-        public async Task<ReadOnlyCollection<UserDTO?>> GetUsersNotLoggedIn()
-        {
-            try
-            {
-                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
-                HttpResponseMessage response = await _client.GetAsync($"/User/GetUsers");
-                return response.IsSuccessStatusCode && response.Content is not null
-                    ? new ReadOnlyCollection<UserDTO?>((response.Content.ReadFromJsonAsAsyncEnumerable<UserDTO?>()).ToBlockingEnumerable<UserDTO?>().Where(u => !(u?.Id).Equals(AuthenticatedUserService.GetUserId())).ToList()) ?? new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound })
-                    : new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound });
-            }
-            catch (Exception) { throw; }
-        }
-
-        public async Task<UserDTO> LogIn(LogInUserDTO logInUser)
-        {
-            if (!logInUser.Validate().IsValid) { return UserDTO.UserDTONotValid; }
-
-            StringContent content = new(JsonSerializer.Serialize(logInUser));
-            content.Headers.ContentType = new("application/json");
-
-            try
-            {
-                HttpResponseMessage response = await _client.PostAsync($"/User/LogIn", content);
-                return !response.IsSuccessStatusCode
-                    ? response.StatusCode == System.Net.HttpStatusCode.Unauthorized
-                        ? UserDTO.UserDTOUserNotAuthorized
-                        : UserDTO.UserDTOHttpResponseUnsuccessful
-                    : response.Content is not null
-                        ? await response.Content.ReadFromJsonAsync<UserDTO>() ?? UserDTO.UserDTONotFound
-                        : UserDTO.UserDTONotFound;
-            }
-            catch (Exception) { throw; }
-        }
-
-        public async Task<bool> Register(LogInUserDTO registerUser)
-        {
-            if (!registerUser.Validate().IsValid) { return false; }
-
-            StringContent content = new(JsonSerializer.Serialize(registerUser));
-            content.Headers.ContentType = new("application/json");
-
-            try
-            {
-                HttpResponseMessage response = await _client.PostAsync($"/User/Register", content);
-                return response.IsSuccessStatusCode && response.Content is not null;
-            }
-            catch (Exception) { throw; }
-        }
+        catch (Exception) { throw; }
     }
 }
