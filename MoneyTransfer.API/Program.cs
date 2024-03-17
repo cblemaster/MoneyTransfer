@@ -129,7 +129,7 @@ app.MapPut("/Transfer/Reject/{id:int}", async Task<Results<BadRequest<string>, N
 
 app.MapPost("/Transfer/Request", async Task<Results<BadRequest<string>, Created<TransferDetailsDTO>>> (Context context, AddTransferDTO dto) =>
 {
-    if (!dto.IsValid)
+    if (!dto.Validate().IsValid)
     {
         return TypedResults.BadRequest("The information provided with the request is invalid.");
     }
@@ -182,7 +182,7 @@ app.MapPost("/Transfer/Request", async Task<Results<BadRequest<string>, Created<
 
 app.MapPost("/Transfer/Send", async Task<Results<BadRequest<string>, Created<TransferDetailsDTO>>> (Context context, AddTransferDTO dto) =>
 {
-    if (!dto.IsValid)
+    if (!dto.Validate().IsValid)
     {
         return TypedResults.BadRequest("The information provided with the request is invalid.");
     }
@@ -263,7 +263,7 @@ app.MapGet("/Transfer/Details/{id:int}", async Task<Results<BadRequest<string>, 
 
 app.MapPost("/User/Register", async Task<Results<BadRequest<string>, Conflict<string>, Created<UserDTO>>> (Context context, IPasswordHasher passwordHasher, LogInUserDTO registerUser) =>
 {
-    if (!registerUser.IsValid())
+    if (!registerUser.Validate().IsValid)
     {
         return TypedResults.BadRequest("The information provided with the request is invalid.");
     }
@@ -304,7 +304,7 @@ app.MapPost("/User/Register", async Task<Results<BadRequest<string>, Conflict<st
 
 app.MapPost("/User/LogIn", async Task<Results<BadRequest<string>, UnauthorizedHttpResult, Ok<UserDTO>>> (Context context, IPasswordHasher passwordHasher, ITokenGenerator tokenGenerator, LogInUserDTO logInUser) =>
 {
-    if (!logInUser.IsValid())
+    if (!logInUser.Validate().IsValid)
     {
         return TypedResults.BadRequest("The information provided with the request is invalid.");
     }

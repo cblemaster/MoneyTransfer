@@ -1,4 +1,6 @@
-﻿namespace MoneyTransfer.Core.Entities;
+﻿using MoneyTransfer.Core.Validation;
+
+namespace MoneyTransfer.Core.Entities;
 
 public partial class Transfer
 {
@@ -24,17 +26,19 @@ public partial class Transfer
 
     public TransferType TransferType => (TransferType)TransferTypeId;
 
-    public bool IsValid =>
-        TransferTypeId > 0 &&
-        TransferStatusId > 0 &&
-        AccountIdFrom > 0 &&
-        AccountIdTo > 0 &&
-        Amount > 0 &&
-        AccountIdFrom != AccountIdTo;
+    public ValidationResult Validate()
+    {
+        bool isValid = TransferTypeId > 0 && TransferStatusId > 0 && AccountIdFrom > 0
+            && AccountIdTo > 0 && Amount > 0 && AccountIdFrom != AccountIdTo;
 
-    public bool IsValidForAdd => IsValid && Id == 0;
+        string errorMessage = "One or more invalid values for this transfer.";
 
-    public bool IsValidForUpdate => IsValid && Id > 0;
+        return new() { IsValid = isValid, ErrorMessage = !isValid ? errorMessage : string.Empty };
+    }
 
-    public bool IsValidForApproveOrReject => IsValidForUpdate && TransferStatus == TransferStatus.Pending;
+    public bool IsValidForAdd => Validate().IsValid && Id.Equals(0);
+
+    public bool IsValidForUpdate => Validate().IsValid && Id > 0;
+
+    public bool IsValidForApproveOrReject => IsValidForUpdate && TransferStatus.Equals(Entities.TransferStatus.Pending.ToString());
 }

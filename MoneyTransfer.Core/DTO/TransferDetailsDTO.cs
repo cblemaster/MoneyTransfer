@@ -61,7 +61,7 @@ public class TransferDetailsDTO
 
         string errorMessage = "One or more invalid values for this transfer.";
 
-        return new() { IsValid = isValid, ErrorMessage = errorMessage };
+        return new() { IsValid = isValid, ErrorMessage = !isValid ? errorMessage : string.Empty };
     }
 
     public bool IsValidForAdd => Validate().IsValid && Id.Equals(0);
@@ -70,4 +70,4 @@ public class TransferDetailsDTO
 
     public bool IsValidForApproveOrReject => IsValidForUpdate && TransferStatus.Equals(Entities.TransferStatus.Pending.ToString());
 }
-}
+
