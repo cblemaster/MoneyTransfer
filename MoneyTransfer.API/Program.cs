@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using MoneyTransfer.API.Context;
-using MoneyTransfer.API.Entities;
+using MoneyTransfer.Core.DTO;
+using MoneyTransfer.Core.Entities;
 using MoneyTransfer.Security;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using System.Text.Json.Serialization;
+using Context = MoneyTransfer.API.Context.MoneyTransferContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var config = new ConfigurationBuilder()
+IConfigurationRoot config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
             .Build();
@@ -18,7 +19,7 @@ var config = new ConfigurationBuilder()
 string connectionString = config.GetConnectionString("Project") ?? "Error retrieving connection string!";
 string jwtSecret = config.GetValue<string>("JwtSecret") ?? "Error retreiving jwt config!";
 
-var key = Encoding.ASCII.GetBytes(jwtSecret);
+byte[] key = Encoding.ASCII.GetBytes(jwtSecret);
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap[JwtRegisteredClaimNames.Sub] = "sub";
 
 builder.Services.AddAuthentication(x =>
@@ -43,15 +44,8 @@ builder.Services.AddAuthentication(x =>
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("requireauthuser", policy => policy.RequireAuthenticatedUser());
 
-builder.Services.AddDbContext<MoneyTransferContext>(options =>
+builder.Services.AddDbContext<Context>(options =>
     options.UseSqlServer(connectionString));
-
-// TODO: I don't like to set this serializer option, because it hides the issue
-//      of using entity objects directly in the api, but I couldn't add a user with
-//      an associated account to the db without getting cycle errors in postman
-//      unless I set this serializer option
-builder.Services.ConfigureHttpJsonOptions(options =>
-    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 builder.Services
     .AddSingleton<ITokenGenerator>(tk => new JwtGenerator(jwtSecret))
@@ -59,295 +53,230 @@ builder.Services
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "Welcome to Money Transfer!");
 
-app.MapPut("/Transfer/Approve/{id}", async (int id, object transfer, MoneyTransferContext context) =>
+app.MapPut("/Transfer/Approve/{id:int}", async Task<Results<BadRequest<string>, NotFound<string>, NoContent>> (Context context, int id, TransferDetailsDTO dto) =>
 {
-    if (id <= 0) { return Results.BadRequest(); }
-    if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
+    if (id < 1)
+    {
+        return TypedResults.BadRequest("Invalid transfer id.");
+    }
+    if (!dto.Validate().IsValid)
+    {
+        return TypedResults.BadRequest("The information provided with the request is invalid.");
+    }
+    if (!id.Equals(dto.Id))
+    {
+        return TypedResults.BadRequest($"Transfer id mismatch. The id provided with the http request is {id}, and the id provided with the request content is {dto.Id}.");
+    }
 
-    Transfer findTransfer = (await context.Transfers.Include(transfer => transfer.AccountIdFromNavigation)
-        .SingleOrDefaultAsync(transfer => transfer.Id == id))!;
+    Transfer entity = await context.Transfers.Include(t => t.AccountIdFromNavigation).SingleOrDefaultAsync(t => t.Id.Equals(id));
 
-    if (findTransfer is null) { return Results.NotFound(); }
-    if (!findTransfer.IsValidForApproveOrReject) { return Results.BadRequest(); }
-    if (!AccountFromHasSufficientFundsForTransfer(findTransfer.Amount, findTransfer.AccountIdFromNavigation.CurrentBalance(), context))
-    { return Results.StatusCode(402); }
-
-    findTransfer.TransferStatusId = (int)TransferStatus.Approved;
+    if (entity is null)
+    {
+        return TypedResults.NotFound($"Transfer id {id} not found.");
+    }
+    if (!entity.IsValidForApproveOrReject)
+    {
+        return TypedResults.BadRequest("Transfer id {id} cannot be approved, as it is not in Pending status.");
+    }
+    if (!AccountFromHasSufficientFundsForTransfer(entity.Amount, entity.AccountIdFromNavigation.CurrentBalance()))
+    {
+        return TypedResults.BadRequest("Insufficient funds to complete the transfer.");
+    }
+    
+    entity.TransferStatusId = (int)TransferStatus.Approved;
+    
     await context.SaveChangesAsync();
-    return Results.NoContent();
+    
+    return TypedResults.NoContent();
+
 }).RequireAuthorization("requireauthuser");
 
-app.MapGet("/Transfer/Details/{id}", async (int id, MoneyTransferContext context) =>
+app.MapPut("/Transfer/Reject/{id:int}", async Task<Results<BadRequest<string>, NotFound<string>, NoContent>> (Context context, int id, TransferDetailsDTO dto) =>
 {
-    return id <= 0
-        ? Results.BadRequest()
-        : context is null || context.Transfers is null
-        ? Results.StatusCode(500)
-        : await context.Transfers.Where(transfer => transfer.Id == id).Select(t =>
-        new
-        {
-            Id = t.Id,
-            Amount = t.Amount,
-            TransferStatus = t.TransferStatus.ToString(),
-            TransferType = t.TransferType.ToString(),
-            DateCreated = t.DateCreated,
-            AccountIdFromNavigation = new Account
-            {
-                Id = t.AccountIdFromNavigation.Id,
-                User = new User
-                {
-                    Id = t.AccountIdFromNavigation.User.Id,
-                    Username = t.AccountIdFromNavigation.User.Username
-                },
-            },
-            AccountIdToNavigation = new Account
-            {
-                Id = t.AccountIdToNavigation.Id,
-                User = new User
-                {
-                    Id = t.AccountIdToNavigation.User.Id,
-                    Username = t.AccountIdToNavigation.User.Username,
-                },
-            },
-        }).Select(a =>
-                new
-                {
-                    Id = a.Id,
-                    DateCreated = a.DateCreated,
-                    Amount = a.Amount,
-                    TransferStatus = a.TransferStatus,
-                    TransferType = a.TransferType,
-                    UserFromName = a.AccountIdFromNavigation.User.Username,
-                    UserToName = a.AccountIdToNavigation.User.Username,
+    if (id < 1)
+    {
+        return TypedResults.BadRequest("Invalid transfer id.");
+    }
+    if (!dto.Validate().IsValid)
+    {
+        return TypedResults.BadRequest("The information provided with the request is invalid.");
+    }
+    if (!id.Equals(dto.Id))
+    {
+        return TypedResults.BadRequest($"Transfer id mismatch. The id provided with the http request is {id}, and the id provided with the request content is {dto.Id}.");
+    }
 
-                }).SingleOrDefaultAsync() is object transfer
-        ? Results.Ok(transfer)
-        : Results.NotFound();
-}).RequireAuthorization("requireauthuser");
+    Transfer entity = await context.Transfers.SingleOrDefaultAsync(t => t.Id.Equals(id));
 
-app.MapPut("/Transfer/Reject/{id}", async (int id, object transfer, MoneyTransferContext context) =>
-{
-    if (id <= 0) { return Results.BadRequest(); }
-    if (context is null || context.Transfers is null) { return Results.StatusCode(500); }
+    if (entity is null)
+    {
+        return TypedResults.NotFound($"Transfer id {id} not found.");
+    }
+    if (!entity.IsValidForApproveOrReject)
+    {
+        return TypedResults.BadRequest("Transfer id {id} cannot be rejected, as it is not in Pending status.");
+    }
 
-    Transfer findTransfer = (await context.Transfers.Include(transfer => transfer.AccountIdFromNavigation)
-        .SingleOrDefaultAsync(transfer => transfer.Id == id))!;
+    entity.TransferStatusId = (int)TransferStatus.Rejected;
 
-    if (findTransfer is null) { return Results.NotFound(); }
-    if (!findTransfer.IsValidForApproveOrReject) { return Results.BadRequest(); }
-
-    findTransfer.TransferStatusId = (int)TransferStatus.Rejected;
     await context.SaveChangesAsync();
-    return Results.NoContent();
+
+    return TypedResults.NoContent();
+
 }).RequireAuthorization("requireauthuser");
 
-app.MapPost("/Transfer/Request", async (AddTransfer transfer, MoneyTransferContext context) =>
+app.MapPost("/Transfer/Request", async Task<Results<BadRequest<string>, Created<TransferDetailsDTO>>> (Context context, AddTransferDTO dto) =>
 {
-    if (transfer is null || !transfer.IsValid) { return Results.BadRequest(); }
-    if (context is null || context.Accounts is null || context.Transfers is null) { return Results.StatusCode(500); }
-
+    if (!dto.IsValid)
+    {
+        return TypedResults.BadRequest("The information provided with the request is invalid.");
+    }
+    
     Account accountFrom = (await context.Accounts
         .Include(account => account.TransferAccountIdFromNavigations)
         .Include(account => account.TransferAccountIdToNavigations)
-        .SingleOrDefaultAsync(account => account.User.Username == transfer.UserFromName))!;
+        .SingleOrDefaultAsync(a => a.User.Username.Equals(dto.UserFromName)));
 
-    if (accountFrom is null) { return Results.BadRequest(); }
+    if (accountFrom is null)
+    {
+        return TypedResults.BadRequest("Unable to find account to transfer from.");
+    }
 
     Transfer transferToAdd = new()
     {
-        Id = 0,
         TransferStatusId = (int)TransferStatus.Pending,
         TransferTypeId = (int)TransferType.Request,
         DateCreated = DateOnly.FromDateTime(DateTime.Today),
-        Amount = transfer.Amount,
+        Amount = dto.Amount,
         AccountIdFrom = accountFrom.Id,
         AccountIdTo =
             await context.Accounts.SingleOrDefaultAsync
-                (account => account.User.Username == transfer.UserToName) is Account accountTo
+                (a => a.User.Username.Equals(dto.UserToName)) is Account accountTo
                 ? accountTo.Id
                 : 0,
     };
 
-    if (!transferToAdd.IsValidForAdd) { return Results.BadRequest(); }
+    if (!transferToAdd.IsValidForAdd)
+    {
+        return TypedResults.BadRequest("The information provided with the request is invalid.");
+    }
 
     await context.Transfers.AddAsync(transferToAdd);
+
     await context.SaveChangesAsync();
-    return Results.Created($"/Transfer/Details/{transferToAdd.Id}", transferToAdd);
+
+    TransferDetailsDTO newDto = new()
+    {
+        Id = transferToAdd.Id,
+        Amount = transferToAdd.Amount,
+        DateCreated = transferToAdd.DateCreated,
+        UserFromName = transferToAdd.AccountIdFromNavigation.User.Username,
+        UserToName = transferToAdd.AccountIdToNavigation.User.Username,
+        TransferStatus = transferToAdd.TransferStatus.ToString(),
+        TransferType = transferToAdd.TransferType.ToString()
+    };
+
+    return TypedResults.Created($"/Transfer/Details/{newDto.Id}", newDto);
+
 }).RequireAuthorization("requireauthuser");
 
-app.MapPost("/Transfer/Send", async (AddTransfer transfer, MoneyTransferContext context) =>
+app.MapPost("/Transfer/Send", async Task<Results<BadRequest<string>, Created<TransferDetailsDTO>>> (Context context, AddTransferDTO dto) =>
 {
-    if (transfer is null || !transfer.IsValid) { return Results.BadRequest(); }
-    if (context is null || context.Accounts is null || context.Transfers is null) { return Results.StatusCode(500); }
+    if (!dto.IsValid)
+    {
+        return TypedResults.BadRequest("The information provided with the request is invalid.");
+    }
 
     Account accountFrom = (await context.Accounts
         .Include(account => account.TransferAccountIdFromNavigations)
         .Include(account => account.TransferAccountIdToNavigations)
-        .SingleOrDefaultAsync(account => account.User.Username == transfer.UserFromName))!;
+        .SingleOrDefaultAsync(account => account.User.Username.Equals(dto.UserFromName)));
 
-    if (accountFrom is null ||
-        !AccountFromHasSufficientFundsForTransfer(transfer.Amount, accountFrom.CurrentBalance(), context))
-    { return Results.BadRequest(); }
+    if (accountFrom is null)
+    {
+        return TypedResults.BadRequest("Unable to find account to transfer from.");
+    }
 
     Transfer transferToAdd = new()
     {
-        Id = 0,
         TransferStatusId = (int)TransferStatus.Approved,
         TransferTypeId = (int)TransferType.Send,
         DateCreated = DateOnly.FromDateTime(DateTime.Today),
-        Amount = transfer.Amount,
+        Amount = dto.Amount,
         AccountIdFrom = accountFrom.Id,
         AccountIdTo =
             await context.Accounts.SingleOrDefaultAsync
-                (account => account.User.Username == transfer.UserToName) is Account accountTo
+                (a => a.User.Username.Equals(dto.UserToName)) is Account accountTo
                 ? accountTo.Id
                 : 0,
     };
 
-    if (!transferToAdd.IsValidForAdd) { return Results.BadRequest(); }
-
-    context.Transfers.Add(transferToAdd);
-    await context.SaveChangesAsync();
-    return Results.Created($"/Transfer/Details/{transferToAdd.Id}", transferToAdd);
-}).RequireAuthorization("requireauthuser");
-
-app.MapGet("/User/Account/Details/{id}", async (int id, MoneyTransferContext context) =>
+    if (!transferToAdd.IsValidForAdd)
     {
-        return id <= 0
-            ? Results.BadRequest()
-            : context is null || context.Accounts is null
-                ? Results.StatusCode(500)
-                : await context.Accounts.Where(a => a.User.Id == id).Select(a =>
-                new Account
-                {
-                    Id = a.Id,
-                    StartingBalance = a.StartingBalance,
-                    DateCreated = a.DateCreated,
-                    TransferAccountIdFromNavigations =
-                        a.TransferAccountIdFromNavigations
-                            .Select(t => new Transfer
-                            {
-                                Id = t.Id,
-                                Amount = t.Amount,
-                                TransferStatusId = t.TransferStatusId,
-                            }).ToList(),
-                    TransferAccountIdToNavigations =
-                        a.TransferAccountIdToNavigations
-                            .Select(t => new Transfer
-                            {
-                                Id = t.Id,
-                                Amount = t.Amount,
-                                TransferStatusId = t.TransferStatusId,
-                            }).ToList(),
-                    User = new User
-                    {
-                        Id = a.User.Id,
-                        Username = a.User.Username
-                    },
-                })
-                .Select(a =>
-                    new
-                    {
-                        Id = a.Id,
-                        Username = a.User.Username,
-                        CurrentBalance = a.CurrentBalance(),
-                        DateCreated = a.DateCreated,
-                    }).SingleOrDefaultAsync() is object account
-            ? Results.Ok(account)
-            : Results.NotFound();
-    }).RequireAuthorization("requireauthuser");
-
-app.MapGet("/User/{id}", async (int id, MoneyTransferContext context) =>
-{
-    return id <= 0
-        ? Results.BadRequest()
-        : context is null || context.Users is null
-        ? Results.StatusCode(500)
-        : await context.Users
-            .Where(user => user.Id == id)
-            .Select(user => new ReturnUser()
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Token = null!,
-            })
-            .Select(a => new
-            {
-                Id = a.Id,
-                Username = a.Username,
-                Token = a.Token,
-                Message = string.Empty,
-            })
-            .SingleOrDefaultAsync() is object user
-                ? Results.Ok(user)
-                : Results.NotFound();
-}).RequireAuthorization("requireauthuser");
-
-app.MapGet("/User/GetUsers", async Task<object> (MoneyTransferContext context) =>
-{
-    return context is null || context.Users is null
-        ? Results.StatusCode(500)
-        : await context.Users
-            .Select(user => new ReturnUser()
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Token = null!,
-            })
-            .Select(a => new
-            {
-                Id = a.Id,
-                Username = a.Username,
-                Token = a.Token,
-                Message = string.Empty,
-            })
-            .OrderBy(a => a.Username)
-            .ToListAsync();
-}).RequireAuthorization("requireauthuser");
-
-app.MapPost("/User/LogIn", async (LogInUser logInUser, MoneyTransferContext context, IPasswordHasher passwordHasher, ITokenGenerator tokenGenerator) =>
-{
-    if (logInUser is null || !logInUser.IsValid()) { return Results.BadRequest(); }
-    if (context is null || context.Users is null || passwordHasher is null || tokenGenerator is null)
-    { return Results.StatusCode(500); }
-
-    // Get the user by username
-    User user = await context.Users.SingleOrDefaultAsync(user => user.Username == logInUser.Username) ?? User.NotFound;
-
-    // If we found a user and the password hash matches
-    if (user.Id > 0)
-    {
-        if (passwordHasher.VerifyHashMatch(user.PasswordHash, logInUser.Password, user.Salt))
-        {
-            // Create an authentication token
-            string token = tokenGenerator.GenerateToken(user.Id, user.Username);
-
-            // Create a ReturnUser object to return to the client
-            ReturnUser retUser = new() { Id = user.Id, Username = user.Username, Token = token };
-
-            return Results.Ok(retUser);
-        }
-        else
-        {
-            return Results.Unauthorized();
-        }
+        return TypedResults.BadRequest("The information provided with the request is invalid.");
     }
 
-    return Results.BadRequest();
-});
+    await context.Transfers.AddAsync(transferToAdd);
 
-app.MapPost("/User/Register", async (LogInUser registerUser, MoneyTransferContext context, IPasswordHasher passwordHasher) =>
+    await context.SaveChangesAsync();
+
+    TransferDetailsDTO newDto = new()
+    {
+        Id = transferToAdd.Id,
+        Amount = transferToAdd.Amount,
+        DateCreated = transferToAdd.DateCreated,
+        UserFromName = transferToAdd.AccountIdFromNavigation.User.Username,
+        UserToName = transferToAdd.AccountIdToNavigation.User.Username,
+        TransferStatus = transferToAdd.TransferStatus.ToString(),
+        TransferType = transferToAdd.TransferType.ToString()
+    };
+
+    return TypedResults.Created($"/Transfer/Details/{newDto.Id}", newDto);
+}).RequireAuthorization("requireauthuser");
+
+app.MapGet("/Transfer/Details/{id:int}", async Task<Results<BadRequest<string>, NotFound<string>, Ok<TransferDetailsDTO>>> (Context context, int id) =>
 {
-    if (registerUser is null || !registerUser.IsValid()) { return Results.BadRequest(); }
-    if (context is null || context.Users is null || passwordHasher is null)
-    { return Results.StatusCode(500); }
+    if (id < 1)
+    {
+        return TypedResults.BadRequest("Invalid transfer id.");
+    }
 
-    User existingUser = await context.Users.SingleOrDefaultAsync(user => user.Username == registerUser.Username) ?? User.NotFound;
+    Transfer entity = await context.Transfers.SingleOrDefaultAsync(t => t.Id.Equals(id));
+
+    if (entity is null)
+    {
+        return TypedResults.NotFound($"Transfer id {id} not found.");
+    }
+
+    TransferDetailsDTO dto = new()
+    {
+        Id = entity.Id,
+        Amount = entity.Amount,
+        DateCreated = entity.DateCreated,
+        TransferStatus = entity.TransferStatus.ToString(),
+        TransferType = entity.TransferType.ToString(),
+        UserToName = entity.AccountIdToNavigation.User.Username,
+        UserFromName = entity.AccountIdFromNavigation.User.Username,
+    };
+
+    return TypedResults.Ok(dto);
+
+}).RequireAuthorization("requireauthuser");
+
+app.MapPost("/User/Register", async Task<Results<BadRequest<string>, Conflict<string>, Created<UserDTO>>> (Context context, IPasswordHasher passwordHasher, LogInUser registerUser) =>
+{
+    if (!registerUser.IsValid())
+    {
+        return TypedResults.BadRequest("The information provided with the request is invalid.");
+    }
+    
+    User existingUser = await context.Users.SingleOrDefaultAsync(u => u.Username.Equals(registerUser.Username)) ?? User.NotFound;
+    
     if (existingUser.Id > 0)
     {
-        return Results.Conflict(new { message = "Username already taken. Please choose a different username." });
+        return TypedResults.Conflict("Username already taken. Please choose a different username.");
     }
 
     PasswordHash hash = passwordHasher.ComputeHash(registerUser.Password);
@@ -365,113 +294,210 @@ app.MapPost("/User/Register", async (LogInUser registerUser, MoneyTransferContex
     };
 
     context.Users.Add(userToRegister);
+
     await context.SaveChangesAsync();
-    return Results.Created($"/User/{userToRegister.Id}", userToRegister);
+
+    UserDTO dto = new()
+    {
+        Id = userToRegister.Id,
+        Username = userToRegister.Username,
+        Token = string.Empty };
+
+    return TypedResults.Created($"/User/{dto.Id}", dto);
 });
 
-app.MapGet("/User/Transfer/Completed/{id}", async Task<object> (int id, MoneyTransferContext context) =>
+app.MapPost("/User/LogIn", async Task<Results<BadRequest<string>, UnauthorizedHttpResult, Ok<UserDTO>>> (Context context, IPasswordHasher passwordHasher, ITokenGenerator tokenGenerator, LogInUser logInUser) =>
+{
+    if (!logInUser.IsValid())
     {
-        return id <= 0
-            ? Results.BadRequest()
-            : context is null || context.Transfers is null
-                ? Results.StatusCode(500)
-                : await context.Transfers.Where(transfer =>
-                (transfer.AccountIdFromNavigation.UserId == id
-                  || transfer.AccountIdToNavigation.UserId == id)
-                  && transfer.TransferStatusId != (int)TransferStatus.Pending)
-                .Select(t => new
-                {
-                    Id = t.Id,
-                    Amount = t.Amount,
-                    TransferStatus = t.TransferStatus.ToString(),
-                    TransferType = t.TransferType.ToString(),
-                    DateCreated = t.DateCreated,
-                    AccountIdFromNavigation = new Account
-                    {
-                        Id = t.AccountIdFromNavigation.Id,
-                        User = new User
-                        {
-                            Id = t.AccountIdFromNavigation.User.Id,
-                            Username = t.AccountIdFromNavigation.User.Username
-                        },
-                    },
-                    AccountIdToNavigation = new Account
-                    {
-                        Id = t.AccountIdToNavigation.Id,
-                        User = new User
-                        {
-                            Id = t.AccountIdToNavigation.User.Id,
-                            Username = t.AccountIdToNavigation.User.Username,
-                        },
-                    },
-                }).Select(a =>
-                    new
-                    {
-                        Id = a.Id,
-                        DateCreated = a.DateCreated,
-                        Amount = a.Amount,
-                        TransferStatus = a.TransferStatus,
-                        TransferType = a.TransferType,
-                        UserFromName = a.AccountIdFromNavigation.User.Username,
-                        UserToName = a.AccountIdToNavigation.User.Username,
-                    })
-                    .OrderByDescending(a => a.DateCreated)
-                    .ToListAsync();
-    }).RequireAuthorization("requireauthuser");
+        return TypedResults.BadRequest("The information provided with the request is invalid.");
+    }
 
-app.MapGet("/User/Transfer/Pending/{id}", async Task<object> (int id, MoneyTransferContext context) =>
+    // Get the user by username
+    User user = await context.Users.SingleOrDefaultAsync(u => u.Username.Equals(logInUser.Username)) ?? User.NotFound;
+
+    if (user is null || user.Id.Equals(0))
     {
-        return id <= 0
-            ? Results.BadRequest()
-            : context is null || context.Transfers is null
-                ? Results.StatusCode(500)
-                : await context.Transfers.Where(transfer =>
-                    (transfer.AccountIdFromNavigation.UserId == id
-                      || transfer.AccountIdToNavigation.UserId == id)
-                      && transfer.TransferStatusId == (int)TransferStatus.Pending)
-                    .Select(t => new
-                    {
-                        Id = t.Id,
-                        Amount = t.Amount,
-                        TransferStatus = t.TransferStatus.ToString(),
-                        TransferType = t.TransferType.ToString(),
-                        DateCreated = t.DateCreated,
-                        AccountIdFromNavigation = new Account
-                        {
-                            Id = t.AccountIdFromNavigation.Id,
-                            User = new User
-                            {
-                                Id = t.AccountIdFromNavigation.User.Id,
-                                Username = t.AccountIdFromNavigation.User.Username,
-                            },
-                        },
-                        AccountIdToNavigation = new Account
-                        {
-                            Id = t.AccountIdToNavigation.Id,
-                            User = new User
-                            {
-                                Id = t.AccountIdToNavigation.User.Id,
-                                Username = t.AccountIdToNavigation.User.Username,
-                            },
-                        },
-                    }).Select(a =>
-                        new
-                        {
-                            Id = a.Id,
-                            DateCreated = a.DateCreated,
-                            Amount = a.Amount,
-                            TransferStatus = a.TransferStatus,
-                            TransferType = a.TransferType,
-                            UserFromName = a.AccountIdFromNavigation.User.Username,
-                            UserToName = a.AccountIdToNavigation.User.Username,
-                        })
-                        .OrderByDescending(a => a.DateCreated)
-                        .ToListAsync();
-    }).RequireAuthorization("requireauthuser");
+        return TypedResults.Unauthorized();
+    }
+
+    if (!passwordHasher.VerifyHashMatch(user.PasswordHash, logInUser.Password, user.Salt))
+    {
+        return TypedResults.Unauthorized();
+    }
+    else  // If we found a user and the password hash matches
+    {
+        // Create an authentication token
+        string token = tokenGenerator.GenerateToken(user.Id, user.Username);
+
+        // Create a ReturnUser object to return to the client
+        UserDTO dto = new() { Id = user.Id, Username = user.Username, Token = token };
+
+        return TypedResults.Ok(dto);
+    }
+});
+
+app.MapGet("/User/Account/Details/{id:int}", async Task<Results<BadRequest<string>, NotFound<string>, Ok<AccountDetailsDTO>>> (Context context, int id) =>
+{
+    if (id < 1)
+    {
+        return TypedResults.BadRequest("Invalid user id.");
+    }
+
+    Account entity = await context.Accounts.SingleOrDefaultAsync(a => a.User.Id.Equals(id));
+
+    if (entity is null)
+    {
+        return TypedResults.NotFound($"Account for user id {id} not found.");
+    }
+
+    AccountDetailsDTO dto = new()
+    {
+        Id = entity.Id,
+        Username = entity.User.Username,
+        DateCreated = entity.DateCreated,
+        CurrentBalance = entity.CurrentBalance(),
+    };
+
+    return TypedResults.Ok(dto);
+
+}).RequireAuthorization("requireauthuser");
+
+app.MapGet("/User/{id:int}", async Task<Results<BadRequest<string>, NotFound<string>, Ok<UserDTO>>> (Context context, int id) =>
+{
+    if (id < 1)
+    {
+        return TypedResults.BadRequest("Invalid user id.");
+    }
+
+    User entity = await context.Users.SingleOrDefaultAsync(u => u.Id.Equals(id));
+
+    if (entity is null)
+    {
+        return TypedResults.NotFound($"User id {id} not found.");
+    }
+
+    UserDTO dto = new()
+    {
+        Id = entity.Id,
+        Username = entity.Username,
+        Token = string.Empty,
+    };
+
+    return TypedResults.Ok(dto);
+
+}).RequireAuthorization("requireauthuser");
+
+app.MapGet("/User", async Task<Results<BadRequest<string>, NotFound<string>, Ok<IEnumerable<UserDTO>>>> (Context context) =>
+{
+    IOrderedQueryable<User> entities = context.Users.OrderBy(u => u.Username);
+
+    if (entities is null || !entities.Any())
+    {
+        return TypedResults.NotFound("No users found.");
+    }
+
+    List<UserDTO> dtoList = [];
+
+    foreach (User entity in entities)
+    {
+        UserDTO dto = new()
+        {
+            Id = entity.Id,
+            Username = entity.Username,
+            Token = string.Empty,
+        };
+
+        dtoList.Add(dto);
+    }
+
+    return TypedResults.Ok(dtoList.AsEnumerable<UserDTO>());
+
+}).RequireAuthorization("requireauthuser");
+
+app.MapGet("/User/Transfer/Completed/{id:int}", async Task<Results<BadRequest<string>, NotFound<string>, Ok<IEnumerable<TransferDetailsDTO>>>> (Context context, int id) =>
+{
+    if (id < 1)
+    {
+        return TypedResults.BadRequest("Invalid user id.");
+    }
+
+    IEnumerable<Transfer> entities = context.Transfers.
+        Where(t => (t.AccountIdFromNavigation.UserId.Equals(id) || t.AccountIdToNavigation.UserId.Equals(id))
+            && !t.TransferStatusId.Equals((int)TransferStatus.Pending))
+        .OrderByDescending(t => t.DateCreated)
+        .AsEnumerable<Transfer>();
+
+    if (entities is null || !entities.Any())
+    {
+        return TypedResults.NotFound("No completed transfers found.");
+    }
+
+    List<TransferDetailsDTO> dtoList = [];
+
+    foreach (Transfer entity in entities)
+    {
+        TransferDetailsDTO dto = new()
+        {
+            Id = entity.Id,
+            DateCreated = entity.DateCreated,
+            Amount = entity.Amount,
+            TransferStatus = entity.TransferStatus.ToString(),
+            TransferType = entity.TransferType.ToString(),
+            UserToName = entity.AccountIdToNavigation.User.Username,
+            UserFromName = entity.AccountIdFromNavigation.User.Username,
+        };
+
+        dtoList.Add(dto);
+    }
+
+    return TypedResults.Ok(dtoList.AsEnumerable<TransferDetailsDTO>());
+
+}).RequireAuthorization("requireauthuser");
+
+app.MapGet("/User/Transfer/Pending/{id}", async Task<Results<BadRequest<string>, NotFound<string>, Ok<IEnumerable<TransferDetailsDTO>>>> (Context context, int id) =>
+{
+    if (id < 1)
+    {
+        return TypedResults.BadRequest("Invalid user id.");
+    }
+
+    IEnumerable<Transfer> entities = context.Transfers.
+        Where(t => (t.AccountIdFromNavigation.UserId.Equals(id) || t.AccountIdToNavigation.UserId.Equals(id))
+            && t.TransferStatusId.Equals((int)TransferStatus.Pending))
+        .OrderByDescending(t => t.DateCreated)
+        .AsEnumerable<Transfer>();
+
+    if (entities is null || !entities.Any())
+    {
+        return TypedResults.NotFound("No pending transfers found.");
+    }
+
+    List<TransferDetailsDTO> dtoList = [];
+
+    foreach (Transfer entity in entities)
+    {
+        TransferDetailsDTO dto = new()
+        {
+            Id = entity.Id,
+            DateCreated = entity.DateCreated,
+            Amount = entity.Amount,
+            TransferStatus = entity.TransferStatus.ToString(),
+            TransferType = entity.TransferType.ToString(),
+            UserToName = entity.AccountIdToNavigation.User.Username,
+            UserFromName = entity.AccountIdFromNavigation.User.Username,
+        };
+
+        dtoList.Add(dto);
+    }
+
+    return TypedResults.Ok(dtoList.AsEnumerable<TransferDetailsDTO>());
+
+}).RequireAuthorization("requireauthuser");
 
 app.Run();
 
-static bool AccountFromHasSufficientFundsForTransfer(decimal amount, decimal accountFromCurrentBalance, MoneyTransferContext context)
+static bool AccountFromHasSufficientFundsForTransfer(decimal amount, decimal accountFromCurrentBalance)
 {
     return accountFromCurrentBalance > 0 && accountFromCurrentBalance >= amount;
 }

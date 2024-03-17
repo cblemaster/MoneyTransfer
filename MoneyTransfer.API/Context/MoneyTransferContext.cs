@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MoneyTransfer.API.Entities;
+using MoneyTransfer.Core.Entities;
 
 namespace MoneyTransfer.API.Context;
 

@@ -1,4 +1,6 @@
-﻿namespace MoneyTransfer.Core.DTO;
+﻿using MoneyTransfer.Core.Validation;
+
+namespace MoneyTransfer.Core.DTO;
 
 public class TransferDetailsDTO
 {
@@ -51,4 +53,21 @@ public class TransferDetailsDTO
             UserToName = "http response unsuccessful",
             UserFromName = "http response unsuccessful",
         };
+
+    public ValidationResult Validate()
+    {
+        bool isValid = TransferType.Length > 0 && TransferStatus.Length > 0 &&
+        UserFromName.Length > 0 && UserToName.Length > 0 && Amount > 0M;
+
+        string errorMessage = "One or more invalid values for this transfer.";
+
+        return new() { IsValid = isValid, ErrorMessage = errorMessage };
+    }
+
+    public bool IsValidForAdd => Validate().IsValid && Id.Equals(0);
+
+    public bool IsValidForUpdate => Validate().IsValid && Id > 0;
+
+    public bool IsValidForApproveOrReject => IsValidForUpdate && TransferStatus.Equals(Entities.TransferStatus.Pending.ToString());
+}
 }
