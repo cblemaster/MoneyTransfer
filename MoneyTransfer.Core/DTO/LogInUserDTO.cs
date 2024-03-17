@@ -34,7 +34,7 @@ public class LogInUserDTO
             ErrorMessage = errorMessage,
         };
 
-        bool StringIsValid(string username, int maxLength, int minLength)
+        static bool StringIsValid(string username, int maxLength, int minLength)
         {
             return !string.IsNullOrWhiteSpace(username) &&
             username.Length >= minLength &&

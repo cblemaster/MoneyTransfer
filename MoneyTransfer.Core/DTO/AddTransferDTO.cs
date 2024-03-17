@@ -45,9 +45,11 @@ public class AddTransferDTO
             ErrorMessage = errorMessage,
         };
 
-        bool UsernameIsValid(string username) =>
-            !string.IsNullOrWhiteSpace(username) &&
+        static bool UsernameIsValid(string username)
+        {
+            return !string.IsNullOrWhiteSpace(username) &&
             username.Length >= 1 &&
             username.Length <= 50;
+        }
     }
 }
