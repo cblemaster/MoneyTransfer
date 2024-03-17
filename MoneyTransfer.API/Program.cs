@@ -135,8 +135,6 @@ app.MapPost("/Transfer/Request", async Task<Results<BadRequest<string>, Created<
     }
     
     Account accountFrom = ((await context.Accounts
-        .Include(account => account.TransferAccountIdFromNavigations)
-        .Include(account => account.TransferAccountIdToNavigations)
         .SingleOrDefaultAsync(a => a.User.Username.Equals(dto.UserFromName))))!;
 
     if (accountFrom is null)
@@ -172,8 +170,8 @@ app.MapPost("/Transfer/Request", async Task<Results<BadRequest<string>, Created<
         Id = transferToAdd.Id,
         Amount = transferToAdd.Amount,
         DateCreated = transferToAdd.DateCreated,
-        UserFromName = transferToAdd.AccountIdFromNavigation.User.Username,
-        UserToName = transferToAdd.AccountIdToNavigation.User.Username,
+        UserFromName = dto.UserFromName,
+        UserToName = dto.UserToName,
         TransferStatus = transferToAdd.TransferStatus.ToString(),
         TransferType = transferToAdd.TransferType.ToString()
     };
@@ -190,8 +188,6 @@ app.MapPost("/Transfer/Send", async Task<Results<BadRequest<string>, Created<Tra
     }
 
     Account accountFrom = ((await context.Accounts
-        .Include(account => account.TransferAccountIdFromNavigations)
-        .Include(account => account.TransferAccountIdToNavigations)
         .SingleOrDefaultAsync(account => account.User.Username.Equals(dto.UserFromName))))!;
 
     if (accountFrom is null)
@@ -227,8 +223,8 @@ app.MapPost("/Transfer/Send", async Task<Results<BadRequest<string>, Created<Tra
         Id = transferToAdd.Id,
         Amount = transferToAdd.Amount,
         DateCreated = transferToAdd.DateCreated,
-        UserFromName = transferToAdd.AccountIdFromNavigation.User.Username,
-        UserToName = transferToAdd.AccountIdToNavigation.User.Username,
+        UserFromName = dto.UserFromName,
+        UserToName = dto.UserToName,
         TransferStatus = transferToAdd.TransferStatus.ToString(),
         TransferType = transferToAdd.TransferType.ToString()
     };
@@ -243,7 +239,7 @@ app.MapGet("/Transfer/Details/{id:int}", async Task<Results<BadRequest<string>, 
         return TypedResults.BadRequest("Invalid transfer id.");
     }
 
-    Transfer entity = (await context.Transfers.SingleOrDefaultAsync(t => t.Id.Equals(id)))!;
+    Transfer entity = (await context.Transfers.Include(t => t.AccountIdToNavigation).Include(t => t.AccountIdFromNavigation).SingleOrDefaultAsync(t => t.Id.Equals(id)))!;
 
     if (entity is null)
     {
@@ -265,7 +261,7 @@ app.MapGet("/Transfer/Details/{id:int}", async Task<Results<BadRequest<string>, 
 
 }).RequireAuthorization("requireauthuser");
 
-app.MapPost("/User/Register", async Task<Results<BadRequest<string>, Conflict<string>, Created<UserDTO>>> (Context context, IPasswordHasher passwordHasher, LogInUser registerUser) =>
+app.MapPost("/User/Register", async Task<Results<BadRequest<string>, Conflict<string>, Created<UserDTO>>> (Context context, IPasswordHasher passwordHasher, LogInUserDTO registerUser) =>
 {
     if (!registerUser.IsValid())
     {
@@ -306,7 +302,7 @@ app.MapPost("/User/Register", async Task<Results<BadRequest<string>, Conflict<st
     return TypedResults.Created($"/User/{dto.Id}", dto);
 });
 
-app.MapPost("/User/LogIn", async Task<Results<BadRequest<string>, UnauthorizedHttpResult, Ok<UserDTO>>> (Context context, IPasswordHasher passwordHasher, ITokenGenerator tokenGenerator, LogInUser logInUser) =>
+app.MapPost("/User/LogIn", async Task<Results<BadRequest<string>, UnauthorizedHttpResult, Ok<UserDTO>>> (Context context, IPasswordHasher passwordHasher, ITokenGenerator tokenGenerator, LogInUserDTO logInUser) =>
 {
     if (!logInUser.IsValid())
     {
@@ -331,7 +327,12 @@ app.MapPost("/User/LogIn", async Task<Results<BadRequest<string>, UnauthorizedHt
         string token = tokenGenerator.GenerateToken(user.Id, user.Username);
 
         // Create a ReturnUser object to return to the client
-        UserDTO dto = new() { Id = user.Id, Username = user.Username, Token = token };
+        UserDTO dto = new()
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Token = token,
+        };
 
         return TypedResults.Ok(dto);
     }
@@ -344,7 +345,7 @@ app.MapGet("/User/Account/Details/{id:int}", async Task<Results<BadRequest<strin
         return TypedResults.BadRequest("Invalid user id.");
     }
 
-    Account entity = (await context.Accounts.SingleOrDefaultAsync(a => a.User.Id.Equals(id)))!;
+    Account entity = (await context.Accounts.Include(a => a.User).SingleOrDefaultAsync(a => a.User.Id.Equals(id)))!;
 
     if (entity is null)
     {
@@ -422,8 +423,10 @@ app.MapGet("/User/Transfer/Completed/{id:int}", Results<BadRequest<string>, NotF
         return TypedResults.BadRequest("Invalid user id.");
     }
 
-    IEnumerable<Transfer> entities = context.Transfers.
-        Where(t => (t.AccountIdFromNavigation.UserId.Equals(id) || t.AccountIdToNavigation.UserId.Equals(id))
+    IEnumerable<Transfer> entities = context.Transfers
+        .Include(t => t.AccountIdToNavigation)
+        .Include(t => t.AccountIdFromNavigation)
+        .Where(t => (t.AccountIdFromNavigation.UserId.Equals(id) || t.AccountIdToNavigation.UserId.Equals(id))
             && !t.TransferStatusId.Equals((int)TransferStatus.Pending))
         .OrderByDescending(t => t.DateCreated)
         .AsEnumerable<Transfer>();
@@ -462,8 +465,10 @@ app.MapGet("/User/Transfer/Pending/{id}", Results<BadRequest<string>, NotFound<s
         return TypedResults.BadRequest("Invalid user id.");
     }
 
-    IEnumerable<Transfer> entities = context.Transfers.
-        Where(t => (t.AccountIdFromNavigation.UserId.Equals(id) || t.AccountIdToNavigation.UserId.Equals(id))
+    IEnumerable<Transfer> entities = context.Transfers
+        .Include(t => t.AccountIdToNavigation)
+        .Include(t => t.AccountIdFromNavigation)
+        .Where(t => (t.AccountIdFromNavigation.UserId.Equals(id) || t.AccountIdToNavigation.UserId.Equals(id))
             && t.TransferStatusId.Equals((int)TransferStatus.Pending))
         .OrderByDescending(t => t.DateCreated)
         .AsEnumerable<Transfer>();
