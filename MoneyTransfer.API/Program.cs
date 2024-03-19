@@ -239,7 +239,12 @@ app.MapGet("/Transfer/Details/{id:int}", async Task<Results<BadRequest<string>, 
         return TypedResults.BadRequest("Invalid transfer id.");
     }
 
-    Transfer entity = (await context.Transfers.Include(t => t.AccountIdToNavigation).Include(t => t.AccountIdFromNavigation).SingleOrDefaultAsync(t => t.Id.Equals(id)))!;
+    Transfer entity = (await context.Transfers
+        .Include(t => t.AccountIdToNavigation)
+        .ThenInclude(a => a.User)
+        .Include(t => t.AccountIdFromNavigation)
+        .ThenInclude(a => a.User)
+        .SingleOrDefaultAsync(t => t.Id.Equals(id)))!;
 
     if (entity is null)
     {
@@ -346,7 +351,11 @@ app.MapGet("/User/Account/Details/{id:int}", async Task<Results<BadRequest<strin
         return TypedResults.BadRequest("Invalid user id.");
     }
 
-    Account entity = (await context.Accounts.Include(a => a.User).SingleOrDefaultAsync(a => a.User.Id.Equals(id)))!;
+    Account entity = (await context.Accounts
+        .Include(a => a.User)
+        .Include(a => a.TransferAccountIdFromNavigations)
+        .Include(a => a.TransferAccountIdToNavigations)
+        .SingleOrDefaultAsync(a => a.UserId.Equals(id)))!;
 
     if (entity is null)
     {
@@ -426,13 +435,15 @@ app.MapGet("/User/Transfer/Completed/{id:int}", Results<BadRequest<string>, NotF
 
     IEnumerable<Transfer> entities = context.Transfers
         .Include(t => t.AccountIdToNavigation)
+        .ThenInclude(a => a.User)
         .Include(t => t.AccountIdFromNavigation)
+        .ThenInclude(a => a.User)
         .Where(t => (t.AccountIdFromNavigation.UserId.Equals(id) || t.AccountIdToNavigation.UserId.Equals(id))
             && !t.TransferStatusId.Equals((int)TransferStatus.Pending))
         .OrderByDescending(t => t.DateCreated)
         .AsEnumerable<Transfer>();
 
-    if (entities is null || !entities.Any())
+    if (entities is null)
     {
         return TypedResults.NotFound("No completed transfers found.");
     }
@@ -468,13 +479,15 @@ app.MapGet("/User/Transfer/Pending/{id}", Results<BadRequest<string>, NotFound<s
 
     IEnumerable<Transfer> entities = context.Transfers
         .Include(t => t.AccountIdToNavigation)
+        .ThenInclude(a => a.User)
         .Include(t => t.AccountIdFromNavigation)
+        .ThenInclude(a => a.User)
         .Where(t => (t.AccountIdFromNavigation.UserId.Equals(id) || t.AccountIdToNavigation.UserId.Equals(id))
             && t.TransferStatusId.Equals((int)TransferStatus.Pending))
         .OrderByDescending(t => t.DateCreated)
         .AsEnumerable<Transfer>();
 
-    if (entities is null || !entities.Any())
+    if (entities is null)
     {
         return TypedResults.NotFound("No pending transfers found.");
     }
