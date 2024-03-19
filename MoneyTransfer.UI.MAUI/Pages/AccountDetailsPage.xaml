@@ -9,18 +9,18 @@
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand, Mode=OneWay}" />
     </ContentPage.Behaviors>
-    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}" Spacing="30">
+    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayout}" Spacing="30">
         <Label Text="{Binding AccountDetails.Username, StringFormat='Hello, {0}', Mode=OneWay}" FontSize="28" 
                TextColor="{StaticResource Primary}" />
         <HorizontalStackLayout Spacing="10">
-            <Label Text="Your account id is:" FontSize="18" TextColor="{StaticResource PrimaryDarkText}" VerticalOptions="Center" />
+            <Label Text="Your account id is:" FontSize="18" TextColor="{StaticResource PrimaryDarkText}" />
             <Label Text="{Binding AccountDetails.Id, Mode=OneWay}" FontSize="24" TextColor="{StaticResource Tertiary}" 
-                   FontAttributes="Bold" VerticalOptions="Center" />
+                   FontAttributes="Bold" />
         </HorizontalStackLayout>
         <HorizontalStackLayout Spacing="10">
-            <Label Text="Your account balance is:" FontSize="24" TextColor="{StaticResource PrimaryDarkText}" VerticalOptions="Center" />
+            <Label Text="Your account balance is:" FontSize="24" TextColor="{StaticResource PrimaryDarkText}" />
             <Label Text="{Binding AccountDetails.CurrentBalance, StringFormat='{0:C}', Mode=OneWay}" FontSize="28" 
-                   TextColor="{StaticResource Tertiary}" FontAttributes="Bold" VerticalOptions="Center" />
+                   TextColor="{StaticResource Tertiary}" FontAttributes="Bold" />
         </HorizontalStackLayout>
         <HorizontalStackLayout Spacing="5">
             <Label Text="You've been a valued customer since" FontSize="18" TextColor="{StaticResource SecondaryDarkText}"/>

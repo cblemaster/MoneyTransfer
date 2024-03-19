@@ -9,7 +9,7 @@
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand, Mode=OneWay}" />
     </ContentPage.Behaviors>
-    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}">
+    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayout}">
         <Button Command="{Binding LogOutCommand, Mode=OneWay}" IsEnabled="{Binding CanLogOut, Mode=OneWay}" Text="Log Out" />
     </VerticalStackLayout>
 </ContentPage>

@@ -10,7 +10,7 @@
             <Setter Property="FontSize" Value="24" />
         </Style>
     </ContentPage.Resources>
-    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}" Spacing="20">
+    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayout}" Spacing="20">
         <Label Text="{Binding TransferDetails.Id, StringFormat='Transfer Id: {0}', Mode=OneWay}" TextColor="{StaticResource Primary}" />
         <Label Text="{Binding TransferDetails.UserFromName, StringFormat='User From: {0}', Mode=OneWay}" 
                TextColor="{StaticResource PrimaryDark}" FontAttributes="Bold" />

@@ -10,7 +10,7 @@
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand, Mode=OneWay}" />
     </ContentPage.Behaviors>
-    <Grid Style="{StaticResource ContainerGridStyle}" RowDefinitions="1*,9*">
+    <Grid Style="{StaticResource ContainerGrid}" RowDefinitions="1*,9*">
         <Label Text="Tap on a transfer to see more info:" TextColor="{StaticResource Primary}" />
         <CollectionView ItemsSource="{Binding TransferDetails}" SelectedItem="{Binding SelectedTransfer, Mode=TwoWay}" SelectionChangedCommand="{Binding ChangeSelectionCommand, Mode=OneWay}" SelectionMode="Single" Grid.Row="1">
             <CollectionView.ItemsLayout>

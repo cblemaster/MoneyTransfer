@@ -23,15 +23,11 @@
                 </VisualStateGroupList>
             </Setter>
         </Style>
-        <Style x:Key="InvalidEntryStyle" TargetType="Entry">
-            <Setter Property="TextColor" Value="{StaticResource Magenta}" />
-            <Setter Property="BackgroundColor" Value="{StaticResource LightPink}" />
-        </Style>
     </ContentPage.Resources>
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand, Mode=OneWay}" />
     </ContentPage.Behaviors>
-    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}" Spacing="10">
+    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayout}" Spacing="10">
         <Label Text="Step One: Select a user to send to:" TextColor="{StaticResource Primary}" />
         <CollectionView ItemsSource="{Binding Users, Mode=OneWay}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}" SelectionMode="Single">
             <CollectionView.ItemsLayout>

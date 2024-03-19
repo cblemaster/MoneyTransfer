@@ -9,13 +9,7 @@
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding PageAppearingCommand, Mode=OneWay}" />
     </ContentPage.Behaviors>
-    <ContentPage.Resources>
-        <Style x:Key="InvalidEntryStyle" TargetType="Entry">
-            <Setter Property="TextColor" Value="{StaticResource Magenta}" />
-            <Setter Property="BackgroundColor" Value="{StaticResource LightPink}" />
-        </Style>
-    </ContentPage.Resources>
-    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayoutStyle}" Spacing="20">
+    <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayout}" Spacing="20">
         <Entry Text="{Binding Username, Mode=TwoWay}" Placeholder="Username" WidthRequest="200">
             <Entry.Behaviors>
                 <toolkit:TextValidationBehavior InvalidStyle="{StaticResource InvalidEntryStyle}" Flags="ValidateOnValueChanged" MaximumLength="50" MinimumLength="1" />
