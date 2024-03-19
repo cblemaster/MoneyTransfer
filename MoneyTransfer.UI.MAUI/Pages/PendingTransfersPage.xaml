@@ -12,7 +12,7 @@
     </ContentPage.Behaviors>
     <Grid Style="{StaticResource ContainerGrid}" RowDefinitions="1*,9*">
         <Label Text="Tap on a transfer to see more info, or to approve or reject:" TextColor="{StaticResource Primary}" />
-        <CollectionView ItemsSource="{Binding TransferDetails}" SelectedItem="{Binding SelectedTransfer, Mode=TwoWay}" SelectionChangedCommand="{Binding ChangeSelectionCommand, Mode=OneWay}" SelectionMode="Single" Grid.Row="1">
+        <CollectionView ItemsSource="{Binding TransferDetails, Mode=OneWay}" SelectedItem="{Binding SelectedTransfer, Mode=TwoWay}" SelectionChangedCommand="{Binding ChangeSelectionCommand, Mode=OneWay}" SelectionMode="Single" Grid.Row="1" EmptyView="No pending transfers found.">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="3" />                
             </CollectionView.ItemsLayout>

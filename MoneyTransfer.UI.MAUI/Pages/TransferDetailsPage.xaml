@@ -25,9 +25,9 @@
         <Label Text="{Binding TransferDetails.DateCreated, StringFormat='Transfer Date: {0:d}', Mode=OneWay}"
                TextColor="{StaticResource Primary}" />
         <HorizontalStackLayout Spacing="10">
-            <Button Command="{Binding ApproveCommand}" IsEnabled="{Binding CanApprove, Mode=OneWay}" Text="Approve" />
-            <Button Command="{Binding RejectCommand}" IsEnabled="{Binding CanReject, Mode=OneWay}" Text="Reject" />
-            <Button Command="{Binding CancelCommand}" IsEnabled="{Binding CanCancel, Mode=OneWay}" Text="Back to list" />
+            <Button Command="{Binding ApproveCommand, Mode=OneWay}" IsEnabled="{Binding CanApprove, Mode=OneWay}" Text="Approve" />
+            <Button Command="{Binding RejectCommand, Mode=OneWay}" IsEnabled="{Binding CanReject, Mode=OneWay}" Text="Reject" />
+            <Button Command="{Binding CancelCommand, Mode=OneWay}" IsEnabled="{Binding CanCancel, Mode=OneWay}" Text="Back to list" />
         </HorizontalStackLayout>
     </VerticalStackLayout>
 </ContentPage>

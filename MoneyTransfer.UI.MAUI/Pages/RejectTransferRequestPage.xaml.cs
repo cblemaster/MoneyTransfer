@@ -11,7 +11,7 @@ public partial class RejectTransferRequestPage : ContentPage
         if (Shell.Current.Handler is not null && Shell.Current.Handler.MauiContext is not null)
         {
             RejectTransferRequestPageModel? pageModel = Shell.Current.Handler.MauiContext.Services.GetService<RejectTransferRequestPageModel>();
-            if (pageModel != null)
+            if (pageModel is not null)
             {
                 BindingContext = pageModel;
                 pageModel.TransferId = id;

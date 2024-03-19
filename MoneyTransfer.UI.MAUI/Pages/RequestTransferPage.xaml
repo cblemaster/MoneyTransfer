@@ -29,7 +29,7 @@
     </ContentPage.Behaviors>
     <VerticalStackLayout Style="{StaticResource ContainerVerticalStackLayout}" Spacing="10">
         <Label Text="Step One: Select a user to request from:" TextColor="{StaticResource Primary}" />
-        <CollectionView ItemsSource="{Binding Users, Mode=OneWay}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}" SelectionMode="Single">
+        <CollectionView ItemsSource="{Binding Users, Mode=OneWay}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}" SelectionMode="Single" EmptyView="No users found.">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10" />
             </CollectionView.ItemsLayout>
