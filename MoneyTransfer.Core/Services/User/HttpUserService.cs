@@ -47,7 +47,7 @@ public class HttpUserService : IUserService
         try
         {
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticatedUserService.GetToken());
-            HttpResponseMessage response = await _client.GetAsync($"/User/GetUsers");
+            HttpResponseMessage response = await _client.GetAsync($"/User");
             return response.IsSuccessStatusCode && response.Content is not null
                 ? new ReadOnlyCollection<UserDTO?>((response.Content.ReadFromJsonAsAsyncEnumerable<UserDTO?>()).ToBlockingEnumerable<UserDTO?>().Where(u => !(u?.Id).Equals(AuthenticatedUserService.GetUserId())).ToList()) ?? new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound })
                 : new ReadOnlyCollection<UserDTO?>(new List<UserDTO?> { UserDTO.UserDTONotFound });

@@ -40,5 +40,5 @@ public partial class Transfer
 
     public bool IsValidForUpdate => Validate().IsValid && Id > 0;
 
-    public bool IsValidForApproveOrReject => IsValidForUpdate && TransferStatus.Equals(Entities.TransferStatus.Pending.ToString());
+    public bool IsValidForApproveOrReject => IsValidForUpdate && TransferStatus.Equals(Entities.TransferStatus.Pending);
 }
