@@ -87,6 +87,7 @@ INSERT INTO TransferStatuses(Id, TransferStatus) VALUES(3,'Rejected');
 
 INSERT INTO TransferTypes(Id, TransferType) VALUES(1,'Request');
 INSERT INTO TransferTypes(Id, TransferType) VALUES(2,'Send');
+GO
 
 -- optional sample data
 --INSERT INTO Users (Username, PasswordHash, Salt) VALUES ('brian','placeholder','placeholder');
@@ -119,3 +120,129 @@ INSERT INTO TransferTypes(Id, TransferType) VALUES(2,'Send');
 --INSERT INTO Transfers (TransferStatusId, TransferTypeId, AccountIdFrom, AccountIdTo, Amount, DateCreated) VALUES ((SELECT ts.Id FROM TransferStatuses ts WHERE ts.TransferStatus = 'Approved'), (SELECT tt.Id FROM TransferTypes tt WHERE tt.TransferType = 'Request'), (SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = 'george'), (SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = 'bernice'), 18, GETDATE());
 --INSERT INTO Transfers (TransferStatusId, TransferTypeId, AccountIdFrom, AccountIdTo, Amount, DateCreated) VALUES ((SELECT ts.Id FROM TransferStatuses ts WHERE ts.TransferStatus = 'Approved'), (SELECT tt.Id FROM TransferTypes tt WHERE tt.TransferType = 'Send'), (SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = 'oscar'), (SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = 'george'), 20, GETDATE());
 --INSERT INTO Transfers (TransferStatusId, TransferTypeId, AccountIdFrom, AccountIdTo, Amount, DateCreated) VALUES ((SELECT ts.Id FROM TransferStatuses ts WHERE ts.TransferStatus = 'Pending'), (SELECT tt.Id FROM TransferTypes tt WHERE tt.TransferType = 'Request'), (SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = 'george'), (SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = 'brian'), 35, GETDATE());
+
+-- optional view and stored procedures
+CREATE VIEW TransferDetails
+AS
+SELECT t.Id, ts.TransferStatus, tt.TransferType, t.Amount, t.DateCreated, uFrom.Username AS 'From', uTo.Username AS 'To' 
+FROM Transfers t
+INNER JOIN TransferStatuses ts ON t.TransferStatusId = ts.Id
+INNER JOIN TransferTypes tt ON t.TransferTypeId = tt.Id
+INNER JOIN Accounts aFrom ON t.AccountIdFrom = aFrom.Id
+INNER JOIN Accounts aTo ON t.AccountIdTo = aTo.Id
+INNER JOIN Users uFrom ON aFrom.UserId = uFrom.Id
+INNER JOIN Users uTo ON aTo.UserId = uTo.Id;
+GO
+
+CREATE PROCEDURE GetAccountDetailsForUser(@userId INT)
+AS
+BEGIN
+	SET NOCOUNT ON
+	DECLARE @currentBalance decimal;
+
+	SET @currentBalance = (SELECT a.StartingBalance FROM Accounts a WHERE a.Id = @userID)
+	   + (SELECT SUM(t.Amount) FROM Transfers t INNER JOIN Accounts a ON (t.AccountIdTo = a.Id) INNER JOIN TransferStatuses ts ON (t.TransferStatusId = ts.Id) WHERE a.Id = @userID AND ts.TransferStatus = 'Approved')
+	   - (SELECT SUM(t.Amount) FROM Transfers t INNER JOIN Accounts a ON (t.AccountIdFrom = a.Id) INNER JOIN TransferStatuses ts ON (t.TransferStatusId = ts.Id) WHERE a.Id = @userID AND ts.TransferStatus = 'Approved');
+
+	SELECT u.Username, a.Id, @currentBalance AS CurrentBalance, a.DateCreated FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE a.Id = @userID;
+END
+GO
+
+CREATE PROCEDURE GetTransferDetailsById(@transferId INT)
+AS
+BEGIN
+	SET NOCOUNT ON
+	SELECT *
+	FROM TransferDetails t
+	WHERE t.Id = @transferId;
+END
+GO
+
+CREATE PROCEDURE GetCompletedTransfersForUser(@userId INT)
+AS
+BEGIN
+	SET NOCOUNT ON
+	SELECT *
+	FROM TransferDetails t
+	WHERE (t.[From] = (SELECT u.Username FROM Users u WHERE u.Id = @userId) OR (t.[To] = (SELECT u.Username FROM Users u WHERE u.Id = @userId)))
+	AND t.TransferStatus <> 'Pending';
+END
+GO
+
+CREATE PROCEDURE GetPendingTransfersForUser(@userId INT)
+AS
+BEGIN
+	SET NOCOUNT ON
+	SELECT *
+	FROM TransferDetails t
+	WHERE (t.[From] = (SELECT u.Username FROM Users u WHERE u.Id = @userId) OR (t.[To] = (SELECT u.Username FROM Users u WHERE u.Id = @userId)))
+	AND t.TransferStatus = 'Pending';
+END
+GO
+
+CREATE PROCEDURE RequestTransfer(@userFrom varchar(50), @userTo varchar(50), @amount decimal)
+AS
+BEGIN
+	SET NOCOUNT ON
+	INSERT INTO Transfers (TransferStatusId, TransferTypeId, AccountIdFrom, AccountIdTo, Amount, DateCreated)
+		VALUES(
+			(SELECT ts.Id FROM TransferStatuses ts WHERE ts.TransferStatus = 'Pending'),
+			(SELECT tt.Id FROM TransferTypes tt WHERE tt.TransferType = 'Request'),
+			(SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = @userFrom),
+			(SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = @userTo),
+			@amount,
+			CAST(GETDATE() AS DATE))
+END
+GO
+
+CREATE PROCEDURE SendTransfer(@userFrom varchar(50), @userTo varchar(50), @amount decimal)
+AS
+BEGIN
+	SET NOCOUNT ON
+	INSERT INTO Transfers (TransferStatusId, TransferTypeId, AccountIdFrom, AccountIdTo, Amount, DateCreated)
+		VALUES(
+			(SELECT ts.Id FROM TransferStatuses ts WHERE ts.TransferStatus = 'Approved'),
+			(SELECT tt.Id FROM TransferTypes tt WHERE tt.TransferType = 'Send'),
+			(SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = @userFrom),
+			(SELECT a.Id FROM Accounts a INNER JOIN Users u ON (a.UserId = u.Id) WHERE u.Username = @userTo),
+			@amount,
+			CAST(GETDATE() AS DATE))
+END
+GO
+
+CREATE PROCEDURE ApproveTransfer(@transferId int)
+AS
+BEGIN
+	SET NOCOUNT ON
+	UPDATE Transfers SET TransferStatusId = (SELECT ts.Id FROM TransferStatuses ts WHERE ts.TransferStatus = 'Approved');
+END
+GO
+
+CREATE PROCEDURE RejectTransfer(@transferId int)
+AS
+BEGIN
+	SET NOCOUNT ON
+	UPDATE Transfers SET TransferStatusId = (SELECT ts.Id FROM TransferStatuses ts WHERE ts.TransferStatus = 'Rejected');
+END
+GO
+
+CREATE PROCEDURE GetAllUsernames
+AS
+BEGIN
+	SELECT u.Username FROM Users u
+END
+GO
+
+CREATE PROCEDURE GetAllUsers
+AS
+BEGIN
+	SELECT u.Id, u.Username FROM Users u;
+END
+GO
+
+CREATE PROCEDURE GetUserById(@userId int)
+AS
+BEGIN
+	SELECT u.Id, u.Username FROM Users u WHERE u.Id = @userId;
+END
+GO
