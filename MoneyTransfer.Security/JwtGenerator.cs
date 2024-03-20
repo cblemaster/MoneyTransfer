@@ -13,18 +13,18 @@ namespace MoneyTransfer.Security
 
         public string GenerateToken(int userId, string username, string role)
         {
-            List<Claim> claims = new()
-            {
+            List<Claim> claims =
+            [
                 new Claim("sub", userId.ToString()),
                 new Claim("name", username),
-            };
+            ];
 
             if (!string.IsNullOrWhiteSpace(role))
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            var tokenDescriptor = new SecurityTokenDescriptor
+            SecurityTokenDescriptor tokenDescriptor = new()
             {
                 Subject = new ClaimsIdentity(claims),
                 IssuedAt = DateTime.UtcNow,
@@ -32,8 +32,8 @@ namespace MoneyTransfer.Security
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(JwtSecret)), SecurityAlgorithms.HmacSha256Signature),
             };
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            JwtSecurityTokenHandler tokenHandler = new();
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
         }
