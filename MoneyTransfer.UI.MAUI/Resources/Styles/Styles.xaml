@@ -7,6 +7,7 @@
     <Style x:Key="InvalidEntryStyle" TargetType="Entry">
         <Setter Property="TextColor" Value="{StaticResource Magenta}" />
         <Setter Property="BackgroundColor" Value="{StaticResource LightPink}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource White}" />
     </Style>
 
     <Style TargetType="Grid" x:Key="ContainerGrid">
