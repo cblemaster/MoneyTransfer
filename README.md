@@ -57,7 +57,7 @@
 
 ## Improvement opportunities:
 - Additional UIs: other web and desktop UIs could easily be built on top of the API and security layers
-- Register user UI needs better error reporting for invalid username and password inputs
+- Register user UI needs better error reporting for invalid username and password inputs, and username already used
 - Log in user UI needs better error reporting for invalid username and password inputs, and incorrect password
 - There is some xaml duplication in the MAUI project pages that have similar functionality (send transfer/request transfer, approve transfer request/reject transfer request, completed transfers/pending transfers); this could be remediated with content templates but this might also introduce complications with data bindings
 - The http data service in the MAUI project seems a bit slow, look for performance improvements there
