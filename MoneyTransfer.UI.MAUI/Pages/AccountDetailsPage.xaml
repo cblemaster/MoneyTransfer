@@ -13,9 +13,9 @@
         <Label Text="{Binding AccountDetails.Username, StringFormat='Hello, {0}', Mode=OneWay}" FontSize="28" 
                TextColor="{StaticResource Primary}" />
         <HorizontalStackLayout Spacing="10">
-            <Label Text="Your account id is:" FontSize="18" TextColor="{StaticResource PrimaryDarkText}" />
+            <Label Text="Your account id is:" FontSize="18" TextColor="{StaticResource PrimaryDarkText}" VerticalOptions="Center" />
             <Label Text="{Binding AccountDetails.Id, Mode=OneWay}" FontSize="24" TextColor="{StaticResource Tertiary}" 
-                   FontAttributes="Bold" />
+                   FontAttributes="Bold" VerticalOptions="Center" />
         </HorizontalStackLayout>
         <HorizontalStackLayout Spacing="10">
             <Label Text="Your account balance is:" FontSize="24" TextColor="{StaticResource PrimaryDarkText}" />
